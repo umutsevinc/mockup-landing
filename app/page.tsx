@@ -122,13 +122,10 @@ export default function Home() {
             </motion.div>
           </div>
 
-          {/* Right: 3D device */}
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3, duration: 1, ease: [0.16, 1, 0.3, 1] }} className="flex-1 w-full h-[450px] md:h-[550px] relative">
-            <HeroDevice />
-            {/* Hint */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-[#555557] tracking-wider uppercase flex items-center gap-1.5 opacity-60">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 9l7 7 7-7"/></svg>
-              Move your cursor to interact
+          {/* Right: interactive 3D device */}
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3, duration: 1, ease: [0.16, 1, 0.3, 1] }} className="flex-1 w-full h-[480px] md:h-[560px]">
+            <div className="bento-card bento-glow h-full rounded-2xl">
+              <HeroDevice />
             </div>
           </motion.div>
         </motion.div>
@@ -172,19 +169,27 @@ export default function Home() {
 
           {/* Row 2: 3 equal */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            {[
-              { icon: I.dl, color: "green", title: "One-click export", desc: "4K PNG, transparent backgrounds, or looping video. Portfolio-ready in one click." },
-              { icon: I.cam, color: "cyan", title: "Camera presets", desc: "Curated angles or free orbit. Lock the perfect shot for consistent exports." },
-              { icon: I.sun, color: "amber", title: "Environments", desc: "Studio lighting, HDR environments, adjustable intensity. Perfect backdrop every time." },
-            ].map((f, i) => (
-              <R key={f.title} delay={i * 0.06}>
-                <div className="bento-card p-8 h-full min-h-[220px]">
-                  <div className={`w-11 h-11 rounded-[14px] bg-${f.color}-500/10 flex items-center justify-center text-${f.color}-400 mb-5`}>{f.icon}</div>
-                  <h3 className="text-[16px] font-semibold tracking-[-0.02em] text-[#ededef] mb-2">{f.title}</h3>
-                  <p className="text-[13px] text-[#8b8b8d] leading-relaxed">{f.desc}</p>
-                </div>
-              </R>
-            ))}
+            <R delay={0}>
+              <div className="bento-card p-8 h-full min-h-[220px]">
+                <div className="w-11 h-11 rounded-[14px] bg-green-500/10 flex items-center justify-center text-green-400 mb-5">{I.dl}</div>
+                <h3 className="text-[16px] font-semibold tracking-[-0.02em] text-[#ededef] mb-2">One-click export</h3>
+                <p className="text-[13px] text-[#8b8b8d] leading-relaxed">4K PNG, transparent backgrounds, or looping video. Portfolio-ready in one click.</p>
+              </div>
+            </R>
+            <R delay={0.06}>
+              <div className="bento-card p-8 h-full min-h-[220px]">
+                <div className="w-11 h-11 rounded-[14px] bg-cyan-500/10 flex items-center justify-center text-cyan-400 mb-5">{I.cam}</div>
+                <h3 className="text-[16px] font-semibold tracking-[-0.02em] text-[#ededef] mb-2">Camera presets</h3>
+                <p className="text-[13px] text-[#8b8b8d] leading-relaxed">Curated angles or free orbit. Lock the perfect shot for consistent exports.</p>
+              </div>
+            </R>
+            <R delay={0.12}>
+              <div className="bento-card p-8 h-full min-h-[220px]">
+                <div className="w-11 h-11 rounded-[14px] bg-amber-500/10 flex items-center justify-center text-amber-400 mb-5">{I.sun}</div>
+                <h3 className="text-[16px] font-semibold tracking-[-0.02em] text-[#ededef] mb-2">Environments</h3>
+                <p className="text-[13px] text-[#8b8b8d] leading-relaxed">Studio lighting, HDR environments, adjustable intensity. Perfect backdrop every time.</p>
+              </div>
+            </R>
           </div>
 
           {/* Row 3: 1 standard + 1 wide */}
