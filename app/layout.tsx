@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Mockup for Framer — 3D Device Mockups in Seconds",
+  title: "Framer Mockup — 3D Device Mockups in Seconds",
   description:
     "Create stunning 3D interactive mockups of Apple devices directly inside Framer. iPhone, iPad, iMac, Apple Watch — all in real-time 3D.",
   keywords: [
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "interactive",
   ],
   openGraph: {
-    title: "Mockup for Framer",
+    title: "Framer Mockup",
     description: "3D interactive device mockups inside Framer",
     type: "website",
   },
