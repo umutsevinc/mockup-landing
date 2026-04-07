@@ -122,7 +122,7 @@ export default function HeroDevice() {
   const orbitRef = useRef<any>(null);
 
   const [screenTex, setScreenTex] = useState<THREE.Texture | null>(null);
-  const [autoRotate, setAutoRotate] = useState(true);
+  const [autoRotate, setAutoRotate] = useState(false);
   const [followMouse, setFollowMouse] = useState(false);
   const [floatOn, setFloatOn] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
