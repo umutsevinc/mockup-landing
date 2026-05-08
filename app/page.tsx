@@ -91,7 +91,7 @@ export default function Home() {
       </section>
 
       {/* ══ S2 — PAIN POINTS (light) ══ */}
-      <section style={{ background: "#F5F5F7", padding: "56px 24px" }}>
+      <section className="section-light" style={{ padding: "60px 24px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <A className="text-center mb-8"><h2 style={{ color: "#1D1D1F" }}>Still exporting flat screenshots?</h2></A>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -112,7 +112,7 @@ export default function Home() {
       </section>
 
       {/* ══ S3 — HOW IT WORKS (light) ══ */}
-      <section id="how" style={{ background: "#FAFAFA", padding: "56px 24px" }}>
+      <section id="how" style={{ background: "#FAFAFA", padding: "60px 24px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <A className="text-center mb-10"><h2 style={{ color: "#1D1D1F" }}>3D mockups in 3 clicks</h2></A>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -137,7 +137,7 @@ export default function Home() {
       </section>
 
       {/* ══ S4 — FEATURE BENTO (dark) ══ */}
-      <section id="features" style={{ background: "var(--bg-primary)", padding: "56px 24px" }}>
+      <section id="features" style={{ background: "var(--bg-primary)", padding: "60px 24px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <A className="text-center mb-10"><h2>Everything you need.</h2></A>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3">
@@ -196,7 +196,7 @@ export default function Home() {
       </section>
 
       {/* ══ S5 — PRICING (light) ══ */}
-      <section id="pricing" style={{ background: "#F5F5F7", padding: "56px 24px" }}>
+      <section id="pricing" className="section-light" style={{ padding: "60px 24px" }}>
         <div style={{ maxWidth: 960, margin: "0 auto" }}>
           <A className="text-center mb-3"><h2 style={{ color: "#1D1D1F" }}>Simple, transparent pricing.</h2></A>
           <A className="text-center mb-8" delay={0.05}>
@@ -235,7 +235,7 @@ export default function Home() {
       </section>
 
       {/* ══ S6 — TESTIMONIALS (dark) ══ */}
-      <section style={{ background: "var(--bg-primary)", padding: "56px 24px" }}>
+      <section style={{ background: "var(--bg-primary)", padding: "60px 24px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <A className="text-center mb-8"><h2>Designers love it.</h2></A>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
