@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { motion, useInView } from "framer-motion";
@@ -36,9 +36,41 @@ function A({ children, className = "", delay = 0, scale = true }: { children: Re
 
 export default function Home() {
   const [yearly, setYearly] = useState(false);
+  const [showCheckoutBanner, setShowCheckoutBanner] = useState(false);
+  const [checkoutPlan, setCheckoutPlan] = useState("");
+
+  // Detect checkout success/cancel from URL params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const checkout = params.get("checkout");
+    const plan = params.get("plan");
+    if (checkout === "success" && plan) {
+      setShowCheckoutBanner(true);
+      setCheckoutPlan(plan);
+      // Clean URL
+      window.history.replaceState({}, "", window.location.pathname);
+      // Auto-hide after 8s
+      setTimeout(() => setShowCheckoutBanner(false), 8000);
+    }
+  }, []);
 
   return (
     <div className="flex flex-col">
+
+      {/* Checkout success banner */}
+      {showCheckoutBanner && (
+        <div style={{
+          position: "fixed", top: 64, left: "50%", transform: "translateX(-50%)",
+          zIndex: 100, padding: "12px 24px", borderRadius: 12,
+          background: "rgba(29,158,117,0.15)", border: "1px solid rgba(29,158,117,0.3)",
+          color: "#1D9E75", fontSize: 14, fontWeight: 600, backdropFilter: "blur(12px)",
+          display: "flex", alignItems: "center", gap: 8,
+        }}>
+          <span style={{ fontSize: 18 }}>&#10003;</span>
+          Welcome to {checkoutPlan}! You can now close this tab and return to Framer.
+          <button onClick={() => setShowCheckoutBanner(false)} style={{ background: "none", border: "none", color: "#1D9E75", cursor: "pointer", fontSize: 18, marginLeft: 8 }}>&times;</button>
+        </div>
+      )}
 
       {/* ══ NAV ══ */}
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, backdropFilter: "blur(20px) saturate(150%)", background: "rgba(5,5,9,0.7)", borderBottom: "1px solid var(--border-subtle)" }}>
