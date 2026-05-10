@@ -76,14 +76,14 @@ export default function Home() {
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, backdropFilter: "blur(20px) saturate(150%)", background: "rgba(5,5,9,0.7)", borderBottom: "1px solid var(--border-subtle)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56, padding: "0 24px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <Image src="/logo/white.png" alt="Framer Mockup" width={22} height={22} style={{ borderRadius: 6 }} />
-            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)", letterSpacing: "-0.01em" }}>Framer Mockup</span>
+            <Image src="/logo/white.png" alt="Memselon Mockup" width={22} height={22} style={{ borderRadius: 6 }} />
+            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)", letterSpacing: "-0.01em" }}>Memselon Mockup</span>
           </div>
           <div className="hidden md:flex" style={{ gap: 28, fontSize: 14, color: "var(--text-secondary)" }}>
-            {["Features", "Pricing"].map(l => <a key={l} href={`#${l.toLowerCase()}`} style={{ textDecoration: "none", color: "inherit" }}>{l}</a>)}
+            {["Features", "Pricing", "FAQ"].map(l => <a key={l} href={`#${l.toLowerCase()}`} style={{ textDecoration: "none", color: "inherit" }}>{l}</a>)}
           </div>
           <a href="https://www.framer.com/marketplace/plugins/mockup-for-framer/" target="_blank" rel="noopener noreferrer" style={{ height: 36, padding: "0 18px", borderRadius: 9999, background: "var(--cta-gradient)", color: "#fff", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", textDecoration: "none" }}>
-            Get the plugin
+            Try free
           </a>
         </div>
       </nav>
@@ -307,11 +307,11 @@ export default function Home() {
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
           <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4">
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Image src="/logo/white.png" alt="Framer Mockup" width={16} height={16} style={{ borderRadius: 4 }} />
-              <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>Framer Mockup</span>
+              <Image src="/logo/white.png" alt="Memselon Mockup" width={16} height={16} style={{ borderRadius: 4 }} />
+              <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>Memselon Mockup</span>
             </div>
             <div style={{ display: "flex", gap: 20, fontSize: 11, color: "var(--text-tertiary)" }}>
-              {["Features", "Pricing"].map(l => <a key={l} href={`#${l.toLowerCase()}`} style={{ color: "inherit", textDecoration: "none" }}>{l}</a>)}
+              {["Features", "Pricing", "FAQ"].map(l => <a key={l} href={`#${l.toLowerCase()}`} style={{ color: "inherit", textDecoration: "none" }}>{l}</a>)}
             </div>
           </div>
           <div style={{ fontSize: 10, color: "rgba(72,72,74,0.4)" }}>
