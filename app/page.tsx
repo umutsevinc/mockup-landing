@@ -93,27 +93,26 @@ export default function Home() {
         <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10 flex-1">
           <div className="md:w-[45%] flex flex-col justify-center text-center md:text-left">
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.5 }}>
-              <div className="pill w-fit mx-auto md:mx-0 mb-5">
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent-teal)", display: "inline-block" }} />
-                Try it live — no signup needed
+              <div style={{ display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--text-secondary)", opacity: 0.7, marginBottom: 18 }} className="mx-auto md:mx-0">
+                Real 3D. Real-time. In Framer.
               </div>
             </motion.div>
             <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }}>
-              Your designs<br />deserve depth.
+              The first real-time 3D mockup studio for Framer.
             </motion.h1>
-            <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.5 }} style={{ fontSize: "clamp(16px, 1.8vw, 20px)", color: "var(--text-secondary)", maxWidth: 400, margin: "12px auto 28px", lineHeight: 1.5 }} className="md:mx-0">
-              Drop your screenshot on a real 3D iPhone. Rotate. Animate. Export in 4K. All inside Framer.
+            <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.5 }} style={{ fontSize: "clamp(16px, 1.8vw, 20px)", color: "var(--text-secondary)", maxWidth: 480, margin: "12px auto 28px", lineHeight: 1.5 }} className="md:mx-0">
+              Stop exporting PNGs from Rotato or Previewed. Memselon Mockup ships real 3D — live, scrollable, interactive — straight into your Framer site.
             </motion.p>
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }} className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
               <a href="https://www.framer.com/marketplace/plugins/mockup-for-framer/" target="_blank" rel="noopener noreferrer" style={{ height: 46, padding: "0 24px", borderRadius: 12, background: "var(--cta-gradient)", color: "#fff", fontSize: 14, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-                Get the plugin — it{"'"}s free
+                Try free
               </a>
               <a href="#how" style={{ height: 46, padding: "0 24px", borderRadius: 12, border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", fontSize: 14, fontWeight: 500, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
-                Watch demo
+                See it live
               </a>
             </motion.div>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} style={{ fontSize: 13, color: "var(--text-tertiary)", marginTop: 20 }}>
-              Used by <strong style={{ color: "var(--text-secondary)" }}>200+</strong> Framer designers
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} style={{ fontSize: 13, color: "var(--text-tertiary)", marginTop: 20, opacity: 0.7 }}>
+              Built by a certified Framer Partner Expert from Strasbourg ☁️
             </motion.p>
           </div>
           <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15, duration: 0.9, ease: [0.16, 1, 0.3, 1] }} className="md:w-[55%] w-full">
