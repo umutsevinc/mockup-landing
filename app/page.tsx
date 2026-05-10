@@ -124,12 +124,12 @@ export default function Home() {
       {/* ══ S2 — PAIN POINTS (light) ══ */}
       <section className="section-light" style={{ padding: "60px 24px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <A className="text-center mb-8"><h2 style={{ color: "#1D1D1F" }}>Still exporting flat screenshots?</h2></A>
+          <A className="text-center mb-8"><h2 style={{ color: "#1D1D1F" }}>Why are you still exporting PNGs?</h2></A>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {[
-              { title: "Mockup sites are generic", desc: "Same angles, same devices, same look. Your portfolio blends in." },
-              { title: "3D tools are overkill", desc: "Blender, Cinema 4D, After Effects — months of learning for one mockup." },
-              { title: "External tools break your flow", desc: "Export, upload, download, re-import. Why leave your editor?" },
+              { title: "Static mockup tools fall flat", desc: "Rotato, Previewed, Device Frames — they all export PNG or MP4 you import as static images. Your site looks frozen." },
+              { title: "3D tools are overkill", desc: "Blender, Cinema 4D, After Effects — months of learning for one mockup that's still just a video file." },
+              { title: "External tools break your flow", desc: "Export from one app, upload, download, re-import in Framer. Every screenshot change. Every iteration." },
             ].map((c, i) => (
               <A key={c.title} delay={i * 0.08}>
                 <div style={{ background: "#fff", border: "1px solid rgba(0,0,0,0.06)", borderRadius: 16, padding: 28 }}>
@@ -149,8 +149,8 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {[
               { n: "01", title: "Pick your device", desc: "iPhone 17 Pro, iPhone Air, iPad Pro, iMac, Apple Watch Ultra.", color: "#7F77DD" },
-              { n: "02", title: "Drop your design", desc: "Drag any screenshot or Framer export. Image, video, or Lottie.", color: "#1D9E75" },
-              { n: "03", title: "Export in 4K", desc: "One click. 4K PNG, transparent background, no watermark.", color: "#7F77DD" },
+              { n: "02", title: "Drop your design", desc: "Drag any screenshot or video. Image, video, or Lottie.", color: "#1D9E75" },
+              { n: "03", title: "Embed live in Framer", desc: "Save your scene. Drop the 3D component on any page. Real-time render, no PNG exports needed. Or capture a 4K snapshot when you need a static asset.", color: "#7F77DD" },
             ].map((s, i) => (
               <A key={s.n} delay={i * 0.1}>
                 <div style={{ background: "#fff", border: "1px solid rgba(0,0,0,0.06)", borderRadius: 16, padding: "32px 28px", position: "relative", overflow: "hidden" }}>
