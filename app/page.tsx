@@ -114,7 +114,7 @@ export default function Home() {
               </a>
             </motion.div>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} style={{ fontSize: 13, color: "var(--text-tertiary)", marginTop: 20, opacity: 0.7 }}>
-              Built by a certified Framer Partner Expert from Strasbourg ☁️
+              Built by a certified Framer Partner Expert · Crafted by a human ☁️
             </motion.p>
           </div>
           <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15, duration: 0.9, ease: [0.16, 1, 0.3, 1] }} className="md:w-[55%] w-full">
@@ -285,7 +285,7 @@ export default function Home() {
               style={{ height: 48, padding: "0 24px", borderRadius: 12, border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", fontSize: 14, fontWeight: 500, display: "inline-flex", alignItems: "center", textDecoration: "none" }}
             />
           </div>
-          <p style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 18, opacity: 0.7 }}>Built by a Framer Partner Expert from Strasbourg ☁️</p>
+          <p style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 18, opacity: 0.7 }}>Crafted by a human ☁️</p>
         </A>
       </section>
 
@@ -339,7 +339,7 @@ export default function Home() {
           {/* Bottom bar */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-3" style={{ paddingTop: 24, borderTop: "1px solid var(--border-subtle)" }}>
             <div style={{ fontSize: 11, color: "rgba(72,72,74,0.6)" }}>
-              © 2026 Memselon ☁️ · Made in Strasbourg, France · Available worldwide
+              © 2026 Memselon ☁️ · Crafted by a human · Available worldwide
             </div>
             <div style={{ display: "flex", gap: 16, fontSize: 11, color: "var(--text-tertiary)" }}>
               <a href="/privacy" style={{ color: "inherit", textDecoration: "none" }}>Privacy</a>

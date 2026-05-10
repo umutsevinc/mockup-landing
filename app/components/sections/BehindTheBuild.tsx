@@ -55,7 +55,7 @@ export default function BehindTheBuild() {
         </A>
         <A delay={0.15}>
           <p style={{ color: "var(--text-secondary)", fontSize: 17, lineHeight: 1.7, maxWidth: 620, margin: "0 auto 28px" }}>
-            Hey, I&apos;m Umut — design engineer based in Strasbourg, building cinematic web experiences for clients like Jetfly Aviation and BBA Studio. After hours of exporting PNGs from Rotato and re-importing them every time a screenshot changed, I asked: why is there no native 3D in Framer? So I built Memselon Mockup. Real 3D. Real-time. No exports.
+            Hey, I&apos;m Umut — design engineer building cinematic web experiences for clients like Jetfly Aviation and BBA Studio. Solo human shipping immersive Framer tools ☁️
           </p>
         </A>
         <A delay={0.25}>

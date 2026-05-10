@@ -25,7 +25,7 @@ export default function PrivacyPage() {
         <p style={{ fontSize: 13, color: "var(--text-tertiary)", marginBottom: 40 }}>Effective date: May 10, 2026</p>
 
         <Section title="1. Who we are">
-          <p>Memselon Mockup is a Framer plugin and web service operated by Umut Sevinc, currently registered as a sole proprietor in Strasbourg, France (with planned migration to a private limited company in Estonia). You can reach us at <a href="mailto:contact@memselon.com" style={linkStyle}>contact@memselon.com</a>.</p>
+          <p>Memselon Mockup is a Framer plugin and web service operated by Umut Sevinc, currently registered as a sole proprietor in France (with planned migration to a private limited company in Estonia). You can reach us at <a href="mailto:contact@memselon.com" style={linkStyle}>contact@memselon.com</a>.</p>
         </Section>
 
         <Section title="2. What data we collect">

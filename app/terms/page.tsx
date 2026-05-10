@@ -26,7 +26,7 @@ export default function TermsPage() {
 
         <Section title="1. Agreement">
           <p>By using Memselon Mockup (the &ldquo;Service&rdquo;) — including the Framer plugin, the web app, and any related services — you agree to these Terms of Service. If you don&apos;t agree, please don&apos;t use the Service.</p>
-          <p>The Service is operated by Umut Sevinc, currently registered as a sole proprietor in Strasbourg, France (with planned migration to a private limited company in Estonia).</p>
+          <p>The Service is operated by Umut Sevinc, currently registered as a sole proprietor in France (with planned migration to a private limited company in Estonia).</p>
         </Section>
 
         <Section title="2. Plans and billing">
@@ -70,7 +70,7 @@ export default function TermsPage() {
         </Section>
 
         <Section title="9. Governing law">
-          <p>These Terms are governed by French law (and Estonian law upon completion of the company migration). Disputes are subject to the courts of Strasbourg, France.</p>
+          <p>These Terms are governed by French law (and Estonian law upon completion of the company migration). Disputes are subject to the competent courts of France.</p>
         </Section>
 
         <Section title="10. Contact">
