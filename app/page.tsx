@@ -5,6 +5,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { motion, useInView } from "framer-motion";
 import BehindTheBuild from "./components/sections/BehindTheBuild";
+import FounderCountCTA from "./components/FounderCountCTA";
 
 const HeroDevice = dynamic(() => import("./components/HeroDevice"), {
   ssr: false,
@@ -271,32 +272,79 @@ export default function Home() {
       <BehindTheBuild />
 
       {/* ══ S7 — CTA (dark) ══ */}
-      <section style={{ background: "var(--bg-primary)", padding: "64px 24px", position: "relative" }}>
+      <section style={{ background: "var(--bg-primary)", padding: "80px 24px", position: "relative" }}>
         <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(127,119,221,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
         <A className="text-center relative z-10">
-          <h2 style={{ maxWidth: 500, margin: "0 auto" }}>Your mockups deserve better.</h2>
-          <p style={{ color: "var(--text-secondary)", fontSize: 16, margin: "12px auto 28px", maxWidth: 420 }}>Start creating studio-grade 3D mockups. Free.</p>
-          <a href="https://www.framer.com/marketplace/plugins/mockup-for-framer/" target="_blank" rel="noopener noreferrer" style={{ height: 48, padding: "0 28px", borderRadius: 12, background: "var(--cta-gradient)", color: "#fff", fontSize: 15, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-            Get started — it{"'"}s free
-          </a>
-          <p style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 14 }}>No credit card &bull; 3 free credits/month &bull; Cancel anytime</p>
+          <h2 style={{ maxWidth: 540, margin: "0 auto" }}>Ship mockups that breathe.</h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: 16, margin: "14px auto 30px", maxWidth: 460 }}>Stop exporting PNGs. Start embedding real 3D.</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <a href="https://www.framer.com/marketplace/plugins/mockup-for-framer/" target="_blank" rel="noopener noreferrer" style={{ height: 48, padding: "0 28px", borderRadius: 12, background: "var(--cta-gradient)", color: "#fff", fontSize: 15, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
+              Try free — no credit card
+            </a>
+            <FounderCountCTA
+              style={{ height: 48, padding: "0 24px", borderRadius: 12, border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", fontSize: 14, fontWeight: 500, display: "inline-flex", alignItems: "center", textDecoration: "none" }}
+            />
+          </div>
+          <p style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 18, opacity: 0.7 }}>Built by a Framer Partner Expert from Strasbourg ☁️</p>
         </A>
       </section>
 
       {/* ══ S8 — FOOTER ══ */}
-      <footer style={{ background: "var(--bg-primary)", borderTop: "1px solid var(--border-subtle)", padding: "32px 24px" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-          <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4">
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Image src="/logo/white.png" alt="Memselon Mockup" width={16} height={16} style={{ borderRadius: 4 }} />
-              <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>Memselon Mockup</span>
+      <footer style={{ background: "var(--bg-primary)", borderTop: "1px solid var(--border-subtle)", padding: "56px 24px 28px" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-6 mb-10">
+            {/* Col 1 — Brand */}
+            <div className="col-span-2 md:col-span-1">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                <Image src="/logo/white.png" alt="Memselon Mockup" width={20} height={20} style={{ borderRadius: 5 }} />
+                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>Memselon Mockup</span>
+              </div>
+              <p style={{ fontSize: 12, color: "var(--text-tertiary)", lineHeight: 1.5, maxWidth: 220 }}>
+                Real 3D. Real-time. In Framer.
+              </p>
             </div>
-            <div style={{ display: "flex", gap: 20, fontSize: 11, color: "var(--text-tertiary)" }}>
-              {["Features", "Pricing", "FAQ"].map(l => <a key={l} href={`#${l.toLowerCase()}`} style={{ color: "inherit", textDecoration: "none" }}>{l}</a>)}
+
+            {/* Col 2 — Product */}
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-secondary)", marginBottom: 12 }}>Product</div>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+                <li><a href="#features" style={{ fontSize: 13, color: "var(--text-tertiary)", textDecoration: "none" }}>Features</a></li>
+                <li><a href="#pricing" style={{ fontSize: 13, color: "var(--text-tertiary)", textDecoration: "none" }}>Pricing</a></li>
+                <li><a href="#faq" style={{ fontSize: 13, color: "var(--text-tertiary)", textDecoration: "none" }}>FAQ</a></li>
+                <li><a href="mailto:contact@memselon.com?subject=Memselon%20Mockup%20Roadmap" style={{ fontSize: 13, color: "var(--text-tertiary)", textDecoration: "none" }}>Roadmap</a></li>
+              </ul>
+            </div>
+
+            {/* Col 3 — Resources */}
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-secondary)", marginBottom: 12 }}>Resources</div>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+                <li><a href="https://www.framer.com/marketplace/plugins/mockup-for-framer/" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "var(--text-tertiary)", textDecoration: "none" }}>Framer Marketplace</a></li>
+                <li><a href="https://memselon.com" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "var(--text-tertiary)", textDecoration: "none" }}>Memselon Studio</a></li>
+                <li><span style={{ fontSize: 13, color: "rgba(72,72,74,0.5)" }}>Documentation (soon)</span></li>
+              </ul>
+            </div>
+
+            {/* Col 4 — Connect */}
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-secondary)", marginBottom: 12 }}>Connect</div>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+                <li><a href="https://x.com/memselon" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "var(--text-tertiary)", textDecoration: "none" }}>X (@memselon)</a></li>
+                <li><a href="https://www.linkedin.com/in/umut-sevinc/" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "var(--text-tertiary)", textDecoration: "none" }}>LinkedIn</a></li>
+                <li><a href="mailto:contact@memselon.com" style={{ fontSize: 13, color: "var(--text-tertiary)", textDecoration: "none" }}>contact@memselon.com</a></li>
+              </ul>
             </div>
           </div>
-          <div style={{ fontSize: 10, color: "rgba(72,72,74,0.4)" }}>
-            Made with &#10084;&#65039; by <a href="https://memselon.com" target="_blank" rel="noopener noreferrer" style={{ color: "var(--text-tertiary)", textDecoration: "none" }}>Memselon</a>
+
+          {/* Bottom bar */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3" style={{ paddingTop: 24, borderTop: "1px solid var(--border-subtle)" }}>
+            <div style={{ fontSize: 11, color: "rgba(72,72,74,0.6)" }}>
+              © 2026 Memselon ☁️ · Made in Strasbourg, France · Available worldwide
+            </div>
+            <div style={{ display: "flex", gap: 16, fontSize: 11, color: "var(--text-tertiary)" }}>
+              <a href="/privacy" style={{ color: "inherit", textDecoration: "none" }}>Privacy</a>
+              <a href="/terms" style={{ color: "inherit", textDecoration: "none" }}>Terms</a>
+            </div>
           </div>
         </div>
       </footer>
