@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { motion, useInView } from "framer-motion";
+import BehindTheBuild from "./components/sections/BehindTheBuild";
 
 const HeroDevice = dynamic(() => import("./components/HeroDevice"), {
   ssr: false,
@@ -266,28 +267,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══ S6 — TESTIMONIALS (dark) ══ */}
-      <section style={{ background: "var(--bg-primary)", padding: "60px 24px" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <A className="text-center mb-8"><h2>Designers love it.</h2></A>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {TESTIMONIALS.slice(0, 3).map((t, i) => (
-              <A key={t.name} delay={i * 0.06}>
-                <div className="card" style={{ padding: 24 }}>
-                  <p style={{ color: "var(--text-secondary)", fontSize: 14, lineHeight: 1.6, marginBottom: 14, fontStyle: "italic" }}>{`"${t.quote}"`}</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <div style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--bg-card)", border: "1px solid var(--border-subtle)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "var(--text-secondary)" }}>{t.name[0]}</div>
-                    <div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)" }}>{t.name}</div>
-                      <div style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{t.handle}</div>
-                    </div>
-                  </div>
-                </div>
-              </A>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ══ S6 — BEHIND THE BUILD (dark) ══ */}
+      <BehindTheBuild />
 
       {/* ══ S7 — CTA (dark) ══ */}
       <section style={{ background: "var(--bg-primary)", padding: "64px 24px", position: "relative" }}>
@@ -338,8 +319,3 @@ const PLANS = [
   { name: "Ultra", price: "29", yprice: "21", per: "/ mo", hl: false, cta: "Go Ultra", features: ["Unlimited exports", "Everything in Pro", "Transparent BG", "Multi-device scenes", "Batch export", "Lottie screens", "Priority support"] },
 ];
 
-const TESTIMONIALS = [
-  { name: "Sarah K.", handle: "@sarahdesigns", quote: "I used to spend 30 minutes per mockup. Now it takes 10 seconds. Changed my workflow." },
-  { name: "Marc D.", handle: "@marcdvlp", quote: "The 3D orbit is insane. My portfolio went from flat to studio-quality overnight." },
-  { name: "Emma L.", handle: "@emmalcreates", quote: "Finally a mockup tool that doesn't pull me out of Framer. Upload, rotate, export." },
-];
