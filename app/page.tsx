@@ -2,20 +2,11 @@
 
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import { motion, useInView } from "framer-motion";
 import BehindTheBuild from "./components/sections/BehindTheBuild";
 import FounderCountCTA from "./components/FounderCountCTA";
-
-const HeroDevice = dynamic(() => import("./components/HeroDevice"), {
-  ssr: false,
-  loading: () => (
-    <div className="hero-playground flex items-center justify-center">
-      <div style={{ width: 28, height: 28, border: "2px solid rgba(255,255,255,0.06)", borderTopColor: "rgba(127,119,221,0.5)", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
-  ),
-});
+import ScrollHeader from "./components/sections/ScrollHeader";
+import Hero from "./components/sections/Hero";
 
 /* ── Animated wrapper with scale ── */
 function A({ children, className = "", delay = 0, scale = true }: { children: React.ReactNode; className?: string; delay?: number; scale?: boolean }) {
@@ -74,54 +65,11 @@ export default function Home() {
         </div>
       )}
 
-      {/* ══ NAV ══ */}
-      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50, backdropFilter: "blur(20px) saturate(150%)", background: "rgba(5,5,9,0.7)", borderBottom: "1px solid var(--border-subtle)" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56, padding: "0 24px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <Image src="/logo/white.png" alt="Memselon Mockup" width={22} height={22} style={{ borderRadius: 6 }} />
-            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)", letterSpacing: "-0.01em" }}>Memselon Mockup</span>
-          </div>
-          <div className="hidden md:flex" style={{ gap: 28, fontSize: 14, color: "var(--text-secondary)" }}>
-            {["Features", "Pricing", "FAQ"].map(l => <a key={l} href={`#${l.toLowerCase()}`} style={{ textDecoration: "none", color: "inherit" }}>{l}</a>)}
-          </div>
-          <a href="https://www.framer.com/marketplace/plugins/mockup-for-framer/" target="_blank" rel="noopener noreferrer" style={{ height: 36, padding: "0 18px", borderRadius: 9999, background: "var(--cta-gradient)", color: "#fff", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", textDecoration: "none" }}>
-            Try free
-          </a>
-        </div>
-      </nav>
+      {/* ══ NAV (M15: refonded as ScrollHeader) ══ */}
+      <ScrollHeader />
 
-      {/* ══ S1 — HERO (dark) ══ */}
-      <section style={{ background: "var(--bg-primary)", minHeight: "100vh", maxWidth: 1200, margin: "0 auto", padding: "96px 24px 40px", display: "flex", flexDirection: "column" }}>
-        <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10 flex-1">
-          <div className="md:w-[45%] flex flex-col justify-center text-center md:text-left">
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.5 }}>
-              <div style={{ display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--text-secondary)", opacity: 0.7, marginBottom: 18 }} className="mx-auto md:mx-0">
-                Real 3D. Real-time. In Framer.
-              </div>
-            </motion.div>
-            <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }}>
-              The first real-time 3D mockup studio for Framer.
-            </motion.h1>
-            <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.5 }} style={{ fontSize: "clamp(16px, 1.8vw, 20px)", color: "var(--text-secondary)", maxWidth: 480, margin: "12px auto 28px", lineHeight: 1.5 }} className="md:mx-0">
-              Stop exporting PNGs from Rotato or Previewed. Memselon Mockup ships real 3D — live, scrollable, interactive — straight into your Framer site.
-            </motion.p>
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }} className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-              <a href="https://www.framer.com/marketplace/plugins/mockup-for-framer/" target="_blank" rel="noopener noreferrer" style={{ height: 46, padding: "0 24px", borderRadius: 12, background: "var(--cta-gradient)", color: "#fff", fontSize: 14, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-                Try free
-              </a>
-              <a href="#how" style={{ height: 46, padding: "0 24px", borderRadius: 12, border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", fontSize: 14, fontWeight: 500, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
-                See it live
-              </a>
-            </motion.div>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} style={{ fontSize: 13, color: "var(--text-tertiary)", marginTop: 20, opacity: 0.7 }}>
-              Built by a certified Framer Partner Expert · Crafted by a human ☁️
-            </motion.p>
-          </div>
-          <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15, duration: 0.9, ease: [0.16, 1, 0.3, 1] }} className="md:w-[55%] w-full">
-            <HeroDevice />
-          </motion.div>
-        </div>
-      </section>
+      {/* ══ S1 — HERO (M15: refonded — ElevenLabs-style) ══ */}
+      <Hero />
 
       {/* ══ S2 — PAIN POINTS (light) ══ */}
       <section className="section-light" style={{ padding: "60px 24px" }}>
