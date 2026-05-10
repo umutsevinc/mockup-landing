@@ -8,24 +8,40 @@ const inter = Inter({
   display: "swap",
 });
 
+const SITE_URL = "https://mockup-landing-rho.vercel.app";
+
 export const metadata: Metadata = {
-  title: "Framer Mockup — 3D Device Mockups in Seconds",
+  metadataBase: new URL(SITE_URL),
+  title: "Memselon Mockup — Real-time 3D Mockups for Framer",
   description:
-    "Create stunning 3D interactive mockups of Apple devices directly inside Framer. iPhone, iPad, iMac, Apple Watch — all in real-time 3D.",
+    "The first real-time 3D mockup studio for Framer. Embed interactive 3D mockups live in your site — no PNG exports needed. iPhone 17, iPhone Air, iPad, iMac, Apple Watch.",
   keywords: [
     "framer plugin",
     "3d mockup",
+    "real-time 3d",
+    "framer mockup",
     "device mockup",
-    "iphone mockup",
-    "apple mockup",
-    "framer",
-    "3d",
-    "interactive",
+    "framer studio",
+    "memselon",
+    "react three fiber",
+    "webgl mockup",
   ],
+  alternates: {
+    canonical: SITE_URL,
+  },
   openGraph: {
-    title: "Framer Mockup",
-    description: "3D interactive device mockups inside Framer",
     type: "website",
+    url: SITE_URL,
+    title: "Memselon Mockup — Real 3D. Real-time. In Framer.",
+    description:
+      "Stop exporting PNGs. Ship real 3D mockups live in your Framer site.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Memselon Mockup — Real 3D. Real-time. In Framer.",
+    description: "The first real-time 3D mockup studio for Framer.",
+    site: "@memselon",
+    creator: "@memselon",
   },
   icons: {
     icon: "/icon.svg",
