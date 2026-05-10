@@ -198,11 +198,12 @@ export default function Home() {
               </div>
             </A>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-3">
             {[
               { title: "Free orbit", desc: "360 rotation + zoom", accent: "var(--accent-purple)" },
-              { title: "Video export", desc: "MP4 & WebM loops", accent: "var(--accent-teal)" },
-              { title: "Animations", desc: "Rotate, follow, float", accent: "var(--accent-purple)" },
+              { title: "Video screens", desc: "Drop videos in the device screen. Live in your site.", accent: "var(--accent-teal)" },
+              { title: "Save & embed", desc: "Save your 3D scene. Drop it live in Framer.", accent: "var(--accent-purple)" },
+              { title: "Animations", desc: "Rotate, follow, float", accent: "var(--accent-teal)" },
             ].map((f, i) => (
               <A key={f.title} delay={i * 0.05}>
                 <div className="card" style={{ padding: "22px 20px", textAlign: "center" }}>
@@ -215,7 +216,7 @@ export default function Home() {
           </div>
           <A>
             <div className="card card-glow" style={{ padding: "28px", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 40 }}>
-              {[{ val: "0ms", label: "Idle render" }, { val: "< 2MB", label: "Plugin size" }, { val: "4K", label: "Max export" }, { val: "5", label: "Devices" }].map(s => (
+              {[{ val: "0ms", label: "Idle render" }, { val: "< 2MB", label: "Plugin size" }, { val: "4K", label: "Max export" }, { val: "5", label: "Devices" }, { val: "WebGL", label: "GPU rendering" }, { val: "60 FPS", label: "Mobile-ready" }].map(s => (
                 <div key={s.label} style={{ textAlign: "center" }}>
                   <div style={{ fontSize: 28, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.03em" }}>{s.val}</div>
                   <div style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 2 }}>{s.label}</div>
