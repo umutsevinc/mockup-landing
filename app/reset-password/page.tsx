@@ -1,163 +1,180 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import Image from "next/image";
-import { createClient } from "@supabase/supabase-js";
+import { Suspense, useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
+import { AuthCard, AuthInput, AuthButton, AuthError } from '@/app/components/AuthCard'
 
-const supabase = createClient(
-  "https://slfsatozvrdsbozzqgcx.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNsZnNhdG96dnJkc2JvenpxZ2N4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyMjk5NzEsImV4cCI6MjA3NDgwNTk3MX0.ESYlRVDcZgZR-slcrwL8sAf3WyfFiCw5gQMItNFkVf8"
-);
+/**
+ * Dual-mode page:
+ *   1. No recovery session → ask for email, send recovery link.
+ *   2. Recovery session present (Supabase set it via detectSessionInUrl
+ *      when the user clicks the email link) → ask for new password.
+ *
+ * Wrapped in Suspense because useSearchParams forces dynamic rendering
+ * in Next 16 — without the boundary, the build fails to prerender.
+ */
+export default function ResetPasswordPage() {
+	return (
+		<Suspense fallback={<AuthCard title="Loading…">{null}</AuthCard>}>
+			<ResetPasswordInner />
+		</Suspense>
+	)
+}
 
-export default function ResetPassword() {
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+function ResetPasswordInner() {
+	const router = useRouter()
+	const params = useSearchParams()
+	const [mode, setMode] = useState<'request' | 'reset'>('request')
+	const [email, setEmail] = useState('')
+	const [password, setPassword] = useState('')
+	const [confirm, setConfirm] = useState('')
+	const [sent, setSent] = useState(false)
+	const [done, setDone] = useState(false)
+	const [loading, setLoading] = useState(false)
+	const [error, setError] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !email.includes("@")) {
-      setError("Please enter a valid email address.");
-      return;
-    }
+	useEffect(() => {
+		// Two possible signals that we're in "reset" mode:
+		//   - hash like #type=recovery (older Supabase)
+		//   - query like ?type=recovery (newer)
+		//   - an existing PASSWORD_RECOVERY auth event was emitted
+		const hash = typeof window !== 'undefined' ? window.location.hash : ''
+		if (hash.includes('type=recovery') || params.get('type') === 'recovery') {
+			setMode('reset')
+		}
+		const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+			if (event === 'PASSWORD_RECOVERY') setMode('reset')
+		})
+		return () => sub.subscription.unsubscribe()
+	}, [params])
 
-    setLoading(true);
-    setError("");
+	async function sendLink(e: React.FormEvent) {
+		e.preventDefault()
+		setError('')
+		if (!email.includes('@')) {
+			setError('Please enter a valid email.')
+			return
+		}
+		setLoading(true)
+		const redirectTo =
+			typeof window !== 'undefined' ? `${window.location.origin}/reset-password` : undefined
+		const { error: err } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
+		setLoading(false)
+		if (err) {
+			setError(err.message)
+			return
+		}
+		setSent(true)
+	}
 
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "https://mockup-landing-rho.vercel.app/reset-password",
-    });
+	async function applyPassword(e: React.FormEvent) {
+		e.preventDefault()
+		setError('')
+		if (password.length < 8) {
+			setError('Password must be at least 8 characters.')
+			return
+		}
+		if (password !== confirm) {
+			setError('Passwords do not match.')
+			return
+		}
+		setLoading(true)
+		const { error: err } = await supabase.auth.updateUser({ password })
+		setLoading(false)
+		if (err) {
+			setError(err.message)
+			return
+		}
+		setDone(true)
+		setTimeout(() => router.push('/sign-in?reset=1'), 1500)
+	}
 
-    setLoading(false);
+	if (mode === 'reset') {
+		if (done) {
+			return (
+				<AuthCard title="Password updated" subtitle="Redirecting you to sign in…">
+					<div style={{ fontSize: 13, color: '#8E8E93' }}>You can now sign in with your new password.</div>
+				</AuthCard>
+			)
+		}
+		return (
+			<AuthCard title="Set a new password" subtitle="Enter your new password below.">
+				<form onSubmit={applyPassword} noValidate>
+					<AuthInput
+						label="New password"
+						type="password"
+						autoComplete="new-password"
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+						placeholder="At least 8 characters"
+						required
+						disabled={loading}
+					/>
+					<AuthInput
+						label="Confirm password"
+						type="password"
+						autoComplete="new-password"
+						value={confirm}
+						onChange={(e) => setConfirm(e.target.value)}
+						placeholder="••••••••"
+						required
+						disabled={loading}
+					/>
+					<AuthError>{error}</AuthError>
+					<AuthButton type="submit" disabled={loading}>
+						{loading ? 'Updating…' : 'Update password'}
+					</AuthButton>
+				</form>
+			</AuthCard>
+		)
+	}
 
-    if (resetError) {
-      setError(resetError.message);
-    } else {
-      setSent(true);
-    }
-  };
+	if (sent) {
+		return (
+			<AuthCard
+				title="Check your email"
+				subtitle={`We sent a reset link to ${email}. Click it to choose a new password.`}
+				footer={
+					<Link href="/sign-in" style={{ fontSize: 13, color: '#7F77DD', textDecoration: 'none' }}>
+						Back to sign in
+					</Link>
+				}
+			>
+				<div style={{ fontSize: 13, color: '#8E8E93', lineHeight: 1.6 }}>
+					Didn&apos;t get the email? Check spam, or try again in a minute.
+				</div>
+			</AuthCard>
+		)
+	}
 
-  return (
-    <div style={{
-      minHeight: "100vh",
-      background: "var(--bg-primary, #050509)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: 24,
-    }}>
-      <div style={{
-        width: "100%",
-        maxWidth: 400,
-        background: "var(--bg-card, #0F0F14)",
-        border: "1px solid rgba(255,255,255,0.06)",
-        borderRadius: 20,
-        padding: 32,
-      }}>
-        {/* Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
-          <Image src="/logo/white.png" alt="Framer Mockup" width={24} height={24} style={{ borderRadius: 6 }} />
-          <span style={{ fontSize: 15, fontWeight: 600, color: "#F5F5F7" }}>Framer Mockup</span>
-        </div>
-
-        {sent ? (
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 600, color: "#F5F5F7", marginBottom: 8 }}>
-              Check your email
-            </div>
-            <p style={{ fontSize: 14, color: "#8E8E93", lineHeight: 1.6 }}>
-              We sent a password reset link to <strong style={{ color: "#F5F5F7" }}>{email}</strong>.
-              Click the link in the email to reset your password.
-            </p>
-            <a
-              href="/"
-              style={{
-                display: "block",
-                textAlign: "center",
-                marginTop: 24,
-                fontSize: 13,
-                color: "#7F77DD",
-                textDecoration: "none",
-              }}
-            >
-              Back to home
-            </a>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            <div style={{ fontSize: 18, fontWeight: 600, color: "#F5F5F7", marginBottom: 4 }}>
-              Reset password
-            </div>
-            <p style={{ fontSize: 13, color: "#8E8E93", marginBottom: 24 }}>
-              Enter your email and we{"'"}ll send you a reset link.
-            </p>
-
-            <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#8E8E93", marginBottom: 6 }}>
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-              disabled={loading}
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                borderRadius: 10,
-                border: "1px solid rgba(255,255,255,0.1)",
-                background: "rgba(255,255,255,0.04)",
-                color: "#F5F5F7",
-                fontSize: 14,
-                outline: "none",
-                marginBottom: 16,
-                boxSizing: "border-box",
-              }}
-            />
-
-            {error && (
-              <div style={{
-                background: "rgba(239,68,68,0.1)",
-                border: "1px solid rgba(239,68,68,0.2)",
-                color: "#ef4444",
-                padding: "8px 12px",
-                borderRadius: 8,
-                fontSize: 12,
-                marginBottom: 16,
-              }}>
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: 10,
-                border: "none",
-                background: "linear-gradient(135deg, #7F77DD, #534AB7)",
-                color: "#fff",
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.6 : 1,
-              }}
-            >
-              {loading ? "Sending..." : "Send reset link"}
-            </button>
-
-            <div style={{ textAlign: "center", marginTop: 20 }}>
-              <a href="/" style={{ fontSize: 12, color: "#48484A", textDecoration: "none" }}>
-                Back to home
-              </a>
-            </div>
-          </form>
-        )}
-      </div>
-    </div>
-  );
+	return (
+		<AuthCard
+			title="Reset password"
+			subtitle="Enter your email and we'll send you a reset link."
+			footer={
+				<Link href="/sign-in" style={{ fontSize: 13, color: '#7F77DD', textDecoration: 'none' }}>
+					Back to sign in
+				</Link>
+			}
+		>
+			<form onSubmit={sendLink} noValidate>
+				<AuthInput
+					label="Email"
+					type="email"
+					autoComplete="email"
+					value={email}
+					onChange={(e) => setEmail(e.target.value)}
+					placeholder="you@example.com"
+					required
+					disabled={loading}
+				/>
+				<AuthError>{error}</AuthError>
+				<AuthButton type="submit" disabled={loading}>
+					{loading ? 'Sending…' : 'Send reset link'}
+				</AuthButton>
+			</form>
+		</AuthCard>
+	)
 }
