@@ -1,30 +1,152 @@
 "use client";
 
-import { Suspense, useRef, useEffect, useCallback, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useGLTF, Environment, OrbitControls, Html } from "@react-three/drei";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Environment, Html, PerformanceMonitor, useGLTF } from "@react-three/drei";
+import { motion } from "framer-motion";
 import * as THREE from "three";
 
 const MODEL_URL =
   "https://slfsatozvrdsbozzqgcx.supabase.co/storage/v1/object/public/device-models/iPhone17Pro/iphone17pro.glb";
+const VIDEO_URL = "/hero-showreel.mp4";
 
-/* ── Phone model ── */
+/* ════════════════════════════════════════════════════════════════════
+   SCREEN TEXTURE — tries video first, falls back to animated CanvasTexture
+   ════════════════════════════════════════════════════════════════════ */
+function useScreenTexture() {
+  const [texture, setTexture] = useState<THREE.Texture | null>(null);
+  const [mode, setMode] = useState<"loading" | "video" | "fallback">("loading");
+  const fallbackCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const fallbackTexRef = useRef<THREE.CanvasTexture | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const video = document.createElement("video");
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.crossOrigin = "anonymous";
+    video.preload = "auto";
+
+    const cleanupVideo = () => {
+      video.removeEventListener("canplay", onCanPlay);
+      video.removeEventListener("error", onError);
+      video.pause();
+      video.src = "";
+      video.load();
+    };
+
+    const onCanPlay = () => {
+      if (cancelled) return;
+      const tex = new THREE.VideoTexture(video);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.flipY = false;
+      tex.center.set(0.5, 0.5);
+      setTexture(tex);
+      setMode("video");
+      video.play().catch(() => {});
+    };
+
+    const onError = () => {
+      if (cancelled) return;
+      cleanupVideo();
+      // Build animated CanvasTexture fallback
+      const canvas = document.createElement("canvas");
+      canvas.width = 1080;
+      canvas.height = 2340;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      drawFallback(ctx, canvas.width, canvas.height, 0);
+      const ctex = new THREE.CanvasTexture(canvas);
+      ctex.colorSpace = THREE.SRGBColorSpace;
+      ctex.flipY = false;
+      ctex.center.set(0.5, 0.5);
+      fallbackCanvasRef.current = canvas;
+      fallbackTexRef.current = ctex;
+      setTexture(ctex);
+      setMode("fallback");
+    };
+
+    video.addEventListener("canplay", onCanPlay);
+    video.addEventListener("error", onError);
+    video.src = VIDEO_URL;
+    video.load();
+
+    return () => {
+      cancelled = true;
+      cleanupVideo();
+      texture?.dispose?.();
+      fallbackTexRef.current?.dispose?.();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return { texture, mode, fallbackCanvas: fallbackCanvasRef, fallbackTex: fallbackTexRef };
+}
+
+function drawFallback(ctx: CanvasRenderingContext2D, w: number, h: number, t: number) {
+  // Base
+  ctx.fillStyle = "#050507";
+  ctx.fillRect(0, 0, w, h);
+
+  // Animated gradient brand (purple ⇆ teal pulse)
+  const phase = (Math.sin(t * 0.0009) + 1) / 2; // 0..1, ~7s period
+  const gradient = ctx.createLinearGradient(0, 0, w, h);
+  gradient.addColorStop(0, `rgba(139, 92, 246, ${0.22 + phase * 0.18})`);
+  gradient.addColorStop(0.5, `rgba(40, 25, 90, 0.30)`);
+  gradient.addColorStop(1, `rgba(6, 182, 212, ${0.22 + (1 - phase) * 0.18})`);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, w, h);
+
+  // Subtle grid pattern (ASCII-style dots)
+  ctx.fillStyle = "rgba(255, 255, 255, 0.035)";
+  for (let x = 70; x < w; x += 90) {
+    for (let y = 70; y < h; y += 90) {
+      ctx.fillRect(x, y, 2, 2);
+    }
+  }
+
+  // Diagonal sweep highlight (subtle scanline that crosses)
+  const sweepY = (((t * 0.05) % (h + 200)) - 100) | 0;
+  const sweep = ctx.createLinearGradient(0, sweepY - 80, 0, sweepY + 80);
+  sweep.addColorStop(0, "rgba(255, 255, 255, 0)");
+  sweep.addColorStop(0.5, "rgba(255, 255, 255, 0.04)");
+  sweep.addColorStop(1, "rgba(255, 255, 255, 0)");
+  ctx.fillStyle = sweep;
+  ctx.fillRect(0, sweepY - 80, w, 160);
+
+  // Text — SHOWREEL
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  ctx.fillStyle = "rgba(250, 250, 250, 0.78)";
+  ctx.font = "500 90px ui-monospace, 'JetBrains Mono', SF Mono, Menlo, monospace";
+  ctx.fillText("SHOWREEL", w / 2, h / 2 - 70);
+
+  ctx.fillStyle = "rgba(250, 250, 250, 0.40)";
+  ctx.font = "500 46px ui-monospace, 'JetBrains Mono', SF Mono, Menlo, monospace";
+  ctx.fillText("·  COMING SOON  ·", w / 2, h / 2 + 60);
+
+  // Footer mark
+  ctx.fillStyle = "rgba(250, 250, 250, 0.22)";
+  ctx.font = "400 32px ui-monospace, 'JetBrains Mono', SF Mono, Menlo, monospace";
+  ctx.fillText("MEMSELON  MOCKUP", w / 2, h - 110);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   PHONE — applies texture to screen mesh, cursor follow + idle float
+   ════════════════════════════════════════════════════════════════════ */
 function Phone({
   screenTex,
-  followMouse,
-  floatOn,
   mouseRef,
 }: {
   screenTex: THREE.Texture | null;
-  followMouse: boolean;
-  floatOn: boolean;
-  mouseRef: React.RefObject<{ x: number; y: number }>;
+  mouseRef: React.RefObject<{ x: number; y: number; active: boolean }>;
 }) {
   const { scene } = useGLTF(MODEL_URL);
   const group = useRef<THREE.Group>(null);
   const time = useRef(0);
 
-  // Apply screen texture
   useEffect(() => {
     if (!scene) return;
     scene.traverse((child) => {
@@ -36,7 +158,6 @@ function Phone({
           transparent: false,
           side: THREE.FrontSide,
         });
-        mat.name = "Screen_Unlit";
         if (Array.isArray(child.material)) {
           child.material = child.material.map(() => mat);
         } else {
@@ -47,23 +168,18 @@ function Phone({
     });
   }, [scene, screenTex]);
 
-  // Follow cursor + float
   useFrame((_, delta) => {
     if (!group.current) return;
     time.current += delta;
 
-    if (followMouse && mouseRef.current) {
-      const targetY = mouseRef.current.x * 0.6;
-      const targetX = -mouseRef.current.y * 0.25;
-      group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, targetY, 0.04);
-      group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, targetX, 0.04);
-    }
+    // Cursor follow auto-active — max ~12° (Y) and ~6° (X)
+    const targetY = mouseRef.current.active ? mouseRef.current.x * 0.21 : 0;
+    const targetX = mouseRef.current.active ? -mouseRef.current.y * 0.10 : 0;
+    group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, targetY, 0.045);
+    group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, targetX, 0.045);
 
-    if (floatOn) {
-      group.current.position.y = -0.2 + Math.sin(time.current * 0.8 * Math.PI * 2) * 0.05;
-    } else {
-      group.current.position.y = THREE.MathUtils.lerp(group.current.position.y, -0.2, 0.05);
-    }
+    // Idle float — subtle breathing
+    group.current.position.y = -0.2 + Math.sin(time.current * 0.7) * 0.045;
   });
 
   return (
@@ -73,219 +189,225 @@ function Phone({
   );
 }
 
-/* ── Loader ── */
+/* ════════════════════════════════════════════════════════════════════
+   FALLBACK ANIMATOR — drives CanvasTexture redraw at ~30 FPS via raf
+   Lives inside Canvas to call invalidate() in frameloop="demand" mode.
+   ════════════════════════════════════════════════════════════════════ */
+function FallbackAnimator({
+  canvas,
+  tex,
+  active,
+}: {
+  canvas: React.RefObject<HTMLCanvasElement | null>;
+  tex: React.RefObject<THREE.CanvasTexture | null>;
+  active: boolean;
+}) {
+  const { invalidate } = useThree();
+  useEffect(() => {
+    if (!active) return;
+    let raf = 0;
+    let last = performance.now();
+    const tick = (t: number) => {
+      // Throttle to ~30 FPS
+      if (t - last >= 33) {
+        const c = canvas.current;
+        const ctex = tex.current;
+        if (c && ctex) {
+          const ctx = c.getContext("2d");
+          if (ctx) drawFallback(ctx, c.width, c.height, t);
+          ctex.needsUpdate = true;
+          invalidate();
+        }
+        last = t;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [active, canvas, tex, invalidate]);
+  return null;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   VIDEO ANIMATOR — invalidates each frame while video texture renders
+   ════════════════════════════════════════════════════════════════════ */
+function VideoAnimator({ active }: { active: boolean }) {
+  const { invalidate } = useThree();
+  useEffect(() => {
+    if (!active) return;
+    let raf = 0;
+    const tick = () => {
+      invalidate();
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [active, invalidate]);
+  return null;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   LOADER
+   ════════════════════════════════════════════════════════════════════ */
 function Loader() {
   return (
     <Html center>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-        <div style={{
-          width: 28, height: 28,
-          border: "2px solid rgba(255,255,255,0.06)",
-          borderTopColor: "rgba(127,119,221,0.5)",
-          borderRadius: "50%",
-          animation: "spin 1s linear infinite",
-        }} />
-        <div style={{ fontSize: 12, color: "#48484A", letterSpacing: "0.04em" }}>Loading model...</div>
+        <div
+          style={{
+            width: 28,
+            height: 28,
+            border: "2px solid rgba(255,255,255,0.06)",
+            borderTopColor: "rgba(139,92,246,0.5)",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite",
+          }}
+        />
+        <div style={{ fontSize: 11, color: "rgba(250,250,250,0.32)", letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: "ui-monospace, monospace" }}>
+          Loading scene
+        </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     </Html>
   );
 }
 
-/* ── Icons ── */
-const UploadIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
-  </svg>
-);
-const RotateIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
-  </svg>
-);
-const MouseIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" />
-  </svg>
-);
-const WaveIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M2 12c2-3 4-6 6-6s4 6 6 6 4-6 6-6" />
-  </svg>
-);
-
-/* ═══ MAIN COMPONENT ═══ */
+/* ════════════════════════════════════════════════════════════════════
+   MAIN
+   ════════════════════════════════════════════════════════════════════ */
 export default function HeroDevice() {
-  const mouseRef = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
-  const orbitRef = useRef<any>(null);
+  const mouseRef = useRef({ x: 0, y: 0, active: false });
+  const [dpr, setDpr] = useState<number>(() =>
+    typeof window !== "undefined" && window.innerWidth > 768 ? 1.5 : 1
+  );
 
-  const [screenTex, setScreenTex] = useState<THREE.Texture | null>(null);
-  const [autoRotate, setAutoRotate] = useState(false);
-  const [followMouse, setFollowMouse] = useState(false);
-  const [floatOn, setFloatOn] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [uploaded, setUploaded] = useState(false);
-  const [hint, setHint] = useState(true);
+  const { texture, mode, fallbackCanvas, fallbackTex } = useScreenTexture();
 
-  // Hide hint after 5s or first interaction
-  useEffect(() => {
-    const t = setTimeout(() => setHint(false), 5000);
-    return () => clearTimeout(t);
-  }, []);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    mouseRef.current = {
-      x: ((e.clientX - rect.left) / rect.width - 0.5) * 2,
-      y: ((e.clientY - rect.top) / rect.height - 0.5) * 2,
-    };
+  const handleMove = (e: React.MouseEvent) => {
+    const c = containerRef.current;
+    if (!c) return;
+    const r = c.getBoundingClientRect();
+    mouseRef.current.x = ((e.clientX - r.left) / r.width - 0.5) * 2;
+    mouseRef.current.y = ((e.clientY - r.top) / r.height - 0.5) * 2;
+    mouseRef.current.active = true;
+  };
+  const handleLeave = () => {
+    mouseRef.current.active = false;
+    // Smoothly let it return to idle (lerp continues to target=0)
   };
 
-  const loadImage = useCallback((file: File) => {
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Try a smaller image (max 5MB)");
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    const loader = new THREE.TextureLoader();
-    loader.load(url, (tex) => {
-      tex.flipY = false;
-      tex.colorSpace = THREE.SRGBColorSpace;
-      tex.center.set(0.5, 0.5);
-      setScreenTex(tex);
-      setUploaded(true);
-      setHint(false);
-    });
-  }, []);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith("image/")) loadImage(file);
-  }, [loadImage]);
-
-  const handleFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) loadImage(file);
-  }, [loadImage]);
-
-  const toggleAutoRotate = () => {
-    setAutoRotate((v) => !v);
-    if (!autoRotate) setFollowMouse(false);
-  };
-
-  const toggleFollow = () => {
-    setFollowMouse((v) => {
-      if (!v) setAutoRotate(false);
-      return !v;
-    });
-    setHint(false);
-  };
-
-  const toggleFloat = () => setFloatOn((v) => !v);
+  // Memoize floating cards so they don't re-render on mouse move
+  const floatingCards = useMemo(
+    () => [
+      { label: "60 FPS", dot: true, top: "10%", left: 8, delay: 0 },
+      { label: "4K capture", dot: false, top: "46%", right: 8, delay: 0.6 },
+      { label: "Live in Framer", dot: false, bottom: "16%", left: "22%", delay: 1.2 },
+    ],
+    []
+  );
 
   return (
-    <div className="hero-playground" ref={containerRef} onMouseMove={handleMouseMove}>
-      {/* Drop overlay */}
-      {isDragging && (
-        <div style={{
-          position: "absolute", inset: 0, zIndex: 20,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          borderRadius: 20,
-          border: "2px dashed rgba(127,119,221,0.5)",
-          background: "rgba(127,119,221,0.06)",
-          backdropFilter: "blur(8px)",
-        }}>
-          <div style={{ fontSize: 16, color: "var(--accent-purple)", fontWeight: 500 }}>
-            Drop your screenshot
-          </div>
-        </div>
-      )}
-
-      {/* Hint */}
-      {hint && (
-        <div style={{
-          position: "absolute", bottom: 60, left: "50%", transform: "translateX(-50%)",
-          zIndex: 15, fontSize: 12, color: "var(--text-tertiary)",
-          transition: "opacity 0.5s", pointerEvents: "none",
-        }}>
-          Try it — drag your screenshot here
-        </div>
-      )}
-
-      {/* Canvas */}
-      <div
-        style={{ width: "100%", height: "calc(100% - 48px)" }}
-        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={handleDrop}
-      >
-        <Canvas
-          camera={{ position: [0, 0, 3.5], fov: 35 }}
-          dpr={[1, typeof window !== "undefined" && window.innerWidth > 768 ? 1.25 : 1]}
-          gl={{ antialias: true, alpha: true }}
-          style={{ background: "transparent" }}
+    <div
+      className="hero-playground"
+      ref={containerRef}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      style={{
+        boxShadow:
+          "0 0 80px rgba(139, 92, 246, 0.18), 0 0 160px rgba(6, 182, 212, 0.10)",
+      }}
+    >
+      {/* Floating UI cards (HTML, not R3F) */}
+      {floatingCards.map((c, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: [0, -8, 0] }}
+          transition={{
+            opacity: { duration: 0.6, delay: 1 + c.delay },
+            y: {
+              duration: 4 + i * 0.4,
+              delay: 1 + c.delay,
+              repeat: Infinity,
+              repeatType: "loop",
+              ease: "easeInOut",
+            },
+          }}
+          style={{
+            position: "absolute",
+            zIndex: 10,
+            top: c.top,
+            left: c.left,
+            right: c.right,
+            bottom: c.bottom,
+            padding: "6px 12px",
+            borderRadius: 9999,
+            background: "rgba(18, 18, 26, 0.72)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            border: "1px solid rgba(255, 255, 255, 0.10)",
+            color: "rgba(250, 250, 250, 0.78)",
+            fontSize: 11,
+            fontWeight: 500,
+            fontFamily: "ui-monospace, 'JetBrains Mono', SF Mono, Menlo, monospace",
+            letterSpacing: "0.06em",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            pointerEvents: "none",
+            whiteSpace: "nowrap",
+          }}
         >
-          <ambientLight intensity={0.4} color="#ffffff" />
-          <directionalLight position={[5, 5, 5]} intensity={0.8} />
-          <directionalLight position={[-3, 2, -3]} intensity={0.3} color="#7F77DD" />
-          <Suspense fallback={<Loader />}>
-            <Phone
-              screenTex={screenTex}
-              followMouse={followMouse}
-              floatOn={floatOn}
-              mouseRef={mouseRef}
+          {c.dot && (
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: "#22c55e",
+                boxShadow: "0 0 8px rgba(34, 197, 94, 0.6)",
+                animation: "pulse-dot 2s ease-in-out infinite",
+              }}
             />
-            <Environment preset="city" />
-          </Suspense>
-          <OrbitControls
-            ref={orbitRef}
-            autoRotate={autoRotate}
-            autoRotateSpeed={0.5}
-            enableZoom={true}
-            minDistance={2.5}
-            maxDistance={5}
-            enablePan={false}
-            enableDamping={true}
-            dampingFactor={0.05}
-            enabled={!followMouse}
+          )}
+          {c.label}
+        </motion.div>
+      ))}
+      <style>{`@keyframes pulse-dot { 0%, 100% { opacity: 1 } 50% { opacity: 0.4 } }`}</style>
+
+      {/* R3F Canvas */}
+      <Canvas
+        camera={{ position: [0, 0, 3.5], fov: 35 }}
+        dpr={dpr}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        style={{ background: "transparent", width: "100%", height: "100%" }}
+        frameloop="demand"
+      >
+        <PerformanceMonitor
+          onDecline={() => setDpr((d) => Math.max(0.75, d - 0.25))}
+          onIncline={() => setDpr((d) => Math.min(2, d + 0.25))}
+        />
+
+        <ambientLight intensity={0.4} color="#ffffff" />
+        <directionalLight position={[5, 5, 5]} intensity={0.85} />
+        <directionalLight position={[-3, 2, -3]} intensity={0.35} color="#8B5CF6" />
+        <directionalLight position={[3, -2, 2]} intensity={0.25} color="#06B6D4" />
+
+        <Suspense fallback={<Loader />}>
+          <Phone screenTex={texture} mouseRef={mouseRef} />
+          <Environment preset="city" />
+        </Suspense>
+
+        {mode === "video" && <VideoAnimator active={true} />}
+        {mode === "fallback" && (
+          <FallbackAnimator
+            canvas={fallbackCanvas}
+            tex={fallbackTex}
+            active={true}
           />
-        </Canvas>
-      </div>
-
-      {/* Control bar */}
-      <div style={{
-        position: "absolute", bottom: 0, left: 0, right: 0, height: 48,
-        display: "flex", alignItems: "center", gap: 8, padding: "0 12px",
-        background: "rgba(5,5,9,0.8)", backdropFilter: "blur(20px)",
-        borderTop: "1px solid var(--border-subtle)",
-        borderRadius: "0 0 20px 20px",
-      }}>
-        <button className="ctrl-btn" onClick={() => fileRef.current?.click()}>
-          <UploadIcon />
-          <span className="hidden sm:inline">{uploaded ? "Change" : "Upload"}</span>
-        </button>
-        <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} />
-
-        <button className={`ctrl-btn ${autoRotate ? "active" : ""}`} onClick={toggleAutoRotate}>
-          <RotateIcon />
-          <span className="hidden sm:inline">Rotate</span>
-        </button>
-
-        <button className={`ctrl-btn ${followMouse ? "active" : ""}`} onClick={toggleFollow}>
-          <MouseIcon />
-          <span className="hidden sm:inline">Follow</span>
-        </button>
-
-        <button className={`ctrl-btn ${floatOn ? "active" : ""}`} onClick={toggleFloat}>
-          <WaveIcon />
-          <span className="hidden sm:inline">Float</span>
-        </button>
-      </div>
+        )}
+      </Canvas>
     </div>
   );
 }

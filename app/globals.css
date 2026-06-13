@@ -289,3 +289,102 @@ h3 { font-size: clamp(20px, 2.5vw, 28px); font-weight: 500; line-height: 1.3; co
   border-color: rgba(0,0,0,0.12);
   box-shadow: 0 8px 24px rgba(0,0,0,0.08);
 }
+
+/* ─── Pixel decompose hover effect on images ─── */
+.pxl-particle {
+  position: absolute;
+  border-radius: 0;
+  opacity: 0;
+  transform: translate3d(0, 0, 0) scale(0.5);
+  transition:
+    opacity 720ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 820ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+[data-active="true"] .pxl-particle {
+  opacity: 0.9;
+  transform: translate3d(var(--tx), var(--ty), 0) scale(1);
+}
+
+.eyebrow {
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-transform: uppercase;
+}
+.eyebrow .num { color: #FF4B1F; font-variant-numeric: tabular-nums; }
+
+.reveal-up { opacity: 0; transform: translate3d(0, 18px, 0); transition: opacity 700ms ease, transform 700ms cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal-up.in { opacity: 1; transform: translate3d(0, 0, 0); }
+
+.card-lift { transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 420ms ease; }
+.card-lift:hover { transform: translate3d(0, -4px, 0); box-shadow: 0 28px 60px -28px rgba(10, 10, 10, 0.22); }
+
+@keyframes float-y { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -8px, 0); } }
+.float-soft { animation: float-y 6s ease-in-out infinite; }
+
+@keyframes marquee { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
+.marquee-track { animation: marquee 38s linear infinite; }
+
+.cta-glass { transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 320ms ease; }
+.cta-glass:hover { transform: translate3d(0, -1px, 0); box-shadow: 0 24px 36px -18px rgba(255, 75, 31, 0.45), inset 0 1px 0 rgba(255,255,255,0.18); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pxl-particle, .marquee-track, .float-soft, .reveal-up, .cta-glass, .card-lift {
+    animation: none !important; transition: none !important; transform: none !important; opacity: 1 !important;
+  }
+}
+
+/* ─── Responsive overrides for Memselon DA landing inline grids ─── */
+@media (max-width: 900px) {
+  .md-grid-hero,
+  .md-grid-why,
+  .md-about-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  .md-grid-stats,
+  .md-pricing-grid,
+  .md-voices-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px !important;
+  }
+  .md-plugin-grid {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+  }
+}
+@media (max-width: 560px) {
+  .md-grid-stats,
+  .md-pricing-grid,
+  .md-voices-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* Reduce hero padding on tiny screens */
+  section:first-of-type {
+    padding-top: 100px !important;
+  }
+}
+
+/* ─── Memselon DA override — force paper bg + neutralize legacy h1/h2/h3 cascade ─── */
+body {
+  background: #fafaf7 !important;
+  color: #0a0a0a !important;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, "SF Pro Display", sans-serif !important;
+}
+h1, h2, h3 {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+/* Restore reasonable defaults that won't fight inline styles */
+h1 { font-weight: 700; }
+h2 { font-weight: 700; }
+h3 { font-weight: 600; }
+::selection { background: #FF4B1F; color: #fafaf7; }

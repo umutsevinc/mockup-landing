@@ -25,7 +25,7 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const SITE_URL = "https://mockup-landing-rho.vercel.app";
+const SITE_URL = "https://framermockup.memselon.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
