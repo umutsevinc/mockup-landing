@@ -31,9 +31,9 @@ export default function TermsPage() {
 
         <Section title="2. Plans and billing">
           <ul style={ulStyle}>
-            <li><strong style={strongStyle}>Free plan</strong>: limited features with watermark, available for personal and commercial use.</li>
-            <li><strong style={strongStyle}>Paid plans</strong> (Starter, Pro, Studio): billed in USD, monthly or yearly, via Stripe. Stripe may display local currency based on your billing country.</li>
-            <li><strong style={strongStyle}>Founder Lifetime</strong>: one-time payment for lifetime access to Pro features and all future major features. Limited to 100 spots.</li>
+            <li><strong style={strongStyle}>7-day Ultra trial</strong>: full Ultra access for 7 days when you install the plugin. No credit card required.</li>
+            <li><strong style={strongStyle}>Paid plans</strong> (Pro, Ultra): billed in EUR, monthly or yearly, via Stripe. Stripe may display local currency based on your billing country.</li>
+            <li><strong style={strongStyle}>Founder Lifetime</strong>: one-time payment for lifetime access to Ultra features and all future major features. Limited to 50 spots.</li>
           </ul>
           <p>You can upgrade or downgrade at any time. Upgrades are billed prorated. Downgrades take effect at the end of the current billing period.</p>
         </Section>
