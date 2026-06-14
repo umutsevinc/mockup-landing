@@ -86,17 +86,18 @@ const COMPARE = [
 
 const PLANS = [
 	{
-		name: 'Free',
-		blurb: 'For testing the workflow.',
+		name: 'Trial',
+		blurb: 'Try Ultra for 7 days. No card required.',
 		monthly: '0',
 		yearly: '0',
-		cta: 'Get started',
+		cta: 'Start free trial',
 		highlight: false,
+		isTrial: true,
 		bullets: [
-			'2 exports / month, 720p PNG',
-			'Watermark "Made with Memselon"',
-			'iPad + Macintosh 1984',
-			'No animations, no video export',
+			'7 days of full Ultra access',
+			'All 10 devices, 4K exports',
+			'All animations + live 3D embed',
+			'Cancel anytime — no card asked',
 		],
 	},
 	{
@@ -427,13 +428,20 @@ export default function LandingSections() {
 								<div className="mb-2 text-sm font-semibold uppercase tracking-wider text-white/70">{p.name}</div>
 								<div className="text-sm text-white/55 mb-6">{p.blurb}</div>
 								<div className="mb-2 flex items-baseline gap-1">
-									<span className="text-5xl font-bold tracking-tight">€{yearly ? p.yearly : p.monthly}</span>
-									{p.monthly !== '0' ? (
-										<span className="text-sm text-white/55">/{yearly ? 'year' : 'month'}</span>
-									) : null}
+									{p.isTrial ? (
+										<>
+											<span className="text-5xl font-bold tracking-tight">€0</span>
+											<span className="text-sm text-white/55">/ 7 days</span>
+										</>
+									) : (
+										<>
+											<span className="text-5xl font-bold tracking-tight">€{yearly ? p.yearly : p.monthly}</span>
+											<span className="text-sm text-white/55">/{yearly ? 'year' : 'month'}</span>
+										</>
+									)}
 								</div>
 								<Link
-									href="/sign-up"
+									href={p.isTrial ? '/sign-up?trial=ultra' : '/sign-up'}
 									className={
 										'mt-6 block w-full text-center text-sm font-semibold px-5 py-3 rounded-full transition-all ' +
 										(p.highlight
