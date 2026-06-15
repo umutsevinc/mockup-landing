@@ -1,9 +1,132 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Menu } from 'lucide-react'
 import LandingSections from './components/LandingSections'
+
+/**
+ * Hero mockup cloud: iPhone centered, the rest fanned out on the sides.
+ * Each one fades in with a staggered delay and tracks the cursor with a
+ * per-mockup parallax weight (depth illusion). Drag is fully blocked so
+ * the visitor can't pull a PNG off the page.
+ */
+/**
+ * Hero mockup lineup — all available devices laid side-by-side across
+ * the hero. iPhone (hand-phone) anchors the center with the largest
+ * footprint; the rest fan outward symmetrically, each with its own
+ * fade-in delay (center first → ends last) and per-device parallax
+ * weight (heavier = moves more with the cursor, builds the depth
+ * illusion). Drag is fully blocked.
+ *
+ * src marked `card:true` → the JPG is a pricing-card render with a
+ * solid background; we wrap it in a rounded square so it sits well
+ * next to the transparent PNG models. Otherwise the asset is a
+ * cut-out PNG and renders edge-to-edge.
+ */
+type HeroMockup = {
+	src: string
+	label: string
+	x: number
+	y: number
+	size: number
+	weight: number
+	delay: number
+	rotate: number
+	card?: boolean
+}
+const HERO_MOCKUPS: HeroMockup[] = [
+	{ src: '/devices/iphoneair.jpg',  label: 'iPhone Air',      x: -48, y:  4,  size: 150, weight: 1.6, delay: 0.70, rotate: -14, card: true },
+	{ src: '/ren/watch.png',          label: 'Apple Watch',     x: -36, y: -10, size: 200, weight: 1.4, delay: 0.55, rotate: -10 },
+	{ src: '/ren/tablet.png',         label: 'iPad',            x: -22, y:  12, size: 260, weight: 0.9, delay: 0.40, rotate:  -5 },
+	{ src: '/ren/hand-phone.png',     label: 'iPhone 17 Pro',   x:   0, y:   0, size: 380, weight: 0.5, delay: 0.25, rotate:   0 },
+	{ src: '/ren/selfie.png',         label: 'iPhone Air model',x:  22, y:  12, size: 260, weight: 0.9, delay: 0.40, rotate:   5 },
+	{ src: '/ren/scholar.png',        label: 'Pro Display XDR', x:  36, y: -10, size: 220, weight: 1.4, delay: 0.55, rotate:  10 },
+	{ src: '/devices/imac.jpg',       label: 'iMac',            x:  48, y:  4,  size: 160, weight: 1.6, delay: 0.70, rotate:  14, card: true },
+]
+
+function HeroMockups({ cursorX, cursorY }: { cursorX: number; cursorY: number }) {
+	const [vw, setVw] = useState(1280)
+	const [vh, setVh] = useState(800)
+
+	useEffect(() => {
+		const onResize = () => {
+			setVw(window.innerWidth)
+			setVh(window.innerHeight)
+		}
+		onResize()
+		window.addEventListener('resize', onResize)
+		return () => window.removeEventListener('resize', onResize)
+	}, [])
+
+	// Normalized cursor offset from center, [-1, 1]
+	const cx = vw > 0 ? (cursorX - vw / 2) / (vw / 2) : 0
+	const cy = vh > 0 ? (cursorY - vh / 2) / (vh / 2) : 0
+
+	return (
+		<div
+			className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center select-none"
+			aria-hidden="true"
+		>
+			{HERO_MOCKUPS.map((m, i) => {
+				const px = m.weight * 36 * cx
+				const py = m.weight * 24 * cy
+				const tilt = m.weight * 4 * cx
+				return (
+					<div
+						key={m.src + i}
+						className="hero-mockup-anim absolute will-change-transform"
+						style={{
+							left: `calc(50% + ${m.x}%)`,
+							top: `calc(50% + ${m.y}%)`,
+							width: m.size,
+							height: m.size,
+							transform: `translate(-50%, -50%) translate3d(${px}px, ${py}px, 0) rotate(${m.rotate + tilt}deg)`,
+							transition: 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
+							animationDelay: `${m.delay}s`,
+							// Bigger sits in front; the centerpiece always wins.
+							zIndex: 40 + Math.round(m.size / 40) + (i === 3 ? 5 : 0),
+						}}
+					>
+						{m.card ? (
+							<div
+								className="w-full h-full overflow-hidden"
+								style={{
+									borderRadius: 24,
+									boxShadow: '0 18px 36px -10px rgba(0,0,0,0.45)',
+								}}
+							>
+								<Image
+									src={m.src}
+									alt=""
+									width={m.size * 2}
+									height={m.size * 2}
+									draggable={false}
+									onDragStart={(e) => e.preventDefault()}
+									className="w-full h-full object-cover pointer-events-none select-none"
+									style={{ userSelect: 'none', WebkitUserDrag: 'none' } as React.CSSProperties}
+								/>
+							</div>
+						) : (
+							<Image
+								src={m.src}
+								alt=""
+								width={m.size * 2}
+								height={m.size * 2}
+								draggable={false}
+								priority={i === 3}
+								onDragStart={(e) => e.preventDefault()}
+								className="w-full h-full object-contain pointer-events-none select-none"
+								style={{ userSelect: 'none', WebkitUserDrag: 'none' } as React.CSSProperties}
+							/>
+						)}
+					</div>
+				)
+			})}
+		</div>
+	)
+}
 
 const BG_IMAGE_1 =
 	'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_195923_b0ba8ace-1d1d-4f2c-9a28-1ab84b330680.png&w=1280&q=85'
@@ -128,7 +251,7 @@ export default function HomePage() {
 					<svg width="26" height="26" viewBox="0 0 256 256" fill="#ffffff" aria-hidden="true">
 						<path d="M 256 256 L 128 256 L 0 128 L 128 128 Z M 256 128 L 128 128 L 0 0 L 128 0 Z" />
 					</svg>
-					<span className="text-white text-2xl font-playfair italic">Memselon</span>
+					<span className="text-white text-2xl font-playfair italic">Framer mockup</span>
 				</Link>
 
 				{/* Center pill — desktop only */}
@@ -191,6 +314,9 @@ export default function HomePage() {
 
 				{/* Layer 2: cursor-revealed image */}
 				<RevealLayer image={BG_IMAGE_2} cursorX={cursorPos.x} cursorY={cursorPos.y} />
+
+				{/* Layer 2.5: mockup cloud (fade in + parallax follow cursor) */}
+				<HeroMockups cursorX={cursorPos.x} cursorY={cursorPos.y} />
 
 				{/* Layer 3: heading */}
 				<div className="absolute top-[14%] left-0 right-0 z-50 flex flex-col items-center text-center px-5 pointer-events-none">

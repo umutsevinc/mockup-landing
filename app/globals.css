@@ -48,10 +48,32 @@ html, body {
 .hero-zoom   { animation: heroZoom 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-anim, .hero-zoom {
+  .hero-anim, .hero-zoom, .hero-mockup-anim {
     animation: none;
     opacity: 1;
   }
+}
+
+/* Hero mockup cloud — fade + soft float-in, the per-element transform is
+   applied inline (cursor parallax + rotation), so we tween opacity and a
+   gentle scale via a CSS variable to avoid clobbering the inline transform. */
+@keyframes heroMockupIn {
+  0%   { opacity: 0; filter: blur(8px); }
+  100% { opacity: 1; filter: blur(0); }
+}
+.hero-mockup-anim {
+  opacity: 0;
+  animation-name: heroMockupIn;
+  animation-duration: 1.1s;
+  animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-user-drag: none;
+  user-select: none;
+}
+.hero-mockup-anim img {
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
 }
 
 /* ──────────────────────────────────────────────────────────────────

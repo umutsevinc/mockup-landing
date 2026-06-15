@@ -37,13 +37,13 @@ const DEVICES = [
 	{ name: 'iPhone 17 Pro',        tier: 'Pro',    img: '/ren/hand-phone.png' },
 	{ name: 'iPhone Air',           tier: 'Pro',    img: '/ren/selfie.png' },
 	{ name: 'iPhone 16e',           tier: 'Pro' },
-	{ name: 'iPad',                 tier: 'Free',   img: '/ren/tablet.png' },
+	{ name: 'iPad',                 tier: 'Pro',    img: '/ren/tablet.png' },
 	{ name: 'MacBook Pro 16"',      tier: 'Pro' },
 	{ name: 'iMac',                 tier: 'Pro' },
 	{ name: 'Apple Pro Display XDR',tier: 'Ultra',  img: '/ren/scholar.png' },
 	{ name: 'Apple Watch Ultra',    tier: 'Pro',    img: '/ren/watch.png' },
 	{ name: 'Samsung Galaxy S25',   tier: 'Pro' },
-	{ name: 'Macintosh 1984',       tier: 'Free' },
+	{ name: 'Macintosh 1984',       tier: 'Pro' },
 ]
 
 const STEPS = [
@@ -86,21 +86,6 @@ const COMPARE = [
 
 const PLANS = [
 	{
-		name: 'Trial',
-		blurb: 'Try Ultra for 7 days. No card required.',
-		monthly: '0',
-		yearly: '0',
-		cta: 'Start free trial',
-		highlight: false,
-		isTrial: true,
-		bullets: [
-			'7 days of full Ultra access',
-			'All 10 devices, 4K exports',
-			'All animations + live 3D embed',
-			'Cancel anytime — no card asked',
-		],
-	},
-	{
 		name: 'Pro',
 		blurb: 'For freelance designers.',
 		monthly: '9',
@@ -108,7 +93,8 @@ const PLANS = [
 		cta: 'Go Pro',
 		highlight: true,
 		bullets: [
-			'50 exports / month, 1080p',
+			'50 exports / month, up to 1080p',
+			'Photo mode + Video mode (still + iframe)',
 			'No watermark',
 			'All 10 devices',
 			'Orbit camera',
@@ -123,7 +109,8 @@ const PLANS = [
 		cta: 'Go Ultra',
 		highlight: false,
 		bullets: [
-			'Unlimited exports, 4K',
+			'Unlimited exports, up to 4K',
+			'Photo · Video · Live 3D embed — all modes',
 			'Transparent PNG + MP4 video',
 			'All animations (follow cursor, orbit, float, scroll)',
 			'Live 3D Framer component (embed on landings)',
@@ -233,7 +220,7 @@ export default function LandingSections() {
 										<div
 											className={
 												'text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full ' +
-												(d.tier === 'Free'
+												(d.tier === 'Trial'
 													? 'bg-white/15 text-white/80'
 													: d.tier === 'Pro'
 													? 'bg-[#e8702a]/20 text-[#e8702a]'
@@ -376,7 +363,7 @@ export default function LandingSections() {
 							<span className="font-playfair italic font-normal">Pay</span> what fits.
 						</h2>
 						<p className="mt-6 text-base sm:text-lg text-white/65 max-w-xl mx-auto">
-							A Free tier to test. Pro for freelance. Ultra for everything else. Cancel any time.
+							7-day Ultra trial to test. Pro for freelance. Ultra for everything else. Cancel any time.
 						</p>
 
 						{/* Monthly / yearly toggle */}
@@ -428,20 +415,11 @@ export default function LandingSections() {
 								<div className="mb-2 text-sm font-semibold uppercase tracking-wider text-white/70">{p.name}</div>
 								<div className="text-sm text-white/55 mb-6">{p.blurb}</div>
 								<div className="mb-2 flex items-baseline gap-1">
-									{p.isTrial ? (
-										<>
-											<span className="text-5xl font-bold tracking-tight">€0</span>
-											<span className="text-sm text-white/55">/ 7 days</span>
-										</>
-									) : (
-										<>
-											<span className="text-5xl font-bold tracking-tight">€{yearly ? p.yearly : p.monthly}</span>
-											<span className="text-sm text-white/55">/{yearly ? 'year' : 'month'}</span>
-										</>
-									)}
+									<span className="text-5xl font-bold tracking-tight">€{yearly ? p.yearly : p.monthly}</span>
+									<span className="text-sm text-white/55">/{yearly ? 'year' : 'month'}</span>
 								</div>
 								<Link
-									href={p.isTrial ? '/sign-up?trial=ultra' : '/sign-up'}
+									href={'/sign-up'}
 									className={
 										'mt-6 block w-full text-center text-sm font-semibold px-5 py-3 rounded-full transition-all ' +
 										(p.highlight
