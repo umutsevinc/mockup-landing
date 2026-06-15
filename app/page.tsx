@@ -49,13 +49,13 @@ type HeroSide = {
 	rotateY: number
 }
 const HERO_LEFT: HeroSide[] = [
-	{ src: '/ren/watch.png',  label: 'Apple Watch Ultra', size: 180, delay: 0.55, rotateY: -38 },
-	{ src: '/ren/tablet.png', label: 'iPad Pro',          size: 240, delay: 0.42, rotateY: -22 },
-	{ src: '/ren/selfie.png', label: 'iPhone Air',        size: 280, delay: 0.32, rotateY: -10 },
+	{ src: '/ren/watch.png',  label: 'Apple Watch Ultra', size: 260, delay: 0.55, rotateY: -38 },
+	{ src: '/ren/tablet.png', label: 'iPad Pro',          size: 360, delay: 0.42, rotateY: -22 },
+	{ src: '/ren/selfie.png', label: 'iPhone Air',        size: 400, delay: 0.32, rotateY: -10 },
 ]
 const HERO_RIGHT: HeroSide[] = [
-	{ src: '/ren/hand-phone.png', label: 'iPhone (model)',  size: 280, delay: 0.32, rotateY:  10 },
-	{ src: '/ren/scholar.png',    label: 'Pro Display XDR', size: 240, delay: 0.42, rotateY:  22 },
+	{ src: '/ren/hand-phone.png', label: 'iPhone (model)',  size: 400, delay: 0.32, rotateY:  10 },
+	{ src: '/ren/scholar.png',    label: 'Pro Display XDR', size: 360, delay: 0.42, rotateY:  22 },
 ]
 
 function HeroMockups({cursorX, cursorY}: {cursorX: number; cursorY: number}) {
@@ -127,8 +127,8 @@ function HeroMockups({cursorX, cursorY}: {cursorX: number; cursorY: number}) {
 				<div
 					className="hero-mockup-anim relative"
 					style={{
-						width: 380,
-						height: 480,
+						width: 620,
+						height: 720,
 						animationDelay: '0.25s',
 						filter: 'drop-shadow(0 28px 40px rgba(0,0,0,0.55))',
 						transform: `translate3d(${centerParallaxX}px, ${centerParallaxY}px, 0)`,
@@ -136,7 +136,7 @@ function HeroMockups({cursorX, cursorY}: {cursorX: number; cursorY: number}) {
 					}}
 				>
 					<iframe
-						src={`${EMBED_HOST}/embed/${CENTERPIECE_ID}?zoom=1&showSignature=false&bg=transparent`}
+						src={`${EMBED_HOST}/embed/${CENTERPIECE_ID}?zoom=1.6&showSignature=false&bg=transparent`}
 						title="iPhone 17 Pro"
 						loading="eager"
 						sandbox="allow-scripts allow-same-origin"
@@ -336,14 +336,19 @@ export default function HomePage() {
 				className="relative w-full overflow-hidden h-screen bg-black"
 				style={{ height: '100dvh' }}
 			>
-				{/* Layer 1: base image */}
-				<div
-					className="absolute inset-0 bg-center bg-cover bg-no-repeat z-10 hero-zoom"
-					style={{ backgroundImage: `url(${BG_IMAGE_1})` }}
-				/>
-
-				{/* Layer 2: cursor-revealed image */}
-				<RevealLayer image={BG_IMAGE_2} cursorX={cursorPos.x} cursorY={cursorPos.y} />
+				{/* BG image layers retired — solid black canvas so the device
+				    lineup is the only visual focus. The cursor-reveal mask
+				    + Higgs landscape photos are kept in source under a
+				    `false &&` so they can be re-enabled later. */}
+				{false && (
+					<>
+						<div
+							className="absolute inset-0 bg-center bg-cover bg-no-repeat z-10 hero-zoom"
+							style={{ backgroundImage: `url(${BG_IMAGE_1})` }}
+						/>
+						<RevealLayer image={BG_IMAGE_2} cursorX={cursorPos.x} cursorY={cursorPos.y} />
+					</>
+				)}
 
 				{/* Layer 2.5: mockup cloud (fade in + parallax follow cursor) */}
 				<HeroMockups cursorX={cursorPos.x} cursorY={cursorPos.y} />
