@@ -123,12 +123,14 @@ function HeroMockups({cursorX, cursorY}: {cursorX: number; cursorY: number}) {
 					<SideImage key={m.src} m={m} i={i} baseDelay={m.delay} />
 				))}
 				{/* Centerpiece — live 3D iframe, transparent background, no
-				    rotation (perfectly head-on), drop-shadow for depth. */}
+				    rotation (perfectly head-on), drop-shadow for depth.
+				    Locked to 100% of the hero viewport height; width scales
+				    with a 5:6 aspect so the device stays tall + readable. */}
 				<div
 					className="hero-mockup-anim relative"
 					style={{
-						width: 620,
-						height: 720,
+						height: '100dvh',
+						aspectRatio: '5 / 6',
 						animationDelay: '0.25s',
 						filter: 'drop-shadow(0 28px 40px rgba(0,0,0,0.55))',
 						transform: `translate3d(${centerParallaxX}px, ${centerParallaxY}px, 0)`,
