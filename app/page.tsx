@@ -26,29 +26,41 @@ import LandingSections from './components/LandingSections'
  * opening that scene in the plugin and saving over it — the iframe
  * picks it up on next mount.
  */
+/**
+ * Hero lineup — one LIVE 3D scene at the center (iPhone 17 Pro)
+ * surrounded by 5 still PNG captures of the other devices. All
+ * transparent backgrounds, horizontally aligned, with a progressive
+ * CSS `perspective + rotateY` that turns the outer devices toward
+ * the center so the row reads as a 3D fan in real perspective.
+ *
+ * The PNGs come from /ren/ (pre-rendered hero shots in this repo).
+ * The iframe pulls the seeded "Hero · iPhone 17 Pro" scene from
+ * Supabase and forces transparent background via ?bg=transparent.
+ */
 const EMBED_HOST = 'https://framer-3d-mockup-embed.vercel.app'
-type HeroMockup = {
-	id: string
+const CENTERPIECE_ID = '2c4db93b-b197-4287-9113-58e68b5869b4'
+
+type HeroSide = {
+	src: string
 	label: string
-	x: number
-	y: number
 	size: number
 	delay: number
-	rotate: number
+	/** Negative degree on the left, positive on the right. */
+	rotateY: number
 }
-const HERO_MOCKUPS: HeroMockup[] = [
-	{ id: '6bf25fc0-7cb1-4218-a552-a6d3803bfc9c', label: 'Apple Watch Ultra', x: -42, y: -8,  size: 220, delay: 0.55, rotate: -10 },
-	{ id: '33beb656-742d-49a6-8a01-e394024a33da', label: 'iPad Pro',         x: -24, y:  10, size: 300, delay: 0.40, rotate:  -5 },
-	{ id: 'd4c62eee-a968-4bff-b7b7-120e987b2593', label: 'iPhone Air',       x: -10, y:  -2, size: 320, delay: 0.32, rotate:  -2 },
-	{ id: '2c4db93b-b197-4287-9113-58e68b5869b4', label: 'iPhone 17 Pro',    x:  10, y:   2, size: 360, delay: 0.25, rotate:   2 },
-	{ id: '715a63bd-7a6f-499e-ba42-d7cc915b8bba', label: 'iMac',             x:  28, y:  10, size: 280, delay: 0.40, rotate:   5 },
-	{ id: '7aa82034-281d-4c39-83e7-9d90ce149d12', label: 'Pro Display XDR',  x:  44, y: -8,  size: 260, delay: 0.55, rotate:  10 },
+const HERO_LEFT: HeroSide[] = [
+	{ src: '/ren/watch.png',  label: 'Apple Watch Ultra', size: 180, delay: 0.55, rotateY: -38 },
+	{ src: '/ren/tablet.png', label: 'iPad Pro',          size: 240, delay: 0.42, rotateY: -22 },
+	{ src: '/ren/selfie.png', label: 'iPhone Air',        size: 280, delay: 0.32, rotateY: -10 },
+]
+const HERO_RIGHT: HeroSide[] = [
+	{ src: '/ren/hand-phone.png', label: 'iPhone (model)',  size: 280, delay: 0.32, rotateY:  10 },
+	{ src: '/ren/scholar.png',    label: 'Pro Display XDR', size: 240, delay: 0.42, rotateY:  22 },
 ]
 
-function HeroMockups({ cursorX, cursorY }: { cursorX: number; cursorY: number }) {
+function HeroMockups({cursorX, cursorY}: {cursorX: number; cursorY: number}) {
 	const [vw, setVw] = useState(1280)
 	const [vh, setVh] = useState(800)
-
 	useEffect(() => {
 		const onResize = () => {
 			setVw(window.innerWidth)
@@ -58,52 +70,75 @@ function HeroMockups({ cursorX, cursorY }: { cursorX: number; cursorY: number })
 		window.addEventListener('resize', onResize)
 		return () => window.removeEventListener('resize', onResize)
 	}, [])
-
-	// Normalized cursor offset from viewport center, [-1, 1] — propagated
-	// to every iframe via postMessage so the embedded scene can apply
-	// follow-cursor without depending on its own bounded cursor area.
 	const cx = vw > 0 ? (cursorX - vw / 2) / (vw / 2) : 0
 	const cy = vh > 0 ? (cursorY - vh / 2) / (vh / 2) : 0
-	const iframeRefs = useRef<Array<HTMLIFrameElement | null>>([])
-	useEffect(() => {
-		iframeRefs.current.forEach((iframe) => {
-			if (!iframe?.contentWindow) return
-			try {
-				iframe.contentWindow.postMessage(
-					{type: 'memselon:cursor', x: cx, y: cy},
-					EMBED_HOST,
-				)
-			} catch {}
-		})
-	}, [cx, cy])
+
+	const SideImage = ({m, i, baseDelay}: {m: HeroSide; i: number; baseDelay: number}) => {
+		const parallaxX = -cx * 24 * (Math.abs(m.rotateY) / 38)
+		const parallaxY = cy * 14 * (Math.abs(m.rotateY) / 38)
+		return (
+			<div
+				className="hero-mockup-anim relative flex items-center justify-center"
+				style={{
+					width: m.size,
+					height: m.size,
+					perspective: 900,
+					animationDelay: `${baseDelay}s`,
+				}}
+			>
+				<Image
+					src={m.src}
+					alt={m.label}
+					width={m.size * 2}
+					height={m.size * 2}
+					draggable={false}
+					onDragStart={(e) => e.preventDefault()}
+					className="w-full h-full object-contain pointer-events-none select-none"
+					style={{
+						userSelect: 'none',
+						WebkitUserDrag: 'none',
+						transform: `translate3d(${parallaxX}px, ${parallaxY}px, 0) rotateY(${m.rotateY}deg)`,
+						transition: 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)',
+						filter: 'drop-shadow(0 24px 28px rgba(0,0,0,0.45))',
+					} as React.CSSProperties}
+					priority={i === 1}
+				/>
+			</div>
+		)
+	}
+
+	const centerParallaxX = -cx * 12
+	const centerParallaxY = cy * 8
 
 	return (
 		<div
-			className="absolute inset-0 z-40 flex items-center justify-center select-none"
+			className="absolute inset-0 z-40 flex items-center justify-center select-none px-4"
 			aria-hidden="true"
 		>
-			{HERO_MOCKUPS.map((m, i) => (
+			<div
+				className="flex items-center justify-center gap-2 sm:gap-4 md:gap-6"
+				style={{maxWidth: '100%'}}
+			>
+				{HERO_LEFT.map((m, i) => (
+					<SideImage key={m.src} m={m} i={i} baseDelay={m.delay} />
+				))}
+				{/* Centerpiece — live 3D iframe, transparent background, no
+				    rotation (perfectly head-on), drop-shadow for depth. */}
 				<div
-					key={m.id}
-					className="hero-mockup-anim absolute will-change-transform"
+					className="hero-mockup-anim relative"
 					style={{
-						left: `calc(50% + ${m.x}%)`,
-						top: `calc(50% + ${m.y}%)`,
-						width: m.size,
-						height: m.size,
-						transform: `translate(-50%, -50%) rotate(${m.rotate}deg)`,
-						animationDelay: `${m.delay}s`,
-						zIndex: 40 + Math.round(m.size / 40) + (i === 3 ? 5 : 0),
-						filter: 'drop-shadow(0 18px 36px rgba(0,0,0,0.35))',
+						width: 380,
+						height: 480,
+						animationDelay: '0.25s',
+						filter: 'drop-shadow(0 28px 40px rgba(0,0,0,0.55))',
+						transform: `translate3d(${centerParallaxX}px, ${centerParallaxY}px, 0)`,
+						transition: 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)',
 					}}
 				>
 					<iframe
-						ref={(el) => {
-							iframeRefs.current[i] = el
-						}}
-						src={`${EMBED_HOST}/embed/${m.id}?zoom=1&showSignature=false`}
-						title={m.label}
-						loading={i === 3 ? 'eager' : 'lazy'}
+						src={`${EMBED_HOST}/embed/${CENTERPIECE_ID}?zoom=1&showSignature=false&bg=transparent`}
+						title="iPhone 17 Pro"
+						loading="eager"
 						sandbox="allow-scripts allow-same-origin"
 						style={{
 							width: '100%',
@@ -111,11 +146,14 @@ function HeroMockups({ cursorX, cursorY }: { cursorX: number; cursorY: number })
 							border: 'none',
 							background: 'transparent',
 							display: 'block',
-							pointerEvents: 'none',
+							colorScheme: 'normal',
 						}}
 					/>
 				</div>
-			))}
+				{HERO_RIGHT.map((m, i) => (
+					<SideImage key={m.src} m={m} i={i} baseDelay={m.delay} />
+				))}
+			</div>
 		</div>
 	)
 }
