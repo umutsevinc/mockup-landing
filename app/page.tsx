@@ -13,37 +13,36 @@ import LandingSections from './components/LandingSections'
  * the visitor can't pull a PNG off the page.
  */
 /**
- * Hero mockup lineup — all available devices laid side-by-side across
- * the hero. iPhone (hand-phone) anchors the center with the largest
- * footprint; the rest fan outward symmetrically, each with its own
- * fade-in delay (center first → ends last) and per-device parallax
- * weight (heavier = moves more with the cursor, builds the depth
- * illusion). Drag is fully blocked.
+ * Hero mockup lineup — real saved 3D scenes embedded via the public
+ * /embed/[id] route of framer-3d-mockup-embed.vercel.app. Each iframe
+ * renders the GLB model with the default video playing on the screen
+ * mesh, plus the Follow Cursor animation baked into the scene's saved
+ * `animations` payload so it tilts toward the cursor as the user
+ * hovers over it.
  *
- * src marked `card:true` → the JPG is a pricing-card render with a
- * solid background; we wrap it in a rounded square so it sits well
- * next to the transparent PNG models. Otherwise the asset is a
- * cut-out PNG and renders edge-to-edge.
+ * Scene UUIDs are pre-seeded in Supabase (Framer 3D Mockups project,
+ * mockups table, owner contact@memselon.com). Anyone can swap the
+ * config (light, environment, animation knobs, screen video) by
+ * opening that scene in the plugin and saving over it — the iframe
+ * picks it up on next mount.
  */
+const EMBED_HOST = 'https://framer-3d-mockup-embed.vercel.app'
 type HeroMockup = {
-	src: string
+	id: string
 	label: string
 	x: number
 	y: number
 	size: number
-	weight: number
 	delay: number
 	rotate: number
-	card?: boolean
 }
 const HERO_MOCKUPS: HeroMockup[] = [
-	{ src: '/devices/iphoneair.jpg',  label: 'iPhone Air',      x: -48, y:  4,  size: 150, weight: 1.6, delay: 0.70, rotate: -14, card: true },
-	{ src: '/ren/watch.png',          label: 'Apple Watch',     x: -36, y: -10, size: 200, weight: 1.4, delay: 0.55, rotate: -10 },
-	{ src: '/ren/tablet.png',         label: 'iPad',            x: -22, y:  12, size: 260, weight: 0.9, delay: 0.40, rotate:  -5 },
-	{ src: '/ren/hand-phone.png',     label: 'iPhone 17 Pro',   x:   0, y:   0, size: 380, weight: 0.5, delay: 0.25, rotate:   0 },
-	{ src: '/ren/selfie.png',         label: 'iPhone Air model',x:  22, y:  12, size: 260, weight: 0.9, delay: 0.40, rotate:   5 },
-	{ src: '/ren/scholar.png',        label: 'Pro Display XDR', x:  36, y: -10, size: 220, weight: 1.4, delay: 0.55, rotate:  10 },
-	{ src: '/devices/imac.jpg',       label: 'iMac',            x:  48, y:  4,  size: 160, weight: 1.6, delay: 0.70, rotate:  14, card: true },
+	{ id: '6bf25fc0-7cb1-4218-a552-a6d3803bfc9c', label: 'Apple Watch Ultra', x: -42, y: -8,  size: 220, delay: 0.55, rotate: -10 },
+	{ id: '33beb656-742d-49a6-8a01-e394024a33da', label: 'iPad Pro',         x: -24, y:  10, size: 300, delay: 0.40, rotate:  -5 },
+	{ id: 'd4c62eee-a968-4bff-b7b7-120e987b2593', label: 'iPhone Air',       x: -10, y:  -2, size: 320, delay: 0.32, rotate:  -2 },
+	{ id: '2c4db93b-b197-4287-9113-58e68b5869b4', label: 'iPhone 17 Pro',    x:  10, y:   2, size: 360, delay: 0.25, rotate:   2 },
+	{ id: '715a63bd-7a6f-499e-ba42-d7cc915b8bba', label: 'iMac',             x:  28, y:  10, size: 280, delay: 0.40, rotate:   5 },
+	{ id: '7aa82034-281d-4c39-83e7-9d90ce149d12', label: 'Pro Display XDR',  x:  44, y: -8,  size: 260, delay: 0.55, rotate:  10 },
 ]
 
 function HeroMockups({ cursorX, cursorY }: { cursorX: number; cursorY: number }) {
@@ -60,70 +59,63 @@ function HeroMockups({ cursorX, cursorY }: { cursorX: number; cursorY: number })
 		return () => window.removeEventListener('resize', onResize)
 	}, [])
 
-	// Normalized cursor offset from center, [-1, 1]
+	// Normalized cursor offset from viewport center, [-1, 1] — propagated
+	// to every iframe via postMessage so the embedded scene can apply
+	// follow-cursor without depending on its own bounded cursor area.
 	const cx = vw > 0 ? (cursorX - vw / 2) / (vw / 2) : 0
 	const cy = vh > 0 ? (cursorY - vh / 2) / (vh / 2) : 0
+	const iframeRefs = useRef<Array<HTMLIFrameElement | null>>([])
+	useEffect(() => {
+		iframeRefs.current.forEach((iframe) => {
+			if (!iframe?.contentWindow) return
+			try {
+				iframe.contentWindow.postMessage(
+					{type: 'memselon:cursor', x: cx, y: cy},
+					EMBED_HOST,
+				)
+			} catch {}
+		})
+	}, [cx, cy])
 
 	return (
 		<div
-			className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center select-none"
+			className="absolute inset-0 z-40 flex items-center justify-center select-none"
 			aria-hidden="true"
 		>
-			{HERO_MOCKUPS.map((m, i) => {
-				const px = m.weight * 36 * cx
-				const py = m.weight * 24 * cy
-				const tilt = m.weight * 4 * cx
-				return (
-					<div
-						key={m.src + i}
-						className="hero-mockup-anim absolute will-change-transform"
-						style={{
-							left: `calc(50% + ${m.x}%)`,
-							top: `calc(50% + ${m.y}%)`,
-							width: m.size,
-							height: m.size,
-							transform: `translate(-50%, -50%) translate3d(${px}px, ${py}px, 0) rotate(${m.rotate + tilt}deg)`,
-							transition: 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
-							animationDelay: `${m.delay}s`,
-							// Bigger sits in front; the centerpiece always wins.
-							zIndex: 40 + Math.round(m.size / 40) + (i === 3 ? 5 : 0),
+			{HERO_MOCKUPS.map((m, i) => (
+				<div
+					key={m.id}
+					className="hero-mockup-anim absolute will-change-transform"
+					style={{
+						left: `calc(50% + ${m.x}%)`,
+						top: `calc(50% + ${m.y}%)`,
+						width: m.size,
+						height: m.size,
+						transform: `translate(-50%, -50%) rotate(${m.rotate}deg)`,
+						animationDelay: `${m.delay}s`,
+						zIndex: 40 + Math.round(m.size / 40) + (i === 3 ? 5 : 0),
+						filter: 'drop-shadow(0 18px 36px rgba(0,0,0,0.35))',
+					}}
+				>
+					<iframe
+						ref={(el) => {
+							iframeRefs.current[i] = el
 						}}
-					>
-						{m.card ? (
-							<div
-								className="w-full h-full overflow-hidden"
-								style={{
-									borderRadius: 24,
-									boxShadow: '0 18px 36px -10px rgba(0,0,0,0.45)',
-								}}
-							>
-								<Image
-									src={m.src}
-									alt=""
-									width={m.size * 2}
-									height={m.size * 2}
-									draggable={false}
-									onDragStart={(e) => e.preventDefault()}
-									className="w-full h-full object-cover pointer-events-none select-none"
-									style={{ userSelect: 'none', WebkitUserDrag: 'none' } as React.CSSProperties}
-								/>
-							</div>
-						) : (
-							<Image
-								src={m.src}
-								alt=""
-								width={m.size * 2}
-								height={m.size * 2}
-								draggable={false}
-								priority={i === 3}
-								onDragStart={(e) => e.preventDefault()}
-								className="w-full h-full object-contain pointer-events-none select-none"
-								style={{ userSelect: 'none', WebkitUserDrag: 'none' } as React.CSSProperties}
-							/>
-						)}
-					</div>
-				)
-			})}
+						src={`${EMBED_HOST}/embed/${m.id}?zoom=1&showSignature=false`}
+						title={m.label}
+						loading={i === 3 ? 'eager' : 'lazy'}
+						sandbox="allow-scripts allow-same-origin"
+						style={{
+							width: '100%',
+							height: '100%',
+							border: 'none',
+							background: 'transparent',
+							display: 'block',
+							pointerEvents: 'none',
+						}}
+					/>
+				</div>
+			))}
 		</div>
 	)
 }
