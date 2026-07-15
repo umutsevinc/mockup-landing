@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
+import StudioFeatures from './StudioFeatures'
 import { useEffect, useRef, useState } from 'react'
 
 // Section interactive "Take a closer look" — 3D chargée client-only.
@@ -475,6 +476,9 @@ export default function LandingSections() {
 					</div>
 				</div>
 			</section>
+
+			{/* ════════════ Section 4.2 — Inside the studio ════════════ */}
+			<StudioFeatures />
 
 			{/* ════════════ Section 4.5 — Exports (à la Apple) ════════════ */}
 			<ExportFormatsSection />
