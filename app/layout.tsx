@@ -36,7 +36,8 @@ export const metadata: Metadata = {
 		creator: '@memselon',
 	},
 	icons: {
-		icon: '/icon.svg',
+		// ?v=2 : cache-bust — les navigateurs gardent les favicons très longtemps.
+		icon: '/icon.svg?v=2',
 	},
 }
 
