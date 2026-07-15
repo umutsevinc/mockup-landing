@@ -41,7 +41,7 @@ export default function SignInPage() {
 			subtitle="Welcome back. Enter your details to continue."
 			footer={
 				<>
-					<Link href="/sign-up" style={{ fontSize: 13, color: '#7F77DD', textDecoration: 'none' }}>
+					<Link href="/sign-up" style={{ fontSize: 13, color: '#e8702a', textDecoration: 'none' }}>
 						No account? Create one
 					</Link>
 					<br />

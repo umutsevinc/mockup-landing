@@ -137,7 +137,7 @@ function ResetPasswordInner() {
 				title="Check your email"
 				subtitle={`We sent a reset link to ${email}. Click it to choose a new password.`}
 				footer={
-					<Link href="/sign-in" style={{ fontSize: 13, color: '#7F77DD', textDecoration: 'none' }}>
+					<Link href="/sign-in" style={{ fontSize: 13, color: '#e8702a', textDecoration: 'none' }}>
 						Back to sign in
 					</Link>
 				}
@@ -154,7 +154,7 @@ function ResetPasswordInner() {
 			title="Reset password"
 			subtitle="Enter your email and we'll send you a reset link."
 			footer={
-				<Link href="/sign-in" style={{ fontSize: 13, color: '#7F77DD', textDecoration: 'none' }}>
+				<Link href="/sign-in" style={{ fontSize: 13, color: '#e8702a', textDecoration: 'none' }}>
 					Back to sign in
 				</Link>
 			}

@@ -50,7 +50,7 @@ export default function SignUpPage() {
 				title="Check your email"
 				subtitle={`We sent a confirmation link to ${email}. Click it to activate your account.`}
 				footer={
-					<Link href="/sign-in" style={{ fontSize: 13, color: '#7F77DD', textDecoration: 'none' }}>
+					<Link href="/sign-in" style={{ fontSize: 13, color: '#e8702a', textDecoration: 'none' }}>
 						Back to sign in
 					</Link>
 				}
@@ -67,7 +67,7 @@ export default function SignUpPage() {
 			title="Create your account"
 			subtitle="Get started with 2 free credits / month."
 			footer={
-				<Link href="/sign-in" style={{ fontSize: 13, color: '#7F77DD', textDecoration: 'none' }}>
+				<Link href="/sign-in" style={{ fontSize: 13, color: '#e8702a', textDecoration: 'none' }}>
 					Already have an account? Sign in
 				</Link>
 			}
@@ -117,11 +117,11 @@ export default function SignUpPage() {
 					}}
 				>
 					By creating an account you agree to our{' '}
-					<Link href="/terms" style={{ color: '#7F77DD' }}>
+					<Link href="/terms" style={{ color: '#e8702a' }}>
 						Terms
 					</Link>{' '}
 					and{' '}
-					<Link href="/privacy" style={{ color: '#7F77DD' }}>
+					<Link href="/privacy" style={{ color: '#e8702a' }}>
 						Privacy Policy
 					</Link>
 					.
