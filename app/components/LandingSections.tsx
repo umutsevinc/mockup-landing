@@ -2,7 +2,14 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import { useEffect, useRef, useState } from 'react'
+
+// Section interactive "Take a closer look" — 3D chargée client-only.
+const CloserLook = dynamic(() => import('./CloserLook'), {
+	ssr: false,
+	loading: () => <div className="min-h-[620px]" aria-hidden="true" />,
+})
 import { ArrowRight, Camera, Download, Sparkles, Check, MousePointer2, RotateCw, Wind, Zap } from 'lucide-react'
 
 /**
@@ -33,15 +40,173 @@ function useScrollReveal() {
 	return ref
 }
 
+/**
+ * Carousel "The latest" à la Apple : cartes larges, titre + sous-titre
+ * EN HAUT, photo produit EN BAS, scroll-snap horizontal, avance
+ * automatique (pause au hover), flèches de navigation.
+ */
+function DeviceCarousel() {
+	const trackRef = useRef<HTMLDivElement>(null)
+	const pausedRef = useRef(false)
+
+	useEffect(() => {
+		const el = trackRef.current
+		if (!el) return
+		const id = setInterval(() => {
+			if (pausedRef.current) return
+			const card = el.querySelector<HTMLElement>('[data-card]')
+			const step = card ? card.offsetWidth + 16 : 356
+			const max = el.scrollWidth - el.clientWidth - 8
+			if (el.scrollLeft >= max) el.scrollTo({left: 0, behavior: 'smooth'})
+			else el.scrollBy({left: step, behavior: 'smooth'})
+		}, 3200)
+		return () => clearInterval(id)
+	}, [])
+
+	const nudge = (dir: 1 | -1) => {
+		const el = trackRef.current
+		if (!el) return
+		const card = el.querySelector<HTMLElement>('[data-card]')
+		el.scrollBy({left: dir * ((card ? card.offsetWidth : 340) + 16), behavior: 'smooth'})
+	}
+
+	return (
+		<div
+			className="relative"
+			onMouseEnter={() => (pausedRef.current = true)}
+			onMouseLeave={() => (pausedRef.current = false)}
+		>
+			<div
+				ref={trackRef}
+				className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+			>
+				{DEVICES.map((d, i) => (
+					<div
+						key={d.name}
+						data-card
+						className="snap-start relative flex-shrink-0 w-[290px] sm:w-[340px] h-[440px] rounded-3xl overflow-hidden bg-white/[0.05] border border-white/[0.07] transition-transform hover:scale-[1.01]"
+					>
+						{/* Photo pleine carte, qualité max */}
+						{d.img ? (
+							<Image
+								src={d.img}
+								alt={d.name}
+								fill
+								quality={95}
+								className="object-cover object-center"
+								sizes="(max-width: 640px) 290px, 680px"
+							/>
+						) : (
+							<div className="absolute inset-0 flex items-center justify-center">
+								<div className="text-4xl font-semibold text-white/15">{d.name.split(' ')[0]}</div>
+							</div>
+						)}
+						{/* Titre superposé — sans bandeau, juste un voile doux */}
+						<div className="absolute top-0 left-0 right-0 p-6 pb-10 bg-gradient-to-b from-black/45 to-transparent">
+							<div className="text-xl font-semibold leading-tight text-white">{d.name}</div>
+							<div className="mt-1 text-sm text-white/70">Production-grade GLB · {d.tier} plan</div>
+						</div>
+					</div>
+				))}
+			</div>
+
+			{/* Flèches nav */}
+			<button
+				type="button"
+				aria-label="Previous devices"
+				onClick={() => nudge(-1)}
+				className="absolute -left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 border border-white/20 text-white backdrop-blur flex items-center justify-center hover:bg-black/80 transition-colors"
+			>
+				<ArrowRight size={16} className="rotate-180" />
+			</button>
+			<button
+				type="button"
+				aria-label="Next devices"
+				onClick={() => nudge(1)}
+				className="absolute -right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 border border-white/20 text-white backdrop-blur flex items-center justify-center hover:bg-black/80 transition-colors"
+			>
+				<ArrowRight size={16} />
+			</button>
+		</div>
+	)
+}
+
+/** URL de la vidéo de démo (mockup iPhone 17 exporté du plugin,
+ *  hébergée sur Framer). Vide → fallback photo Apple HD. */
+const EXPORT_VIDEO_URL = ''
+
+/** Section "exports" à la Apple (réf. page Cameras iPhone) : média
+ *  massif à gauche qui déborde du cadre, kicker orange + gros titre,
+ *  stats de formats photo/vidéo à droite. */
+function ExportFormatsSection() {
+	return (
+		<section className="relative bg-black border-t border-white/[0.07] overflow-hidden">
+			<div className="max-w-[1560px] mx-auto px-6 md:px-16 pt-24 md:pt-32">
+				<div data-reveal className="reveal-up text-center mb-14">
+					<div className="text-sm font-semibold text-[#e8702a] mb-3">Exports</div>
+					<h2 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight">
+						A big export forward.
+					</h2>
+				</div>
+			</div>
+
+			<div className="relative max-w-[1560px] mx-auto grid grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] items-center gap-10">
+				{/* Média massif à gauche — déborde vers le bord gauche */}
+				<div data-reveal className="reveal-up relative h-[420px] sm:h-[560px] lg:h-[640px] rounded-[2rem] overflow-hidden mx-6 md:mx-16 lg:mx-0 lg:rounded-l-none lg:rounded-r-[2rem]">
+					{EXPORT_VIDEO_URL ? (
+						<video
+							src={EXPORT_VIDEO_URL}
+							autoPlay
+							muted
+							loop
+							playsInline
+							className="absolute inset-0 w-full h-full object-contain object-left"
+						/>
+					) : (
+						<Image
+							src="/cards/iphone17pro-apple.webp"
+							alt="iPhone 17 Pro 4K export"
+							fill
+							quality={95}
+							className="object-contain object-left"
+							sizes="(max-width: 1024px) 100vw, 60vw"
+						/>
+					)}
+				</div>
+
+				{/* Stats à droite */}
+				<div data-reveal className="reveal-up flex flex-col gap-10 px-6 md:px-16 lg:px-0 pb-20 lg:pb-0">
+					<div>
+						<div className="text-sm text-white/60 mb-1">Photo export up to</div>
+						<div className="text-5xl font-semibold text-[#e8702a] tracking-tight">4K</div>
+						<div className="text-sm text-white/60 mt-1">PNG with transparency — WebP coming</div>
+					</div>
+					<div>
+						<div className="text-sm text-white/60 mb-1">Video export</div>
+						<div className="text-5xl font-semibold text-[#e8702a] tracking-tight">4K&nbsp;60s</div>
+						<div className="text-sm text-white/60 mt-1">transparent WebM, rendered offline in your browser</div>
+					</div>
+					<div>
+						<div className="text-sm text-white/60 mb-1">Or skip exports entirely</div>
+						<div className="text-3xl font-semibold text-white tracking-tight">Live 3D embed</div>
+						<div className="text-sm text-white/60 mt-1">the real scene, interactive, on your published Framer site</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	)
+}
+
+// Photos = les cartes officielles du catalogue du plugin (device-models/<id>/card.jpg).
 const DEVICES = [
-	{ name: 'iPhone 17 Pro',        tier: 'Pro',    img: '/ren/hand-phone.png' },
-	{ name: 'iPhone Air',           tier: 'Pro',    img: '/ren/selfie.png' },
+	{ name: 'iPhone 17 Pro',        tier: 'Pro',    img: '/cards/iphone17pro-apple.webp' },
+	{ name: 'iPhone Air',           tier: 'Pro',    img: '/cards/iphoneAir-apple.webp' },
 	{ name: 'iPhone 16e',           tier: 'Pro' },
-	{ name: 'iPad',                 tier: 'Pro',    img: '/ren/tablet.png' },
-	{ name: 'MacBook Pro 16"',      tier: 'Pro' },
-	{ name: 'iMac',                 tier: 'Pro' },
-	{ name: 'Apple Pro Display XDR',tier: 'Ultra',  img: '/ren/scholar.png' },
-	{ name: 'Apple Watch Ultra',    tier: 'Pro',    img: '/ren/watch.png' },
+	{ name: 'iPad',                 tier: 'Pro',    img: '/cards/ipadPro.jpg' },
+	{ name: 'MacBook Pro 16"',      tier: 'Pro',    img: '/cards/macbookPro.jpg' },
+	{ name: 'iMac',                 tier: 'Pro',    img: '/cards/imac.jpg' },
+	{ name: 'Apple Pro Display XDR',tier: 'Ultra',  img: '/cards/appleProDisplayXDR.jpg' },
+	{ name: 'Apple Watch Ultra',    tier: 'Pro',    img: '/cards/appleWatchUltra.jpg' },
 	{ name: 'Samsung Galaxy S25',   tier: 'Pro' },
 	{ name: 'Macintosh 1984',       tier: 'Pro' },
 ]
@@ -154,7 +319,7 @@ export default function LandingSections() {
 	return (
 		<div ref={containerRef} className="bg-[#0a0a0a] text-white overflow-hidden">
 			{/* ════════════ Section 1 — Pitch ════════════ */}
-			<section className="relative px-6 sm:px-10 md:px-16 py-32 md:py-48 max-w-7xl mx-auto">
+			<section className="relative px-6 md:px-16 py-32 md:py-48 max-w-[1560px] mx-auto">
 				<div data-reveal className="reveal-up max-w-4xl">
 					<div className="text-xs sm:text-sm font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-6 flex items-center gap-3">
 						<span className="w-8 h-px bg-[#e8702a]" />
@@ -174,9 +339,12 @@ export default function LandingSections() {
 				</div>
 			</section>
 
+			{/* ════════════ Section 1.5 — Take a closer look (interactif) ════════════ */}
+			<CloserLook />
+
 			{/* ════════════ Section 2 — Showcase devices ════════════ */}
-			<section id="showcase" className="relative px-6 sm:px-10 md:px-16 pt-20 pb-32 border-t border-white/[0.07]">
-				<div className="max-w-7xl mx-auto">
+			<section id="showcase" className="relative px-6 md:px-16 pt-20 pb-32 border-t border-white/[0.07]">
+				<div className="max-w-[1560px] mx-auto">
 					<div data-reveal className="reveal-up flex items-end justify-between flex-wrap gap-6 mb-14">
 						<div>
 							<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4 flex items-center gap-3">
@@ -193,53 +361,13 @@ export default function LandingSections() {
 						</p>
 					</div>
 
-					<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-						{DEVICES.map((d, i) => (
-							<div
-								key={d.name}
-								data-reveal
-								className="reveal-up relative aspect-[3/4] rounded-2xl bg-white/[0.03] border border-white/[0.06] overflow-hidden group transition-all hover:bg-white/[0.05] hover:border-white/[0.12]"
-								style={{ transitionDelay: `${i * 30}ms` }}
-							>
-								{d.img ? (
-									<Image
-										src={d.img}
-										alt={d.name}
-										fill
-										className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.04] transition-all duration-700"
-										sizes="(max-width: 768px) 50vw, 25vw"
-									/>
-								) : (
-									<div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-white/[0.02] to-white/[0.08]">
-										<div className="text-3xl text-white/20 font-playfair italic">{d.name.split(' ')[0]}</div>
-									</div>
-								)}
-								<div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
-									<div className="flex items-end justify-between">
-										<div className="text-sm font-medium leading-tight">{d.name}</div>
-										<div
-											className={
-												'text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full ' +
-												(d.tier === 'Trial'
-													? 'bg-white/15 text-white/80'
-													: d.tier === 'Pro'
-													? 'bg-[#e8702a]/20 text-[#e8702a]'
-													: 'bg-white text-black')
-											}
-										>
-											{d.tier}
-										</div>
-									</div>
-								</div>
-							</div>
-						))}
-					</div>
+					<DeviceCarousel />
 				</div>
 			</section>
 
 			{/* ════════════ Section 3 — How it works ════════════ */}
-			<section className="relative bg-[#f5f4ef] text-[#0a0a0a] px-6 sm:px-10 md:px-16 py-32 md:py-40">
-				<div className="max-w-7xl mx-auto">
+			<section className="relative bg-[#f5f4ef] text-[#0a0a0a] px-6 md:px-16 py-32 md:py-40">
+				<div className="max-w-[1560px] mx-auto">
 					<div data-reveal className="reveal-up max-w-3xl mb-20">
 						<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4 flex items-center gap-3">
 							<span className="w-8 h-px bg-[#e8702a]" />
@@ -274,8 +402,8 @@ export default function LandingSections() {
 			</section>
 
 			{/* ════════════ Section 4 — Animations ════════════ */}
-			<section className="relative px-6 sm:px-10 md:px-16 py-32 md:py-40 border-t border-white/[0.07]">
-				<div className="max-w-7xl mx-auto">
+			<section className="relative px-6 md:px-16 py-32 md:py-40 border-t border-white/[0.07]">
+				<div className="max-w-[1560px] mx-auto">
 					<div data-reveal className="reveal-up max-w-3xl mb-16">
 						<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4 flex items-center gap-3">
 							<span className="w-8 h-px bg-[#e8702a]" />
@@ -290,27 +418,54 @@ export default function LandingSections() {
 						</p>
 					</div>
 
-					<div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-						{ANIMATIONS.map((a, i) => (
+					{/* Bento à la Apple : grande tuile héro + tuiles compactes,
+					    coins très arrondis, photos catalogue en fond. */}
+					<div className="grid grid-cols-2 lg:grid-cols-4 auto-rows-[190px] gap-4">
+						{/* Grande tuile — Follow cursor */}
+						<div data-reveal className="reveal-up col-span-2 row-span-2 relative rounded-[2rem] overflow-hidden bg-white/[0.04] border border-white/[0.07] p-8 flex flex-col justify-between hover:border-white/[0.15] transition-all">
+							<div>
+								<div className="w-11 h-11 rounded-2xl bg-[#e8702a]/15 text-[#e8702a] flex items-center justify-center mb-5">
+									{ANIMATIONS[0].icon}
+								</div>
+								<div className="text-2xl font-semibold mb-2">{ANIMATIONS[0].title}</div>
+								<div className="text-sm text-white/60 leading-relaxed max-w-sm">{ANIMATIONS[0].body}</div>
+							</div>
+							<div className="absolute right-[-40px] bottom-[-60px] w-[280px] h-[280px] opacity-70 pointer-events-none">
+								<Image src="/cards/iphone17pro.jpg" alt="" fill className="object-cover rounded-3xl rotate-6" sizes="280px" />
+							</div>
+							<div className="text-xs text-white/40">Replays page-wide on your published Framer site</div>
+						</div>
+						{/* Tuiles compactes */}
+						{ANIMATIONS.slice(1).map((a, i) => (
 							<div
 								key={a.title}
 								data-reveal
-								className="reveal-up p-6 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.05] hover:border-white/[0.12] transition-all"
+								className="reveal-up col-span-1 row-span-1 p-6 rounded-[2rem] bg-white/[0.04] border border-white/[0.07] hover:border-white/[0.15] transition-all flex flex-col justify-between"
 								style={{ transitionDelay: `${i * 60}ms` }}
 							>
-								<div className="w-10 h-10 rounded-xl bg-[#e8702a]/15 text-[#e8702a] flex items-center justify-center mb-5">
+								<div className="w-10 h-10 rounded-xl bg-[#e8702a]/15 text-[#e8702a] flex items-center justify-center">
 									{a.icon}
 								</div>
-								<div className="text-base font-semibold mb-2">{a.title}</div>
-								<div className="text-sm text-white/55 leading-relaxed">{a.body}</div>
+								<div>
+									<div className="text-base font-semibold mb-1">{a.title}</div>
+									<div className="text-xs text-white/55 leading-relaxed">{a.body}</div>
+								</div>
 							</div>
 						))}
+						{/* Tuile stat 4K */}
+						<div data-reveal className="reveal-up col-span-1 row-span-1 p-6 rounded-[2rem] bg-[#e8702a] text-white flex flex-col justify-between">
+							<div className="text-4xl font-bold tracking-tight">4K</div>
+							<div className="text-xs leading-relaxed text-white/85">PNG & transparent video export, rendered offline in your browser</div>
+						</div>
 					</div>
 				</div>
 			</section>
 
+			{/* ════════════ Section 4.5 — Exports (à la Apple) ════════════ */}
+			<ExportFormatsSection />
+
 			{/* ════════════ Section 5 — Comparison ════════════ */}
-			<section className="relative px-6 sm:px-10 md:px-16 py-32 md:py-40 border-t border-white/[0.07]">
+			<section className="relative px-6 md:px-16 py-32 md:py-40 border-t border-white/[0.07]">
 				<div className="max-w-6xl mx-auto">
 					<div data-reveal className="reveal-up text-center mb-16">
 						<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4 inline-flex items-center gap-3">
@@ -351,8 +506,8 @@ export default function LandingSections() {
 			</section>
 
 			{/* ════════════ Section 6 — Pricing ════════════ */}
-			<section id="pricing" className="relative bg-[#0a0a0a] px-6 sm:px-10 md:px-16 py-32 md:py-40 border-t border-white/[0.07]">
-				<div className="max-w-7xl mx-auto">
+			<section id="pricing" className="relative bg-[#0a0a0a] px-6 md:px-16 py-32 md:py-40 border-t border-white/[0.07]">
+				<div className="max-w-[1560px] mx-auto">
 					<div data-reveal className="reveal-up text-center mb-12">
 						<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4 inline-flex items-center gap-3">
 							<span className="w-8 h-px bg-[#e8702a]" />
@@ -423,8 +578,8 @@ export default function LandingSections() {
 									className={
 										'mt-6 block w-full text-center text-sm font-semibold px-5 py-3 rounded-full transition-all ' +
 										(p.highlight
-											? 'bg-[#e8702a] hover:bg-[#d2611f] text-white hover:scale-[1.02] active:scale-95'
-											: 'bg-white text-[#0a0a0a] hover:bg-white/90')
+											? 'cta-skeu text-white hover:scale-[1.02]'
+											: 'cta-skeu-light text-[#0a0a0a] hover:scale-[1.02]')
 									}
 								>
 									{p.cta}
@@ -458,7 +613,7 @@ export default function LandingSections() {
 						</div>
 						<Link
 							href="/sign-up?plan=founder"
-							className="flex-shrink-0 inline-flex items-center gap-2 bg-white text-[#0a0a0a] text-sm font-semibold px-6 py-3 rounded-full hover:bg-white/90 transition-all hover:scale-[1.03]"
+							className="cta-skeu-light flex-shrink-0 inline-flex items-center gap-2 text-[#0a0a0a] text-sm font-semibold px-6 py-3 rounded-full transition-all hover:scale-[1.03]"
 						>
 							€199 — claim a slot
 							<ArrowRight size={16} />
@@ -468,7 +623,7 @@ export default function LandingSections() {
 			</section>
 
 			{/* ════════════ Section 7 — FAQ ════════════ */}
-			<section id="docs" className="relative px-6 sm:px-10 md:px-16 py-32 md:py-40 border-t border-white/[0.07]">
+			<section id="docs" className="relative px-6 md:px-16 py-32 md:py-40 border-t border-white/[0.07]">
 				<div className="max-w-4xl mx-auto">
 					<div data-reveal className="reveal-up mb-14">
 						<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4 flex items-center gap-3">
@@ -488,7 +643,7 @@ export default function LandingSections() {
 			</section>
 
 			{/* ════════════ Section 8 — Final CTA ════════════ */}
-			<section id="live" className="relative px-6 sm:px-10 md:px-16 py-32 md:py-44 border-t border-white/[0.07] overflow-hidden">
+			<section id="live" className="relative px-6 md:px-16 py-32 md:py-44 border-t border-white/[0.07] overflow-hidden">
 				<div className="absolute inset-0 pointer-events-none">
 					<div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-[#e8702a]/[0.08] blur-3xl" />
 				</div>
@@ -505,7 +660,7 @@ export default function LandingSections() {
 					<div className="mt-10 flex items-center justify-center gap-3 flex-wrap">
 						<Link
 							href="/sign-up"
-							className="inline-flex items-center gap-2 bg-[#e8702a] hover:bg-[#d2611f] text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-all hover:scale-[1.03] active:scale-95 hover:shadow-xl hover:shadow-[#e8702a]/30"
+							className="cta-skeu inline-flex items-center gap-2 text-white font-semibold px-7 py-3.5 rounded-full text-sm transition-all hover:scale-[1.03]"
 						>
 							Install the plugin
 							<ArrowRight size={16} />
@@ -521,8 +676,8 @@ export default function LandingSections() {
 			</section>
 
 			{/* ════════════ Footer ════════════ */}
-			<footer className="relative border-t border-white/[0.07] px-6 sm:px-10 md:px-16 py-14">
-				<div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+			<footer className="relative border-t border-white/[0.07] px-6 md:px-16 py-14">
+				<div className="max-w-[1560px] mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
 					<div>
 						<div className="flex items-center gap-2 mb-3">
 							<svg width="20" height="20" viewBox="0 0 256 256" fill="#ffffff" aria-hidden="true">
@@ -545,7 +700,7 @@ export default function LandingSections() {
 						<a href="mailto:hi@memselon.com" className="hover:text-white">hi@memselon.com</a>
 					</nav>
 				</div>
-				<div className="max-w-7xl mx-auto mt-10 pt-6 border-t border-white/[0.05] text-[10px] tracking-wider uppercase text-white/40 flex flex-wrap items-center justify-between gap-3">
+				<div className="max-w-[1560px] mx-auto mt-10 pt-6 border-t border-white/[0.05] text-[10px] tracking-wider uppercase text-white/40 flex flex-wrap items-center justify-between gap-3">
 					<span>© 2026 Memselon</span>
 					<span>Made for Framer designers</span>
 				</div>

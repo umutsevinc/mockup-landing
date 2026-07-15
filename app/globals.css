@@ -1,15 +1,21 @@
 @import "tailwindcss";
 
 /* ──────────────────────────────────────────────────────────────────
-   Fonts — Inter (UI) + Playfair Display italic (display accent)
-   Loaded from Google Fonts as per the design brief; keeping
-   next/font in layout.tsx is unnecessary for these two faces
-   because they only appear in this hero.
+   Typo à la Apple — stack système (SF Pro sur macOS/iOS). Plus de
+   webfonts : zéro requête, rendu natif. .font-playfair est neutralisé
+   (les anciens accents italiques deviennent des bold serrés Apple).
    ────────────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap');
-
-* { font-family: 'Inter', sans-serif; box-sizing: border-box; }
-.font-playfair { font-family: 'Playfair Display', serif; }
+* {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+    'Helvetica Neue', Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+}
+.font-playfair {
+  font-family: inherit;
+  font-style: normal !important;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
 
 html, body {
   margin: 0;
@@ -99,4 +105,47 @@ html, body {
     transform: none;
     transition: none;
   }
+}
+
+/* ── Skeuomorphic CTAs ─────────────────────────────────────────────
+   Convex "pill" buttons: vertical gradient, top inner highlight,
+   bottom inner shade, soft colored drop shadow. Pressed state sinks. */
+.cta-skeu {
+	background: linear-gradient(180deg, #f8965a 0%, #e8702a 45%, #cd5814 100%);
+	border: 1px solid rgba(90, 30, 0, 0.55);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.45),
+		inset 0 -2px 4px rgba(0, 0, 0, 0.28),
+		0 6px 16px rgba(232, 112, 42, 0.38),
+		0 1px 2px rgba(0, 0, 0, 0.5);
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.28);
+}
+.cta-skeu:hover {
+	background: linear-gradient(180deg, #ffa268 0%, #f07a33 45%, #d55f18 100%);
+}
+.cta-skeu:active {
+	transform: translateY(1px);
+	box-shadow:
+		inset 0 2px 6px rgba(0, 0, 0, 0.35),
+		0 2px 6px rgba(232, 112, 42, 0.25);
+}
+
+.cta-skeu-light {
+	background: linear-gradient(180deg, #ffffff 0%, #f0eee9 55%, #d9d6cf 100%);
+	border: 1px solid rgba(0, 0, 0, 0.28);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.95),
+		inset 0 -2px 4px rgba(0, 0, 0, 0.12),
+		0 5px 14px rgba(0, 0, 0, 0.4),
+		0 1px 2px rgba(0, 0, 0, 0.35);
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.cta-skeu-light:hover {
+	background: linear-gradient(180deg, #ffffff 0%, #f7f5f1 55%, #e4e1da 100%);
+}
+.cta-skeu-light:active {
+	transform: translateY(1px);
+	box-shadow:
+		inset 0 2px 6px rgba(0, 0, 0, 0.18),
+		0 2px 6px rgba(0, 0, 0, 0.3);
 }

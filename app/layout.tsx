@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { GoogleAnalytics } from '@next/third-parties/google'
 import './globals.css'
 
 const SITE_URL = 'https://mockup.memselon.com'
@@ -39,10 +40,72 @@ export const metadata: Metadata = {
 	},
 }
 
+// JSON-LD — SoftwareApplication + FAQ. Rendered server-side in the
+// document head so crawlers and AI answer engines (Google AI Overviews,
+// Perplexity, ChatGPT browsing) get structured facts without executing JS.
+const JSON_LD = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'SoftwareApplication',
+			name: 'Memselon Mockup',
+			applicationCategory: 'DesignApplication',
+			operatingSystem: 'Web (Framer plugin)',
+			url: SITE_URL,
+			description:
+				'Real-time 3D device mockup plugin for Framer. Drop a screenshot or video on a 3D iPhone, iPad, Apple Watch or iMac, orbit the camera, publish it live on your site or export in 4K.',
+			offers: [
+				{ '@type': 'Offer', name: 'Starter', price: '19', priceCurrency: 'EUR' },
+				{ '@type': 'Offer', name: 'Pro', price: '49', priceCurrency: 'EUR' },
+				{ '@type': 'Offer', name: 'Studio', price: '99', priceCurrency: 'EUR' },
+				{ '@type': 'Offer', name: 'Founder Lifetime', price: '499', priceCurrency: 'EUR' },
+			],
+			author: { '@type': 'Organization', name: 'Memselon', url: 'https://memselon.com' },
+		},
+		{
+			'@type': 'FAQPage',
+			mainEntity: [
+				{
+					'@type': 'Question',
+					name: 'What is Memselon Mockup?',
+					acceptedAnswer: {
+						'@type': 'Answer',
+						text: 'A Framer plugin that renders real-time 3D device mockups (iPhone 17 Pro, iPhone Air, iPad Pro, Apple Watch Ultra, iMac). You drop a screenshot or video on the screen, orbit the camera, pick device colors, then publish the live 3D scene on your Framer site or export 4K images and videos.',
+					},
+				},
+				{
+					'@type': 'Question',
+					name: 'Is it a Rotato alternative?',
+					acceptedAnswer: {
+						'@type': 'Answer',
+						text: 'Yes — unlike Rotato or Blender workflows, everything happens inside Framer and the result is a LIVE interactive 3D embed on your published site, not just a rendered export.',
+					},
+				},
+				{
+					'@type': 'Question',
+					name: 'Can the 3D mockup react to the visitor cursor?',
+					acceptedAnswer: {
+						'@type': 'Answer',
+						text: 'Yes. Follow-cursor, auto-rotate, float and grab-rotate animations are saved with the scene and replay on the published Framer page, across the whole page, not just inside the embed frame.',
+					},
+				},
+			],
+		},
+	],
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en">
+			<head>
+				<script
+					type="application/ld+json"
+					dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+				/>
+			</head>
 			<body>{children}</body>
+			{/* GA4 — flux "Memselon" (couvre memselon.com et ses sous-domaines) */}
+			<GoogleAnalytics gaId="G-XD2DLH1KLL" />
 		</html>
 	)
 }
