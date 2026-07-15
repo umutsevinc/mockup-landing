@@ -255,7 +255,9 @@ function drawVideoHeightCoverTex(
 		} catch {}
 		rafId = requestAnimationFrame(renderFrame)
 	}
-	rafId = requestAnimationFrame(renderFrame)
+	// Premier paint SYNCHRONE : attendre le premier RAF laissait un canvas
+	// vide (noir) pendant ≥1 frame quand la texture est recréée en live.
+	renderFrame()
 
 	const stop = () => {
 		if (rafId) cancelAnimationFrame(rafId)

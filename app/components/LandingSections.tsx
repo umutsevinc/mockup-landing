@@ -205,7 +205,7 @@ const DEVICES = [
 	{ name: 'iPad',                 tier: 'Pro',    img: '/cards/ipadPro.jpg' },
 	{ name: 'MacBook Pro 16"',      tier: 'Pro',    img: '/cards/macbookPro.jpg' },
 	{ name: 'iMac',                 tier: 'Pro',    img: '/cards/imac.jpg' },
-	{ name: 'Apple Pro Display XDR',tier: 'Ultra',  img: '/cards/appleProDisplayXDR.jpg' },
+	{ name: 'Apple Pro Display XDR',tier: 'Studio',  img: '/cards/appleProDisplayXDR.jpg' },
 	{ name: 'Apple Watch Ultra',    tier: 'Pro',    img: '/cards/appleWatchUltra.jpg' },
 	{ name: 'Samsung Galaxy S25',   tier: 'Pro' },
 	{ name: 'Macintosh 1984',       tier: 'Pro' },
@@ -245,42 +245,57 @@ const COMPARE = [
 	{ feature: 'Video / animated screens',            lithos: true,  rotato: true,  smart: false, native: false },
 	{ feature: '4K transparent export',               lithos: true,  rotato: true,  smart: false, native: false },
 	{ feature: 'Embed live 3D scene on published site',lithos: true,  rotato: false, smart: false, native: false },
-	{ feature: 'No subscription lock-out on landing',  lithos: 'Ultra', rotato: '—', smart: '—',   native: '—'   },
+	{ feature: 'No subscription lock-out on landing',  lithos: 'Studio', rotato: '—', smart: '—',   native: '—'   },
 	{ feature: 'Updates automatically when design changes', lithos: true,  rotato: false, smart: false, native: true },
 ]
 
+// Grille canonique — Notion « Brief Pricing 19/49/99 » (10/07/2026)
+// + correction 14/07 : pas de trial, garantie remboursé 7 jours.
 const PLANS = [
 	{
-		name: 'Pro',
-		blurb: 'For freelance designers.',
-		monthly: '9',
-		yearly: '79',
-		cta: 'Go Pro',
-		highlight: true,
+		name: 'Starter',
+		blurb: 'For getting started.',
+		monthly: '19',
+		yearly: '190',
+		cta: 'Go Starter',
+		highlight: false,
 		bullets: [
 			'50 exports / month, up to 1080p',
-			'Photo mode + Video mode (still + iframe)',
 			'No watermark',
-			'All 10 devices',
+			'All devices',
 			'Orbit camera',
-			'Save scenes (cloud sync)',
+			'Photo mode',
 		],
 	},
 	{
-		name: 'Ultra',
-		blurb: 'For studios + agencies.',
-		monthly: '29',
-		yearly: '249',
-		cta: 'Go Ultra',
-		highlight: false,
+		name: 'Pro',
+		blurb: 'For freelance designers.',
+		monthly: '49',
+		yearly: '490',
+		cta: 'Go Pro',
+		highlight: true,
 		bullets: [
-			'Unlimited exports, up to 4K',
-			'Photo · Video · Live 3D embed — all modes',
-			'Transparent PNG + MP4 video',
+			'Unlimited exports, up to 4K + transparency',
 			'All animations (follow cursor, orbit, float, scroll)',
-			'Live 3D Framer component (embed on landings)',
+			'Video export (MP4)',
+			'Save scenes (cloud sync)',
 			'Lottie screens',
 			'Priority support',
+		],
+	},
+	{
+		name: 'Studio',
+		blurb: 'For studios + agencies.',
+		monthly: '99',
+		yearly: '990',
+		cta: 'Go Studio',
+		highlight: false,
+		bullets: [
+			'Everything in Pro',
+			'Live 3D embeds on published sites (up to 10 sites)',
+			'Static video 3D component',
+			'White-label (no backlink)',
+			'Performance guarantee — Lighthouse-friendly embeds',
 		],
 	},
 ]
@@ -292,7 +307,7 @@ const FAQ = [
 	},
 	{
 		q: 'How does the live 3D embed work?',
-		a: 'Ultra users get a Framer code component that they drop on the canvas. It renders the saved scene on the published landing, and checks the owner’s subscription on every mount (cached 30 minutes). If the subscription lapses, the component falls back to a watermarked PNG.',
+		a: 'Studio users get a Framer code component that they drop on the canvas. It renders the saved scene on the published landing, and checks the owner’s subscription on every mount (cached 30 minutes). If the subscription lapses, the component falls back to a watermarked PNG.',
 	},
 	{
 		q: 'Can I bring my own 3D models?',
@@ -518,7 +533,7 @@ export default function LandingSections() {
 							<span className="font-playfair italic font-normal">Pay</span> what fits.
 						</h2>
 						<p className="mt-6 text-base sm:text-lg text-white/65 max-w-xl mx-auto">
-							7-day Ultra trial to test. Pro for freelance. Ultra for everything else. Cancel any time.
+							7-day money-back guarantee, no questions asked. Cancel any time.
 						</p>
 
 						{/* Monthly / yearly toggle */}
@@ -601,13 +616,13 @@ export default function LandingSections() {
 						<div className="flex-1">
 							<div className="flex items-center gap-3 mb-3">
 								<Sparkles size={18} strokeWidth={1.5} className="text-[#e8702a]" />
-								<div className="text-xs font-bold tracking-wider uppercase text-[#e8702a]">Founder Lifetime — 100 places only</div>
+								<div className="text-xs font-bold tracking-wider uppercase text-[#e8702a]">Founder Lifetime — 25 places only</div>
 							</div>
 							<h3 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-2">
-								Pay <span className="font-playfair italic">once</span>, keep <span className="font-playfair italic">Ultra</span> forever.
+								Pay <span className="font-playfair italic">once</span>, keep <span className="font-playfair italic">Studio</span> forever.
 							</h3>
 							<p className="text-sm text-white/65 max-w-xl">
-								One-time payment. All Ultra features, no recurring charge. Locked to the first 100
+								One-time payment. All Studio features, no recurring charge. Locked to the first 25
 								Memselon believers — counter ticks down in the plugin.
 							</p>
 						</div>
@@ -615,7 +630,7 @@ export default function LandingSections() {
 							href="/sign-up?plan=founder"
 							className="cta-skeu-light flex-shrink-0 inline-flex items-center gap-2 text-[#0a0a0a] text-sm font-semibold px-6 py-3 rounded-full transition-all hover:scale-[1.03]"
 						>
-							€199 — claim a slot
+							€499 — claim a slot
 							<ArrowRight size={16} />
 						</Link>
 					</div>
@@ -655,7 +670,7 @@ export default function LandingSections() {
 						<span className="font-playfair italic font-normal">Ship 3D.</span>
 					</h2>
 					<p className="mt-8 text-base sm:text-lg text-white/65 max-w-xl mx-auto">
-						The plugin is free to install. Two exports a month, every month, on the house.
+						The plugin is free to install — try it in demo mode, then go paid with a 7-day money-back guarantee.
 					</p>
 					<div className="mt-10 flex items-center justify-center gap-3 flex-wrap">
 						<Link
