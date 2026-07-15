@@ -258,7 +258,9 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 			screen_video_url: media?.type === 'video' ? media.url : null,
 			environment_id: 'studio',
 			environment_offset: 0.5,
-			light_intensity: 0.65,
+			// Teaser (waitlist) : lumière plus douce — à 0.65 l'orange
+			// Cosmic vire au jaune délavé face au render Apple.
+			light_intensity: teaser ? 0.22 : 0.65,
 			camera_position: 'free',
 			is_locked: false,
 			animations: {
