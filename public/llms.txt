@@ -1,0 +1,32 @@
+# Memselon Mockup
+
+> Real-time 3D device mockup plugin for Framer. Drop a screenshot or video
+> on a real 3D Apple device (iPhone 17 Pro, iPhone Air, iPad Pro, Apple
+> Watch Ultra, iMac), orbit the camera, pick device colors and finishes,
+> then publish the LIVE interactive 3D scene on your Framer site or export
+> 4K images and videos. No Blender, no Rotato, no After Effects.
+
+## What it does
+
+- Live 3D mockups rendered in WebGL directly inside Framer and on published sites
+- Screen content: drop any screenshot (PNG/JPG/WebP) or video (MP4/WebM)
+- Devices: iPhone 17 Pro, iPhone Air, iPad Pro, Apple Watch Ultra, iMac
+- Device colors: Apple palette + custom hex, brushed metal / matte / glossy finishes
+- Animations: follow cursor (page-wide), auto-rotate, float loop, grab-rotate
+- Camera: free orbit, saved camera poses, zoom — replayed exactly on the published page
+- Export: 4K PNG and 4K transparent video, rendered offline in the browser
+- Performance: adaptive resolution per device and network, poster fallback on slow connections
+
+## Pricing (EUR, one-time or subscription per plan page)
+
+- Starter: EUR 19
+- Pro: EUR 49
+- Studio: EUR 99
+- Founder Lifetime: EUR 499 (limited to 25 seats)
+
+## Links
+
+- Landing: https://mockup.memselon.com
+- Sign up: https://mockup.memselon.com/sign-up
+- Pricing: https://mockup.memselon.com/#pricing
+- Publisher: Memselon (https://memselon.com), contact@memselon.com
