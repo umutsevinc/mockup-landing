@@ -319,7 +319,7 @@ const FAQ = [
 	},
 	{
 		q: 'What about Windows / Linux?',
-		a: 'Memselon Mockup runs in the browser via WebGL — anywhere Framer runs, the plugin runs. Mac, Windows, Linux, ChromeOS.',
+		a: 'Framer Mockup 3D runs in the browser via WebGL — anywhere Framer runs, the plugin runs. Mac, Windows, Linux, ChromeOS.',
 	},
 	{
 		q: 'Can I cancel anytime?',
@@ -347,7 +347,7 @@ export default function LandingSections() {
 					</h2>
 					<p className="mt-10 max-w-2xl text-base sm:text-lg text-white/70 leading-relaxed">
 						You design in Framer. Then you open Rotato. You re-import. You re-export. Every time the
-						mockup changes, you do it again. Memselon Mockup ends that loop — the device lives on your
+						mockup changes, you do it again. Framer Mockup 3D ends that loop — the device lives on your
 						canvas, your screenshot is its screen, and the published landing renders the same 3D scene
 						you just posed.
 					</p>

@@ -3,8 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Memselon Mockup",
-  description: "How Memselon Mockup collects, uses, and protects your data.",
+  title: "Privacy Policy — Framer Mockup 3D",
+  description: "How Framer Mockup 3D collects, uses, and protects your data.",
 };
 
 export default function PrivacyPage() {
@@ -13,8 +13,8 @@ export default function PrivacyPage() {
       <nav style={{ position: "sticky", top: 0, zIndex: 50, backdropFilter: "blur(20px) saturate(150%)", background: "rgba(5,5,9,0.7)", borderBottom: "1px solid var(--border-subtle)" }}>
         <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56, padding: "0 24px" }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <Image src="/logo/white.png" alt="Memselon Mockup" width={22} height={22} style={{ borderRadius: 6 }} />
-            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)" }}>Memselon Mockup</span>
+            <Image src="/logo/white.png" alt="Framer Mockup 3D" width={22} height={22} style={{ borderRadius: 6 }} />
+            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)" }}>Framer Mockup 3D</span>
           </Link>
           <Link href="/" style={{ fontSize: 13, color: "var(--text-secondary)", textDecoration: "none" }}>← Back to home</Link>
         </div>
@@ -25,7 +25,7 @@ export default function PrivacyPage() {
         <p style={{ fontSize: 13, color: "var(--text-tertiary)", marginBottom: 40 }}>Effective date: May 10, 2026</p>
 
         <Section title="1. Who we are">
-          <p>Memselon Mockup is a Framer plugin and web service operated by Umut Sevinc, currently registered as a sole proprietor in France (with planned migration to a private limited company in Estonia). You can reach us at <a href="mailto:contact@memselon.com" style={linkStyle}>contact@memselon.com</a>.</p>
+          <p>Framer Mockup 3D is a Framer plugin and web service operated by Umut Sevinc, currently registered as a sole proprietor in France (with planned migration to a private limited company in Estonia). You can reach us at <a href="mailto:contact@memselon.com" style={linkStyle}>contact@memselon.com</a>.</p>
         </Section>
 
         <Section title="2. What data we collect">

@@ -36,8 +36,8 @@ export function AuthCard({
 				}}
 			>
 				<div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
-					<Image src="/logo/white.png" alt="Memselon Mockup" width={24} height={24} style={{ borderRadius: 6 }} />
-					<span style={{ fontSize: 15, fontWeight: 600, color: '#F5F5F7' }}>Memselon Mockup</span>
+					<Image src="/logo/white.png" alt="Framer Mockup 3D" width={24} height={24} style={{ borderRadius: 6 }} />
+					<span style={{ fontSize: 15, fontWeight: 600, color: '#F5F5F7' }}>Framer Mockup 3D</span>
 				</div>
 				<div style={{ fontSize: 20, fontWeight: 600, color: '#F5F5F7', marginBottom: subtitle ? 6 : 24 }}>
 					{title}

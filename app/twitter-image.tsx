@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 export const runtime = "nodejs";
-export const alt = "The first real-time 3D mockup studio for Framer — Memselon Mockup";
+export const alt = "The first real-time 3D mockup studio for Framer — Framer Mockup 3D";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

@@ -3,8 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — Memselon Mockup",
-  description: "Terms of service for Memselon Mockup, the real-time 3D mockup studio for Framer.",
+  title: "Terms of Service — Framer Mockup 3D",
+  description: "Terms of service for Framer Mockup 3D, the real-time 3D mockup studio for Framer.",
 };
 
 export default function TermsPage() {
@@ -13,8 +13,8 @@ export default function TermsPage() {
       <nav style={{ position: "sticky", top: 0, zIndex: 50, backdropFilter: "blur(20px) saturate(150%)", background: "rgba(5,5,9,0.7)", borderBottom: "1px solid var(--border-subtle)" }}>
         <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56, padding: "0 24px" }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <Image src="/logo/white.png" alt="Memselon Mockup" width={22} height={22} style={{ borderRadius: 6 }} />
-            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)" }}>Memselon Mockup</span>
+            <Image src="/logo/white.png" alt="Framer Mockup 3D" width={22} height={22} style={{ borderRadius: 6 }} />
+            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)" }}>Framer Mockup 3D</span>
           </Link>
           <Link href="/" style={{ fontSize: 13, color: "var(--text-secondary)", textDecoration: "none" }}>← Back to home</Link>
         </div>
@@ -25,7 +25,7 @@ export default function TermsPage() {
         <p style={{ fontSize: 13, color: "var(--text-tertiary)", marginBottom: 40 }}>Effective date: May 10, 2026</p>
 
         <Section title="1. Agreement">
-          <p>By using Memselon Mockup (the &ldquo;Service&rdquo;) — including the Framer plugin, the web app, and any related services — you agree to these Terms of Service. If you don&apos;t agree, please don&apos;t use the Service.</p>
+          <p>By using Framer Mockup 3D (the &ldquo;Service&rdquo;) — including the Framer plugin, the web app, and any related services — you agree to these Terms of Service. If you don&apos;t agree, please don&apos;t use the Service.</p>
           <p>The Service is operated by Umut Sevinc, currently registered as a sole proprietor in France (with planned migration to a private limited company in Estonia).</p>
         </Section>
 
