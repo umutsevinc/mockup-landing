@@ -40,15 +40,15 @@ function PanelRow({ label, value }: { label: string; value: React.ReactNode }) {
 	)
 }
 
-function Switch({ on }: { on: boolean }) {
+function Switch({ on, animated }: { on: boolean; animated?: boolean }) {
 	return (
 		<span
 			className="inline-flex rounded-full p-[2px] transition-colors"
 			style={{ width: 30, height: 17, background: on ? BLUE : 'rgba(255,255,255,0.16)' }}
 		>
 			<span
-				className="rounded-full bg-white block"
-				style={{ width: 13, height: 13, marginLeft: on ? 13 : 0 }}
+				className={animated ? 'sf-knob rounded-full bg-white block' : 'rounded-full bg-white block'}
+				style={{ width: 13, height: 13, marginLeft: animated ? undefined : on ? 13 : 0 }}
 			/>
 		</span>
 	)
@@ -72,7 +72,7 @@ function VignetteLandscape() {
 	return (
 		<div className="flex items-center justify-center gap-6 h-full">
 			{/* phone paysage */}
-			<div className="relative w-[130px] h-[64px] rounded-[14px] border-2 border-[#e8702a]/80 bg-gradient-to-br from-[#2a1a10] to-[#0d0d0f] shadow-[0_10px_30px_rgba(232,112,42,0.15)]">
+			<div className="sf-landscape relative w-[64px] h-[118px] rounded-[14px] border-2 border-[#e8702a]/80 bg-gradient-to-br from-[#2a1a10] to-[#0d0d0f] shadow-[0_10px_30px_rgba(232,112,42,0.15)]">
 				<div className="absolute inset-[5px] rounded-[9px] bg-gradient-to-br from-[#1c2f4a] to-[#0e1622] overflow-hidden">
 					<div className="absolute inset-x-2 top-2 h-[6px] rounded bg-white/15" />
 					<div className="absolute left-2 bottom-2 w-1/3 h-[5px] rounded bg-white/10" />
@@ -100,11 +100,15 @@ function VignetteVideoComponent() {
 				label="Resolution"
 				value={
 					<span className="flex gap-1">
-						{['720p', '1080p', '4K'].map((r) => (
+						{['720p', '1080p', '4K'].map((r, i) => (
 							<span
 								key={r}
-								className="px-1.5 py-[2px] rounded-md text-[9px] font-semibold"
-								style={r === '4K' ? { background: BLUE, color: '#fff' } : { background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.5)' }}
+								className="sf-pill px-1.5 py-[2px] rounded-md text-[9px] font-semibold"
+								style={{
+									background: 'rgba(255,255,255,0.07)',
+									color: 'rgba(255,255,255,0.5)',
+									animation: `sfPillOn 6s ${i * 2}s steps(1) infinite`,
+								}}
 							>
 								{r}
 							</span>
@@ -130,7 +134,7 @@ function VignetteLibraries() {
 						<span className="text-white/35">{l.count}</span>
 					</div>
 					<div className="h-[4px] rounded-full bg-white/[0.08]">
-						<div className="h-full rounded-full" style={{ width: `${l.pct}%`, background: BLUE }} />
+						<div className={l.pct > 10 ? 'sf-gauge-1 h-full rounded-full' : 'sf-gauge-2 h-full rounded-full'} style={{ background: BLUE }} />
 					</div>
 				</div>
 			))}
@@ -142,7 +146,7 @@ function VignetteLibraries() {
 function VignetteMobilePerf() {
 	return (
 		<div className="w-full max-w-[240px] mx-auto rounded-xl border border-white/[0.08] bg-[#101012] overflow-hidden text-left">
-			<PanelRow label="Mobile perf" value={<Switch on />} />
+			<PanelRow label="Mobile perf" value={<Switch on animated />} />
 			<div className="px-3 py-3 flex items-center justify-center gap-3 text-[11px]">
 				<span className="text-white/40 line-through">DPR 3</span>
 				<span className="text-white/30">→</span>
@@ -162,8 +166,7 @@ function VignettePose() {
 		<div className="flex items-center justify-center gap-5 h-full">
 			{/* phone en ¾ (skew CSS) */}
 			<div
-				className="relative w-[58px] h-[112px] rounded-[13px] border-2 border-[#e8702a]/70 bg-gradient-to-br from-[#3a2213] to-[#0d0d0f]"
-				style={{ transform: 'perspective(300px) rotateY(38deg)' }}
+				className="sf-pose relative w-[58px] h-[112px] rounded-[13px] border-2 border-[#e8702a]/70 bg-gradient-to-br from-[#3a2213] to-[#0d0d0f]"
 			>
 				<div className="absolute top-2.5 left-2.5 w-[22px] h-[22px] rounded-[7px] bg-[#151517] border border-white/10" />
 			</div>
@@ -183,9 +186,9 @@ function VignetteRefresh() {
 	return (
 		<div className="w-full max-w-[240px] mx-auto rounded-xl border border-white/[0.08] bg-[#101012] overflow-hidden text-left">
 			<div className="px-3 py-2 text-[10px] font-semibold tracking-wide text-white/40 border-b border-white/[0.06] flex items-center gap-1.5">
-				<RefreshCw size={10} /> Framer properties
+				<RefreshCw size={10} className="sf-spin" /> Framer properties
 			</div>
-			<PanelRow label="Refresh" value={<Switch on />} />
+			<PanelRow label="Refresh" value={<Switch on animated />} />
 			<div className="px-3 pb-3 pt-1 text-[10px] text-white/35 leading-relaxed">
 				Flip it → the published scene reloads with your latest edits. No re-insert.
 			</div>
@@ -234,9 +237,43 @@ const FEATURES = [
 	},
 ]
 
+const VIGNETTE_CSS = `
+@keyframes sfLandscape {
+	0%, 38% { transform: rotate(0deg); }
+	50%, 88% { transform: rotate(-90deg); }
+	100% { transform: rotate(0deg); }
+}
+@keyframes sfPose {
+	0%, 40% { transform: perspective(300px) rotateY(0deg); }
+	55%, 90% { transform: perspective(300px) rotateY(38deg); }
+	100% { transform: perspective(300px) rotateY(0deg); }
+}
+@keyframes sfSpin {
+	0%, 55% { transform: rotate(0deg); }
+	75%, 100% { transform: rotate(360deg); }
+}
+@keyframes sfGauge1 { 0%, 100% { width: 18%; } 50% { width: 34%; } }
+@keyframes sfGauge2 { 0%, 100% { width: 7%; } 50% { width: 16%; } }
+@keyframes sfKnob { 0%, 45% { margin-left: 0; } 60%, 100% { margin-left: 13px; } }
+@keyframes sfPillOn {
+	0%, 30% { background: #0A99FF; color: #fff; }
+	33%, 100% { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.5); }
+}
+.sf-landscape { animation: sfLandscape 6s ease-in-out infinite; }
+.sf-pose { animation: sfPose 5s ease-in-out infinite; }
+.sf-spin { animation: sfSpin 4s ease-in-out infinite; transform-origin: center; }
+.sf-gauge-1 { animation: sfGauge1 7s ease-in-out infinite; }
+.sf-gauge-2 { animation: sfGauge2 7s ease-in-out infinite; }
+.sf-knob { animation: sfKnob 4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+	.sf-landscape, .sf-pose, .sf-spin, .sf-gauge-1, .sf-gauge-2, .sf-knob, .sf-pill { animation: none !important; }
+}
+`
+
 export default function StudioFeatures() {
 	return (
 		<section className="relative bg-[#0a0a0a] px-6 md:px-16 py-32 md:py-40 border-t border-white/[0.07]">
+			<style dangerouslySetInnerHTML={{ __html: VIGNETTE_CSS }} />
 			<div className="max-w-[1560px] mx-auto">
 				<div data-reveal className="reveal-up mb-16 max-w-3xl">
 					<div className="text-xs sm:text-sm font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-6 flex items-center gap-3">
