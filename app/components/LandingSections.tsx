@@ -12,7 +12,7 @@ const CloserLook = dynamic(() => import('./CloserLook'), {
 	ssr: false,
 	loading: () => <div className="min-h-[620px]" aria-hidden="true" />,
 })
-import { ArrowRight, Camera, Download, Check, MousePointer2, RotateCw, Wind, Zap } from 'lucide-react'
+import { ArrowRight, Download, Check, MousePointer2, RotateCw, Wind, Zap } from 'lucide-react'
 
 /**
  * Tiny scroll-reveal hook. Adds an `is-in` class to children when they
@@ -648,11 +648,17 @@ export default function LandingSections() {
 					<div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-[#e8702a]/[0.08] blur-3xl" />
 				</div>
 				<div data-reveal className="reveal-up relative max-w-4xl mx-auto text-center">
-					<Camera size={36} strokeWidth={1.25} className="mx-auto mb-8 text-[#e8702a]" />
+					{/* Hermione à la place de l'icône — on prononce bien le nom. */}
+					{/* eslint-disable-next-line @next/next/no-img-element */}
+					<img
+						src="/hermione-mockiosa.gif"
+						alt=""
+						loading="lazy"
+						className="mx-auto mb-8 w-[180px] sm:w-[220px] rounded-2xl border border-white/[0.08]"
+					/>
 					<h2 className="text-5xl sm:text-7xl md:text-8xl leading-[0.98] tracking-tight">
-						<span className="font-playfair italic font-normal">Open</span> Framer.{' '}
-						<span className="text-white/65">Drop a screenshot.</span>{' '}
-						<span className="font-playfair italic font-normal">Ship 3D.</span>
+						It&apos;s <span className="font-playfair italic font-normal">Mockiosa</span>,{' '}
+						<span className="text-white/65">not Mockiosaaaaaaa.</span>
 					</h2>
 					<p className="mt-8 text-base sm:text-lg text-white/65 max-w-xl mx-auto">
 						The plugin is free to install — try it in demo mode, then go paid with a 7-day money-back guarantee.
@@ -673,20 +679,6 @@ export default function LandingSections() {
 						</Link>
 					</div>
 
-					{/* Clin d'œil Hermione — on prononce bien le nom de la marque. */}
-					<div className="mt-20 flex flex-col items-center gap-6">
-						<p className="text-lg sm:text-2xl text-white/70 tracking-tight">
-							It&apos;s Mocki<span className="font-playfair italic text-white">ó</span>sa, not
-							Mockios<span className="font-playfair italic text-white">áaa</span>.
-						</p>
-						{/* eslint-disable-next-line @next/next/no-img-element */}
-						<img
-							src="/hermione-mockiosa.gif"
-							alt="It's Mockiósa, not Mockiosáaa"
-							loading="lazy"
-							className="w-[280px] sm:w-[360px] rounded-2xl border border-white/[0.08]"
-						/>
-					</div>
 				</div>
 			</section>
 
