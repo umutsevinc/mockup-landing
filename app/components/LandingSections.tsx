@@ -11,7 +11,7 @@ const CloserLook = dynamic(() => import('./CloserLook'), {
 	ssr: false,
 	loading: () => <div className="min-h-[620px]" aria-hidden="true" />,
 })
-import { ArrowRight, Camera, Download, Sparkles, Check, MousePointer2, RotateCw, Wind, Zap } from 'lucide-react'
+import { ArrowRight, Camera, Download, Check, MousePointer2, RotateCw, Wind, Zap } from 'lucide-react'
 
 /**
  * Tiny scroll-reveal hook. Adds an `is-in` class to children when they
@@ -324,7 +324,7 @@ const FAQ = [
 	},
 	{
 		q: 'Can I cancel anytime?',
-		a: 'Yes — manage your subscription from the Stripe customer portal. Founder Lifetime is one-time, no recurring charge.',
+		a: 'Yes — manage your subscription from the Stripe customer portal, any time.',
 	},
 ]
 
@@ -615,29 +615,6 @@ export default function LandingSections() {
 						))}
 					</div>
 
-					{/* Founder Lifetime */}
-					<div data-reveal className="reveal-up mt-10 rounded-3xl border border-white/[0.08] bg-gradient-to-r from-white/[0.05] to-transparent p-8 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-10">
-						<div className="flex-1">
-							<div className="flex items-center gap-3 mb-3">
-								<Sparkles size={18} strokeWidth={1.5} className="text-[#e8702a]" />
-								<div className="text-xs font-bold tracking-wider uppercase text-[#e8702a]">Founder Lifetime — 25 places only</div>
-							</div>
-							<h3 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-2">
-								Pay <span className="font-playfair italic">once</span>, keep <span className="font-playfair italic">Studio</span> forever.
-							</h3>
-							<p className="text-sm text-white/65 max-w-xl">
-								One-time payment. All Studio features, no recurring charge. Locked to the first 25
-								Memselon believers — counter ticks down in the plugin.
-							</p>
-						</div>
-						<Link
-							href="/sign-up?plan=founder"
-							className="cta-skeu-light flex-shrink-0 inline-flex items-center gap-2 text-[#0a0a0a] text-sm font-semibold px-6 py-3 rounded-full transition-all hover:scale-[1.03]"
-						>
-							$499 — claim a slot
-							<ArrowRight size={16} />
-						</Link>
-					</div>
 				</div>
 			</section>
 

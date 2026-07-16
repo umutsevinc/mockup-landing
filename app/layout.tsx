@@ -59,7 +59,6 @@ const JSON_LD = {
 				{ '@type': 'Offer', name: 'Starter', price: '19', priceCurrency: 'USD' },
 				{ '@type': 'Offer', name: 'Pro', price: '49', priceCurrency: 'USD' },
 				{ '@type': 'Offer', name: 'Studio', price: '99', priceCurrency: 'USD' },
-				{ '@type': 'Offer', name: 'Founder Lifetime', price: '499', priceCurrency: 'USD' },
 			],
 			author: { '@type': 'Organization', name: 'Memselon', url: 'https://memselon.com' },
 		},
