@@ -5,6 +5,7 @@ import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import StudioFeatures from './StudioFeatures'
 import { useEffect, useRef, useState } from 'react'
+import { useInView } from '@/lib/useInView'
 
 // Section interactive "Take a closer look" — 3D chargée client-only.
 const CloserLook = dynamic(() => import('./CloserLook'), {
@@ -48,21 +49,6 @@ function useScrollReveal() {
  */
 function DeviceCarousel() {
 	const trackRef = useRef<HTMLDivElement>(null)
-	const pausedRef = useRef(false)
-
-	useEffect(() => {
-		const el = trackRef.current
-		if (!el) return
-		const id = setInterval(() => {
-			if (pausedRef.current) return
-			const card = el.querySelector<HTMLElement>('[data-card]')
-			const step = card ? card.offsetWidth + 16 : 356
-			const max = el.scrollWidth - el.clientWidth - 8
-			if (el.scrollLeft >= max) el.scrollTo({left: 0, behavior: 'smooth'})
-			else el.scrollBy({left: step, behavior: 'smooth'})
-		}, 3200)
-		return () => clearInterval(id)
-	}, [])
 
 	const nudge = (dir: 1 | -1) => {
 		const el = trackRef.current
@@ -72,11 +58,7 @@ function DeviceCarousel() {
 	}
 
 	return (
-		<div
-			className="relative"
-			onMouseEnter={() => (pausedRef.current = true)}
-			onMouseLeave={() => (pausedRef.current = false)}
-		>
+		<div className="relative">
 			<div
 				ref={trackRef}
 				className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -136,6 +118,15 @@ function DeviceCarousel() {
  *  massif à gauche qui déborde du cadre, kicker orange + gros titre,
  *  stats de formats photo/vidéo à droite. */
 function ExportFormatsSection() {
+	// Optimisation Apple : l'embed est PRÉCHARGÉ ~1200px avant d'arriver
+	// et monté UNE SEULE FOIS (latch) — le démontage au scroll rechargeait
+	// GLB+vidéo à chaque retour. Hors viewport la vidéo se met en pause
+	// dans l'embed (memselon:in-viewport interne) : coût GPU quasi nul.
+	const {ref: mediaRef, inView} = useInView('1200px')
+	const [everInView, setEverInView] = useState(false)
+	useEffect(() => {
+		if (inView) setEverInView(true)
+	}, [inView])
 	return (
 		<section className="relative bg-black border-t border-white/[0.07] overflow-hidden">
 			<div className="max-w-[1560px] mx-auto px-6 md:px-16 pt-24 md:pt-32">
@@ -150,15 +141,27 @@ function ExportFormatsSection() {
 			<div className="relative max-w-[1560px] mx-auto grid grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] items-center gap-10">
 				{/* Média massif à gauche — LE produit lui-même : la scène vidéo
 				    3D statique (composant vidéo du plugin) en gros plan qui
-				    déborde du cadre à gauche, chat samurai qui joue en boucle. */}
-				<div data-reveal className="reveal-up relative h-[420px] sm:h-[560px] lg:h-[640px] overflow-hidden mx-6 md:mx-16 lg:mx-0">
-					<iframe
-						src="https://framer-3d-mockup-embed.vercel.app/embed/b2e6ee46-51d2-4f31-b781-40453ccafdbb?static=true&bg=transparent&showSignature=false&dpr=2&tier=STANDARD"
-						title="Video 3D mockup — live static scene"
-						loading="lazy"
-						className="absolute border-0 pointer-events-none"
+				    déborde du cadre à gauche, chat samurai qui joue en boucle.
+				    Pas de reveal ici (demande : aucun fade in/out sur la vidéo)
+				    et collé au bord gauche en mobile. */}
+				<div ref={mediaRef} className="relative h-[420px] sm:h-[560px] lg:h-[640px] overflow-hidden mr-6 md:mr-16 lg:mx-0">
+					{/* Poster instantané (thumbnail de la scène, même cadrage) —
+					    visible pendant le chargement, la 3D fond par-dessus. */}
+					{/* eslint-disable-next-line @next/next/no-img-element */}
+					<img
+						src="https://memselon-media.memselon.workers.dev/users/9ee54364-d2bf-472f-8273-6cbd2b8592be/b2e6ee46-51d2-4f31-b781-40453ccafdbb/thumbnail-dfd911ad-7914-4211-aeab-ac9defc07c2b.png"
+						alt="Video 3D mockup"
+						className="absolute object-contain pointer-events-none"
 						style={{ width: '300%', height: '280%', left: '-130%', top: '-90%' }}
 					/>
+					{everInView && (
+						<iframe
+							src="https://framer-3d-mockup-embed.vercel.app/embed/b2e6ee46-51d2-4f31-b781-40453ccafdbb?static=true&bg=transparent&showSignature=false&dpr=1&tier=STANDARD"
+							title="Video 3D mockup — live static scene"
+							className="absolute border-0 pointer-events-none"
+							style={{ width: '300%', height: '280%', left: '-130%', top: '-90%' }}
+						/>
+					)}
 				</div>
 
 				{/* Stats à droite */}
