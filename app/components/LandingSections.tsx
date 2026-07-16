@@ -145,14 +145,17 @@ function ExportFormatsSection() {
 				    Pas de reveal ici (demande : aucun fade in/out sur la vidéo)
 				    et collé au bord gauche en mobile. */}
 				<div ref={mediaRef} className="relative h-[420px] sm:h-[560px] lg:h-[640px] overflow-hidden mr-6 md:mr-16 lg:mx-0">
-					{/* Poster instantané (thumbnail de la scène, même cadrage) —
-					    visible pendant le chargement, la 3D fond par-dessus. */}
+					{/* Poster instantané — capture LOCALE de la scène (18 Ko webp,
+					    même cadrage que l'iframe), eager + fetchPriority high :
+					    l'ancienne URL CDN 404ait, d'où la zone vide puis le fondu. */}
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img
-						src="https://memselon-media.memselon.workers.dev/users/9ee54364-d2bf-472f-8273-6cbd2b8592be/b2e6ee46-51d2-4f31-b781-40453ccafdbb/thumbnail-dfd911ad-7914-4211-aeab-ac9defc07c2b.png"
+						src="/exports-poster.webp"
 						alt="Video 3D mockup"
+						loading="eager"
+						fetchPriority="high"
 						className="absolute object-contain pointer-events-none"
-						style={{ width: '300%', height: '280%', left: '-130%', top: '-90%' }}
+						style={{ width: '300%', maxWidth: 'none', height: '280%', left: '-130%', top: '-90%' }}
 					/>
 					{everInView && (
 						<iframe
