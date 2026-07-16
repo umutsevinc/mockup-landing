@@ -3,7 +3,7 @@
 import {Suspense, useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {Canvas} from '@react-three/fiber'
 import {MockupScene} from './mockup/MockupScene'
-import {PixelCatRunner} from './PixelCatRunner'
+import {FeatherRunner} from './FeatherRunner'
 import type {Device, Mockup} from '@/lib/mockup-types'
 import {PLAYGROUND_DEVICES, defaultFinishColor, deviceFinishColors} from '@/lib/playground-devices'
 import {useInView} from '@/lib/useInView'
@@ -30,7 +30,7 @@ function MascotLoading({visible}: {visible: boolean}) {
 			aria-hidden="true"
 		>
 			<div style={{width: 190}}>
-				<PixelCatRunner progressPct={pct} color="#ffffff" />
+				<FeatherRunner progressPct={pct} color="#ffffff" />
 			</div>
 			<p className="text-[11px] tracking-[0.14em] uppercase text-white/45">Loading model</p>
 		</div>

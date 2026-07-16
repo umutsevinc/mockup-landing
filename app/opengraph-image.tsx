@@ -45,6 +45,26 @@ export default async function Image() {
             width: 600,
           }}
         >
+          {/* Lockup Mockiosa — plume + wordmark, comme le header du site */}
+          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 40 }}>
+            <svg
+              width="36"
+              height="36"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FFFFFF"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" />
+              <path d="M16 8 2 22" />
+              <path d="M17.5 15H9" />
+            </svg>
+            <div style={{ display: "flex", fontSize: 32, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+              Mockiosa
+            </div>
+          </div>
           <div style={{ display: "flex", color: "#FFFFFF" }}>The first real-time</div>
           <div style={{ display: "flex", color: "#FFFFFF" }}>3D mockup studio</div>
           <div style={{ display: "flex", color: "#9A9A9E" }}>for Framer.</div>
