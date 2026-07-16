@@ -69,16 +69,19 @@ function DeviceCarousel() {
 						data-card
 						className="snap-start relative flex-shrink-0 w-[290px] sm:w-[340px] h-[440px] rounded-3xl overflow-hidden bg-white/[0.05] border border-white/[0.07] transition-transform hover:scale-[1.01]"
 					>
-						{/* Photo pleine carte, qualité max */}
+						{/* Photo pleine carte, qualité max — décalée vers le bas
+						    pour dégager la zone titre en haut de carte. */}
 						{d.img ? (
-							<Image
-								src={d.img}
-								alt={d.name}
-								fill
-								quality={95}
-								className="object-cover object-center"
-								sizes="(max-width: 640px) 290px, 680px"
-							/>
+							<div className="absolute inset-0 top-16">
+								<Image
+									src={d.img}
+									alt={d.name}
+									fill
+									quality={95}
+									className="object-cover object-center"
+									sizes="(max-width: 640px) 290px, 680px"
+								/>
+							</div>
 						) : (
 							<div className="absolute inset-0 flex items-center justify-center">
 								<div className="text-4xl font-semibold text-white/15">{d.name.split(' ')[0]}</div>
@@ -195,9 +198,9 @@ const DEVICES = [
 	{ name: 'iPhone 17 Pro',        tier: 'Pro',    img: '/cards/iphone17pro-apple.webp' },
 	{ name: 'iPhone Air',           tier: 'Pro',    img: '/cards/iphoneAir-apple.webp' },
 	{ name: 'iPhone 16e',           tier: 'Pro' },
-	{ name: 'iPad',                 tier: 'Pro',    img: '/cards/ipadPro.jpg' },
-	{ name: 'MacBook Pro 16"',      tier: 'Pro',    img: '/cards/macbookPro.jpg' },
-	{ name: 'iMac',                 tier: 'Pro',    img: '/cards/imac.jpg' },
+	{ name: 'iPad',                 tier: 'Pro',    img: '/cards/ipadPro-apple.webp' },
+	{ name: 'MacBook Pro 16"',      tier: 'Pro',    img: '/cards/macbookPro-apple.webp' },
+	{ name: 'iMac',                 tier: 'Pro',    img: '/cards/imac-apple.webp' },
 	{ name: 'Apple Pro Display XDR',tier: 'Studio',  img: '/cards/appleProDisplayXDR.jpg' },
 	{ name: 'Apple Watch Ultra',    tier: 'Pro',    img: '/cards/appleWatchUltra.jpg' },
 	{ name: 'Samsung Galaxy S25',   tier: 'Pro' },
