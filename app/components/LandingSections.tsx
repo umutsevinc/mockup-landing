@@ -132,10 +132,6 @@ function DeviceCarousel() {
 	)
 }
 
-/** URL de la vidéo de démo (mockup iPhone 17 exporté du plugin,
- *  hébergée sur Framer). Vide → fallback photo Apple HD. */
-const EXPORT_VIDEO_URL = ''
-
 /** Section "exports" à la Apple (réf. page Cameras iPhone) : média
  *  massif à gauche qui déborde du cadre, kicker orange + gros titre,
  *  stats de formats photo/vidéo à droite. */
@@ -152,27 +148,17 @@ function ExportFormatsSection() {
 			</div>
 
 			<div className="relative max-w-[1560px] mx-auto grid grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] items-center gap-10">
-				{/* Média massif à gauche — déborde vers le bord gauche */}
-				<div data-reveal className="reveal-up relative h-[420px] sm:h-[560px] lg:h-[640px] rounded-[2rem] overflow-hidden mx-6 md:mx-16 lg:mx-0 lg:rounded-l-none lg:rounded-r-[2rem]">
-					{EXPORT_VIDEO_URL ? (
-						<video
-							src={EXPORT_VIDEO_URL}
-							autoPlay
-							muted
-							loop
-							playsInline
-							className="absolute inset-0 w-full h-full object-contain object-left"
-						/>
-					) : (
-						<Image
-							src="/cards/iphone17pro-apple.webp"
-							alt="iPhone 17 Pro 4K export"
-							fill
-							quality={95}
-							className="object-contain object-left"
-							sizes="(max-width: 1024px) 100vw, 60vw"
-						/>
-					)}
+				{/* Média massif à gauche — LE produit lui-même : la scène vidéo
+				    3D statique (composant vidéo du plugin) en gros plan qui
+				    déborde du cadre à gauche, chat samurai qui joue en boucle. */}
+				<div data-reveal className="reveal-up relative h-[420px] sm:h-[560px] lg:h-[640px] overflow-hidden mx-6 md:mx-16 lg:mx-0">
+					<iframe
+						src="https://framer-3d-mockup-embed.vercel.app/embed/b2e6ee46-51d2-4f31-b781-40453ccafdbb?static=true&bg=transparent&showSignature=false&dpr=2&tier=STANDARD"
+						title="Video 3D mockup — live static scene"
+						loading="lazy"
+						className="absolute border-0 pointer-events-none"
+						style={{ width: '300%', height: '280%', left: '-130%', top: '-90%' }}
+					/>
 				</div>
 
 				{/* Stats à droite */}
@@ -336,22 +322,37 @@ export default function LandingSections() {
 		<div ref={containerRef} className="bg-[#0a0a0a] text-white overflow-hidden">
 			{/* ════════════ Section 1 — Pitch ════════════ */}
 			<section className="relative px-6 md:px-16 py-32 md:py-48 max-w-[1560px] mx-auto">
-				<div data-reveal className="reveal-up max-w-4xl">
-					<div className="text-xs sm:text-sm font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-6 flex items-center gap-3">
-						<span className="w-8 h-px bg-[#e8702a]" />
-						The plugin
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+					<div data-reveal className="reveal-up">
+						<div className="text-xs sm:text-sm font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-6 flex items-center gap-3">
+							<span className="w-8 h-px bg-[#e8702a]" />
+							The plugin
+						</div>
+						<h2 className="text-4xl sm:text-6xl md:text-7xl leading-[0.95] tracking-tight">
+							<span className="font-playfair italic font-normal" style={{ letterSpacing: '-0.04em' }}>Stop exporting.</span>{' '}
+							<span className="text-white/70">Start designing</span>{' '}
+							<span className="font-playfair italic font-normal" style={{ letterSpacing: '-0.04em' }}>in 3D.</span>
+						</h2>
+						<p className="mt-10 max-w-2xl text-base sm:text-lg text-white/70 leading-relaxed">
+							You design in Framer. Then you open another tool — Rotato, Blender, After Effects. You
+							re-import. You re-export. Every time the mockup changes, you do it again. Framer Mockup 3D
+							ends that loop — the device lives on your canvas, your screenshot is its screen, and the
+							published landing renders the same 3D scene you just posed.
+						</p>
 					</div>
-					<h2 className="text-4xl sm:text-6xl md:text-7xl leading-[0.95] tracking-tight">
-						<span className="font-playfair italic font-normal" style={{ letterSpacing: '-0.04em' }}>Stop exporting.</span>{' '}
-						<span className="text-white/70">Start designing</span>{' '}
-						<span className="font-playfair italic font-normal" style={{ letterSpacing: '-0.04em' }}>in 3D.</span>
-					</h2>
-					<p className="mt-10 max-w-2xl text-base sm:text-lg text-white/70 leading-relaxed">
-						You design in Framer. Then you open Rotato. You re-import. You re-export. Every time the
-						mockup changes, you do it again. Framer Mockup 3D ends that loop — the device lives on your
-						canvas, your screenshot is its screen, and the published landing renders the same 3D scene
-						you just posed.
-					</p>
+
+					{/* Démo vidéo du plugin — même carte que la page login */}
+					<div data-reveal className="reveal-up relative hidden lg:block min-h-[460px] rounded-3xl overflow-hidden border border-white/[0.08]">
+						<video
+							src="/auth-demo.mp4"
+							poster="/auth-demo-poster.jpg"
+							autoPlay
+							muted
+							loop
+							playsInline
+							className="absolute inset-0 w-full h-full object-cover"
+						/>
+					</div>
 				</div>
 			</section>
 
@@ -493,7 +494,7 @@ export default function LandingSections() {
 							<span className="w-8 h-px bg-[#e8702a]" />
 						</div>
 						<h2 className="text-4xl sm:text-6xl tracking-tight">
-							<span className="font-playfair italic font-normal">Why</span> not Rotato.
+							<span className="font-playfair italic font-normal">Why</span> Framer Mockup.
 						</h2>
 					</div>
 
@@ -502,7 +503,7 @@ export default function LandingSections() {
 							<thead>
 								<tr className="border-b border-white/[0.08]">
 									<th className="text-left p-5 font-semibold text-white/50 text-xs uppercase tracking-wider">Feature</th>
-									<th className="p-5 font-semibold text-white text-xs uppercase tracking-wider">Memselon</th>
+									<th className="p-5 font-semibold text-white text-xs uppercase tracking-wider">Framer Mockup</th>
 									<th className="p-5 font-medium text-white/55 text-xs uppercase tracking-wider">Rotato</th>
 									<th className="p-5 font-medium text-white/55 text-xs uppercase tracking-wider">Smart Mockups</th>
 									<th className="p-5 font-medium text-white/55 text-xs uppercase tracking-wider">Framer 2D</th>
@@ -679,7 +680,7 @@ export default function LandingSections() {
 							<svg width="20" height="20" viewBox="0 0 256 256" fill="#ffffff" aria-hidden="true">
 								<path d="M 256 256 L 128 256 L 0 128 L 128 128 Z M 256 128 L 128 128 L 0 0 L 128 0 Z" />
 							</svg>
-							<span className="font-playfair italic text-xl">Memselon</span>
+							<span className="font-playfair italic text-xl">Framer Mockup</span>
 						</div>
 						<p className="text-xs text-white/45 max-w-xs leading-relaxed">
 							Real-time 3D mockups for Framer. Crafted by a human, one cloud at a time ☁
@@ -697,7 +698,7 @@ export default function LandingSections() {
 					</nav>
 				</div>
 				<div className="max-w-[1560px] mx-auto mt-10 pt-6 border-t border-white/[0.05] text-[10px] tracking-wider uppercase text-white/40 flex flex-wrap items-center justify-between gap-3">
-					<span>© 2026 Memselon</span>
+					<span>© 2026 Framer Mockup</span>
 					<span>Made for Framer designers</span>
 				</div>
 			</footer>
