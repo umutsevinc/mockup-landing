@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Next 16 : toute qualité next/image non listée ici → 400 sur
+  // /_next/image (le carousel utilise quality={95}).
+  images: {
+    qualities: [75, 95],
+  },
   async redirects() {
     return [
       // Rebrand Mockiosa : l'ancien domaine redirige intégralement
