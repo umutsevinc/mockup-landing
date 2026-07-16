@@ -38,6 +38,10 @@ interface MockupSceneProps {
 	/** Retour élastique à la Apple : au relâchement d'un drag, la caméra
 	    revient en douceur à la vue de face. */
 	snapBack?: boolean
+	/** Mécanisme memselon:in-viewport du plugin : hors viewport la vidéo
+	    d'écran est mise en PAUSE (pas seulement le frameloop R3F) — zéro
+	    décodage vidéo pour les scènes hors écran. */
+	inViewport?: boolean
 }
 
 type MeshAny = THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>
@@ -266,7 +270,7 @@ function drawVideoHeightCoverTex(
 	return {tex, stop}
 }
 
-export function MockupScene({payload, transparentBg, pose, snapBack = false}: MockupSceneProps) {
+export function MockupScene({payload, transparentBg, pose, snapBack = false, inViewport = true}: MockupSceneProps) {
 	const {mockup, device} = payload
 
 	// Charger le modèle avec optimisations (draco activé si disponible)
@@ -294,6 +298,20 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false}: Mo
 	const screenRef = useRef<MeshAny | null>(null)
 	const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
 	const videoCleanupRef = useRef<(() => void) | null>(null)
+	// Vidéo d'écran active + visibilité courante (mécanisme in-viewport).
+	const videoElRef = useRef<HTMLVideoElement | null>(null)
+	const inViewportRef = useRef(inViewport)
+
+	// memselon:in-viewport — pause/reprise de la vidéo d'écran selon la
+	// visibilité de la scène. Le frameloop R3F est déjà coupé par les
+	// parents ; ici on stoppe aussi le DÉCODAGE vidéo.
+	useEffect(() => {
+		inViewportRef.current = inViewport
+		const v = videoElRef.current
+		if (!v) return
+		if (inViewport) v.play().catch(() => {})
+		else v.pause()
+	}, [inViewport])
 	const controlsRef = useRef<any>(null)
 
 	const lightIntensity = mockup.light_intensity ?? 0.5
@@ -573,6 +591,9 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false}: Mo
 
 				const handleCanPlay = () => {
 					if (cancelled) return
+					// Hors viewport : on n'engage pas la lecture — elle
+					// reprendra au retour via l'effet in-viewport.
+					if (!inViewportRef.current) return
 					try {
 						const playPromise = video.play()
 						if (playPromise && typeof playPromise.then === 'function') {
@@ -608,6 +629,7 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false}: Mo
 				video.addEventListener('loadeddata', handleCanPlay)
 				video.addEventListener('error', handleError)
 				video.load()
+				videoElRef.current = video
 
 				const {tex: videoCanvasTex, stop} = drawVideoHeightCoverTex(video, screenAspect, rendererRef.current, screenOpts)
 				// Anti-flash noir : la texture vidéo n'est attachée qu'à la
@@ -624,6 +646,7 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false}: Mo
 
 				videoCleanupRef.current = () => {
 					cancelled = true
+					if (videoElRef.current === video) videoElRef.current = null
 					video.removeEventListener('canplay', attachVideoTex)
 					video.removeEventListener('loadeddata', attachVideoTex)
 					video.removeEventListener('canplay', handleCanPlay)

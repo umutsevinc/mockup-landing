@@ -322,7 +322,7 @@ export default function CloserLook() {
 						style={{background: 'transparent'}}
 					>
 						<Suspense fallback={null}>
-							<MockupScene payload={payload} transparentBg pose={pose} />
+							<MockupScene payload={payload} transparentBg pose={pose} inViewport={inView} />
 						</Suspense>
 					</Canvas>
 				</div>

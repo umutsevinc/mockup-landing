@@ -325,7 +325,7 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 						style={{background: 'transparent'}}
 					>
 						<Suspense fallback={null}>
-							<MockupScene payload={payload} transparentBg snapBack={teaser && isTouch} />
+							<MockupScene payload={payload} transparentBg snapBack={teaser && isTouch} inViewport={inView} />
 						</Suspense>
 					</Canvas>
 				</div>
