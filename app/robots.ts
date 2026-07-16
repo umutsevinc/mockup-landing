@@ -13,6 +13,6 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: "PerplexityBot", allow: "/" },
       { userAgent: "Google-Extended", allow: "/" },
     ],
-    sitemap: "https://mockup.memselon.com/sitemap.xml",
+    sitemap: "https://mockiosa.memselon.com/sitemap.xml",
   };
 }

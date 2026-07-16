@@ -13,7 +13,7 @@ const HeroPlayground = dynamic(() => import('../components/HeroPlayground'), {
 
 /**
  * Waiting list — hero seule + capture email géante. Partageable
- * directement (réponses Twitter, DM) : mockup.memselon.com/waitlist
+ * directement (réponses Twitter, DM) : mockiosa.memselon.com/waitlist
  */
 export default function WaitlistPage() {
 	const [email, setEmail] = useState('')

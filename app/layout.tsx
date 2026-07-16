@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import './globals.css'
 
-const SITE_URL = 'https://mockup.memselon.com'
+const SITE_URL = 'https://mockiosa.memselon.com'
 
 export const metadata: Metadata = {
 	metadataBase: new URL(SITE_URL),
