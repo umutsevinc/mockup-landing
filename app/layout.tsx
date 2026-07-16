@@ -56,10 +56,10 @@ const JSON_LD = {
 			description:
 				'Real-time 3D device mockup plugin for Framer. Drop a screenshot or video on a 3D iPhone, iPad, Apple Watch or iMac, orbit the camera, publish it live on your site or export in 4K.',
 			offers: [
-				{ '@type': 'Offer', name: 'Starter', price: '19', priceCurrency: 'EUR' },
-				{ '@type': 'Offer', name: 'Pro', price: '49', priceCurrency: 'EUR' },
-				{ '@type': 'Offer', name: 'Studio', price: '99', priceCurrency: 'EUR' },
-				{ '@type': 'Offer', name: 'Founder Lifetime', price: '499', priceCurrency: 'EUR' },
+				{ '@type': 'Offer', name: 'Starter', price: '19', priceCurrency: 'USD' },
+				{ '@type': 'Offer', name: 'Pro', price: '49', priceCurrency: 'USD' },
+				{ '@type': 'Offer', name: 'Studio', price: '99', priceCurrency: 'USD' },
+				{ '@type': 'Offer', name: 'Founder Lifetime', price: '499', priceCurrency: 'USD' },
 			],
 			author: { '@type': 'Organization', name: 'Memselon', url: 'https://memselon.com' },
 		},

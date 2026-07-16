@@ -261,11 +261,11 @@ const PLANS = [
 		cta: 'Go Starter',
 		highlight: false,
 		bullets: [
+			'Photo mode only',
 			'50 exports / month, up to 1080p',
 			'No watermark',
 			'All devices',
 			'Orbit camera',
-			'Photo mode',
 		],
 	},
 	{
@@ -589,7 +589,7 @@ export default function LandingSections() {
 								<div className="mb-2 text-sm font-semibold uppercase tracking-wider text-white/70">{p.name}</div>
 								<div className="text-sm text-white/55 mb-6">{p.blurb}</div>
 								<div className="mb-2 flex items-baseline gap-1">
-									<span className="text-5xl font-bold tracking-tight">€{yearly ? p.yearly : p.monthly}</span>
+									<span className="text-5xl font-bold tracking-tight">${yearly ? p.yearly : p.monthly}</span>
 									<span className="text-sm text-white/55">/{yearly ? 'year' : 'month'}</span>
 								</div>
 								<Link
@@ -634,7 +634,7 @@ export default function LandingSections() {
 							href="/sign-up?plan=founder"
 							className="cta-skeu-light flex-shrink-0 inline-flex items-center gap-2 text-[#0a0a0a] text-sm font-semibold px-6 py-3 rounded-full transition-all hover:scale-[1.03]"
 						>
-							€499 — claim a slot
+							$499 — claim a slot
 							<ArrowRight size={16} />
 						</Link>
 					</div>
