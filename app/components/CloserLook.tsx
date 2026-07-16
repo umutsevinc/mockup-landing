@@ -96,7 +96,8 @@ export default function CloserLook() {
 	const [media, setMedia] = useState<{url: string; type: 'image' | 'video'} | null>(null)
 	const fileRef = useRef<HTMLInputElement>(null)
 	// Perf : la section est sous le fold — frameloop coupé hors viewport.
-	const {ref: viewRef, inView} = useInView()
+	// Marge large : la vidéo (re)démarre avant l'arrivée, coupe après la sortie.
+	const {ref: viewRef, inView} = useInView('600px')
 
 	const handleFile = useCallback((file: File | undefined | null) => {
 		if (!file) return

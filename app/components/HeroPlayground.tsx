@@ -135,7 +135,9 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 	// (grab-rotate du modèle) : seuil de 6px entre down et up.
 	const pointerDownRef = useRef<{x: number; y: number} | null>(null)
 	// Perf : frameloop coupé quand le hero est hors viewport (scroll).
-	const {ref: viewRef, inView} = useInView()
+	// Marge large : la vidéo (re)démarre bien AVANT d'arriver dessus et
+	// ne coupe que bien après la sortie — zéro écran figé visible.
+	const {ref: viewRef, inView} = useInView('600px')
 
 	const device = DEVICES.find((d) => d.id === deviceId) || DEVICES[0]
 

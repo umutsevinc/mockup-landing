@@ -302,15 +302,23 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false, inV
 	const videoElRef = useRef<HTMLVideoElement | null>(null)
 	const inViewportRef = useRef(inViewport)
 
-	// memselon:in-viewport — pause/reprise de la vidéo d'écran selon la
-	// visibilité de la scène. Le frameloop R3F est déjà coupé par les
-	// parents ; ici on stoppe aussi le DÉCODAGE vidéo.
+	// memselon:in-viewport — la vidéo d'écran ne joue que dans le viewport.
+	// Sortie de vue : pause + retour à 0 → chaque entrée dans la vue
+	// rejoue la vidéo depuis le début (raccord avec le poster frame 0).
+	// Le frameloop R3F est déjà coupé par les parents ; ici on stoppe
+	// aussi le DÉCODAGE vidéo.
 	useEffect(() => {
 		inViewportRef.current = inViewport
 		const v = videoElRef.current
 		if (!v) return
-		if (inViewport) v.play().catch(() => {})
-		else v.pause()
+		if (inViewport) {
+			v.play().catch(() => {})
+		} else {
+			v.pause()
+			try {
+				v.currentTime = 0
+			} catch {}
+		}
 	}, [inViewport])
 	const controlsRef = useRef<any>(null)
 
