@@ -1,7 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
-import { RotateCw, Video, Smartphone, RefreshCw, Sun, Layers, Play } from 'lucide-react'
+import { RotateCw, Video, Smartphone, RefreshCw, Sun, Layers } from 'lucide-react'
 
 /**
  * « Inside the studio » — les fonctionnalités récentes du plugin,
@@ -104,10 +103,11 @@ function VignetteVideoComponent() {
 						{['720p', '1080p', '4K'].map((r, i) => (
 							<span
 								key={r}
-								className={`sf-pill-${i} px-1.5 py-[2px] rounded-md text-[9px] font-semibold`}
+								className="sf-pill px-1.5 py-[2px] rounded-md text-[9px] font-semibold"
 								style={{
 									background: 'rgba(255,255,255,0.07)',
 									color: 'rgba(255,255,255,0.5)',
+									animation: `sfPillOn 6s ${i * 2}s steps(1) infinite`,
 								}}
 							>
 								{r}
@@ -237,69 +237,6 @@ const FEATURES = [
 	},
 ]
 
-// Durée d'un cycle par carte (la plus longue animation de sa vignette),
-// pour rendre la main automatiquement à la fin de la lecture.
-const CYCLE_MS: Record<string, number> = {
-	'Landscape, one tap': 6200,
-	'Video scenes that stay sharp': 6200,
-	'Two libraries, one storage': 7200,
-	'Mobile perf switch': 4200,
-	'Presentation pose': 5200,
-	'Refresh from Framer': 4200,
-}
-
-function FeatureCard({
-	icon: Icon,
-	title,
-	body,
-	Vignette,
-}: {
-	icon: typeof RotateCw
-	title: string
-	body: string
-	Vignette: () => React.JSX.Element
-}) {
-	const [playing, setPlaying] = useState(false)
-	const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-	const play = () => {
-		if (playing) return
-		setPlaying(true)
-		if (timer.current) clearTimeout(timer.current)
-		timer.current = setTimeout(() => setPlaying(false), CYCLE_MS[title] ?? 6000)
-	}
-
-	return (
-		<button
-			type="button"
-			onClick={play}
-			data-reveal
-			className="reveal-up text-left rounded-3xl border border-white/[0.08] bg-white/[0.03] p-7 flex flex-col gap-6 hover:border-white/[0.15] transition-colors cursor-pointer"
-			aria-label={`Play the ${title} demo`}
-		>
-			<div
-				className={`relative h-[150px] flex items-center justify-center rounded-2xl bg-black/40 border border-white/[0.05] px-4 w-full ${playing ? 'sf-live' : ''}`}
-			>
-				<Vignette />
-				{/* badge lecture — disparaît pendant le cycle */}
-				<span
-					className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5 rounded-full bg-white/[0.07] border border-white/10 px-2.5 py-1 text-[10px] text-white/60 transition-opacity duration-300"
-					style={{ opacity: playing ? 0 : 1 }}
-				>
-					<Play size={9} fill="currentColor" /> Click to play
-				</span>
-			</div>
-			<div>
-				<div className="flex items-center gap-2.5 mb-2.5">
-					<Icon size={15} strokeWidth={1.7} className="text-[#e8702a]" />
-					<h3 className="text-base font-semibold text-white">{title}</h3>
-				</div>
-				<p className="text-sm text-white/55 leading-relaxed">{body}</p>
-			</div>
-		</button>
-	)
-}
-
 const VIGNETTE_CSS = `
 @keyframes sfLandscape {
 	0%, 38% { transform: rotate(0deg); }
@@ -322,22 +259,14 @@ const VIGNETTE_CSS = `
 	0%, 30% { background: #0A99FF; color: #fff; }
 	33%, 100% { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.5); }
 }
-/* Lecture AU CLIC (pas d'auto-play) : les keyframes ne s'appliquent
-   que sous .sf-live, posé par la carte pendant un cycle. */
-.sf-live .sf-landscape { animation: sfLandscape 6s ease-in-out 1; }
-.sf-live .sf-pose { animation: sfPose 5s ease-in-out 1; }
-.sf-live .sf-spin { animation: sfSpin 4s ease-in-out 1; transform-origin: center; }
-.sf-live .sf-gauge-1 { animation: sfGauge1 7s ease-in-out 1; }
-.sf-live .sf-gauge-2 { animation: sfGauge2 7s ease-in-out 1; }
-.sf-live .sf-knob { animation: sfKnob 4s ease-in-out 1; }
-.sf-live .sf-pill-0 { animation: sfPillOn 6s 0s steps(1) 1; }
-.sf-live .sf-pill-1 { animation: sfPillOn 6s 2s steps(1) 1; }
-.sf-live .sf-pill-2 { animation: sfPillOn 6s 4s steps(1) 1; }
-/* au repos, la 1re pill reste active (état par défaut lisible) */
-.sf-pill-0 { background: #0A99FF !important; color: #fff !important; }
-.sf-live .sf-pill-0 { background: rgba(255,255,255,0.07) !important; color: rgba(255,255,255,0.5) !important; }
+.sf-landscape { animation: sfLandscape 6s ease-in-out infinite; }
+.sf-pose { animation: sfPose 5s ease-in-out infinite; }
+.sf-spin { animation: sfSpin 4s ease-in-out infinite; transform-origin: center; }
+.sf-gauge-1 { animation: sfGauge1 7s ease-in-out infinite; }
+.sf-gauge-2 { animation: sfGauge2 7s ease-in-out infinite; }
+.sf-knob { animation: sfKnob 4s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
-	.sf-live .sf-landscape, .sf-live .sf-pose, .sf-live .sf-spin, .sf-live .sf-gauge-1, .sf-live .sf-gauge-2, .sf-live .sf-knob, .sf-live [class*='sf-pill'] { animation: none !important; }
+	.sf-landscape, .sf-pose, .sf-spin, .sf-gauge-1, .sf-gauge-2, .sf-knob, .sf-pill { animation: none !important; }
 }
 `
 
@@ -358,8 +287,23 @@ export default function StudioFeatures() {
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-					{FEATURES.map((f) => (
-						<FeatureCard key={f.title} {...f} />
+					{FEATURES.map(({ icon: Icon, title, body, Vignette }) => (
+						<div
+							key={title}
+							data-reveal
+							className="reveal-up rounded-3xl border border-white/[0.08] bg-white/[0.03] p-7 flex flex-col gap-6 hover:border-white/[0.15] transition-colors"
+						>
+							<div className="h-[150px] flex items-center justify-center rounded-2xl bg-black/40 border border-white/[0.05] px-4">
+								<Vignette />
+							</div>
+							<div>
+								<div className="flex items-center gap-2.5 mb-2.5">
+									<Icon size={15} strokeWidth={1.7} className="text-[#e8702a]" />
+									<h3 className="text-base font-semibold text-white">{title}</h3>
+								</div>
+								<p className="text-sm text-white/55 leading-relaxed">{body}</p>
+							</div>
+						</div>
 					))}
 				</div>
 			</div>
