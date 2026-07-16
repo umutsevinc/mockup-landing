@@ -672,6 +672,21 @@ export default function LandingSections() {
 							Sign in
 						</Link>
 					</div>
+
+					{/* Clin d'œil Hermione — on prononce bien le nom de la marque. */}
+					<div className="mt-20 flex flex-col items-center gap-6">
+						<p className="text-lg sm:text-2xl text-white/70 tracking-tight">
+							It&apos;s Mocki<span className="font-playfair italic text-white">ó</span>sa, not
+							Mockios<span className="font-playfair italic text-white">áaa</span>.
+						</p>
+						{/* eslint-disable-next-line @next/next/no-img-element */}
+						<img
+							src="/hermione-mockiosa.gif"
+							alt="It's Mockiósa, not Mockiosáaa"
+							loading="lazy"
+							className="w-[280px] sm:w-[360px] rounded-2xl border border-white/[0.08]"
+						/>
+					</div>
 				</div>
 			</section>
 
