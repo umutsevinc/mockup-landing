@@ -3,35 +3,21 @@
 import {Suspense, useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {Canvas} from '@react-three/fiber'
 import {MockupScene} from './mockup/MockupScene'
-import {FeatherRunner} from './FeatherRunner'
+import {FeatherFloat} from './FeatherRunner'
 import type {Device, Mockup} from '@/lib/mockup-types'
 import {PLAYGROUND_DEVICES, defaultFinishColor, deviceFinishColors} from '@/lib/playground-devices'
 import {useInView} from '@/lib/useInView'
 
-/** Mascotte de chargement — le pixel cat galope en boucle pendant que
- *  le GLB du device charge (fade entre les mockups). */
+/** Mascotte de chargement — la plume Mockiosa qui lévite, seule,
+ *  pendant que le GLB du device charge (fade entre les mockups). */
 function MascotLoading({visible}: {visible: boolean}) {
-	const [pct, setPct] = useState(0)
-	useEffect(() => {
-		if (!visible) return
-		let raf = 0
-		const t0 = performance.now()
-		const tick = (t: number) => {
-			setPct((((t - t0) / 1800) * 100) % 100)
-			raf = requestAnimationFrame(tick)
-		}
-		raf = requestAnimationFrame(tick)
-		return () => cancelAnimationFrame(raf)
-	}, [visible])
 	return (
 		<div
 			className="absolute inset-0 flex flex-col items-center justify-center gap-3 pointer-events-none z-10"
 			style={{opacity: visible ? 1 : 0, transition: 'opacity 0.35s ease'}}
 			aria-hidden="true"
 		>
-			<div style={{width: 190}}>
-				<FeatherRunner progressPct={pct} color="#ffffff" />
-			</div>
+			<FeatherFloat size={34} color="#ffffff" />
 			<p className="text-[11px] tracking-[0.14em] uppercase text-white/45">Loading model</p>
 		</div>
 	)
