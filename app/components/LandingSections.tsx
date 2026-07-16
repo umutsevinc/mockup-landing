@@ -309,7 +309,7 @@ const FAQ = [
 	},
 	{
 		q: 'What about Windows / Linux?',
-		a: 'Framer Mockup 3D runs in the browser via WebGL — anywhere Framer runs, the plugin runs. Mac, Windows, Linux, ChromeOS.',
+		a: 'Mockiosa runs in the browser via WebGL — anywhere Framer runs, the plugin runs. Mac, Windows, Linux, ChromeOS.',
 	},
 	{
 		q: 'Can I cancel anytime?',
@@ -338,7 +338,7 @@ export default function LandingSections() {
 						</h2>
 						<p className="mt-10 max-w-2xl text-base sm:text-lg text-white/70 leading-relaxed">
 							You design in Framer. Then you open another tool — Rotato, Blender, After Effects. You
-							re-import. You re-export. Every time the mockup changes, you do it again. Framer Mockup 3D
+							re-import. You re-export. Every time the mockup changes, you do it again. Mockiosa
 							ends that loop — the device lives on your canvas, your screenshot is its screen, and the
 							published landing renders the same 3D scene you just posed.
 						</p>
@@ -497,7 +497,7 @@ export default function LandingSections() {
 							<span className="w-8 h-px bg-[#e8702a]" />
 						</div>
 						<h2 className="text-4xl sm:text-6xl tracking-tight">
-							<span className="font-playfair italic font-normal">Why</span> Framer Mockup.
+							<span className="font-playfair italic font-normal">Why</span> Mockiosa.
 						</h2>
 					</div>
 
@@ -506,7 +506,7 @@ export default function LandingSections() {
 							<thead>
 								<tr className="border-b border-white/[0.08]">
 									<th className="text-left p-5 font-semibold text-white/50 text-xs uppercase tracking-wider">Feature</th>
-									<th className="p-5 font-semibold text-white text-xs uppercase tracking-wider">Framer Mockup</th>
+									<th className="p-5 font-semibold text-white text-xs uppercase tracking-wider">Mockiosa</th>
 									<th className="p-5 font-medium text-white/55 text-xs uppercase tracking-wider">Rotato</th>
 									<th className="p-5 font-medium text-white/55 text-xs uppercase tracking-wider">Smart Mockups</th>
 									<th className="p-5 font-medium text-white/55 text-xs uppercase tracking-wider">Framer 2D</th>
@@ -680,10 +680,9 @@ export default function LandingSections() {
 				<div className="max-w-[1560px] mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
 					<div>
 						<div className="flex items-center gap-2 mb-3">
-							<svg width="20" height="20" viewBox="0 0 256 256" fill="#ffffff" aria-hidden="true">
-								<path d="M 256 256 L 128 256 L 0 128 L 128 128 Z M 256 128 L 128 128 L 0 0 L 128 0 Z" />
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" /><path d="M16 8 2 22" /><path d="M17.5 15H9" />
 							</svg>
-							<span className="font-playfair italic text-xl">Framer Mockup</span>
+							<span className="font-playfair italic text-xl">Mockiosa</span>
 						</div>
 						<p className="text-xs text-white/45 max-w-xs leading-relaxed">
 							Real-time 3D mockups for Framer. Crafted by a human, one cloud at a time ☁
@@ -701,7 +700,7 @@ export default function LandingSections() {
 					</nav>
 				</div>
 				<div className="max-w-[1560px] mx-auto mt-10 pt-6 border-t border-white/[0.05] text-[10px] tracking-wider uppercase text-white/40 flex flex-wrap items-center justify-between gap-3">
-					<span>© 2026 Framer Mockup</span>
+					<span>© 2026 Mockiosa</span>
 					<span>Made for Framer designers</span>
 				</div>
 			</footer>

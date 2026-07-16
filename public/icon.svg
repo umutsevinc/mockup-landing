@@ -1,6 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-  <!-- Marque Framer Mockup : deux rubans parallélogrammes 45° (géométrie
-       extraite du logo officiel), blanc sur carte noire arrondie. -->
+  <!-- Mockiosa — plume qui lévite (clin d'œil Wingardium Leviosa).
+       Plume : feather (feather-icons, MIT) ; la ligne du bas est le
+       « sol » au-dessus duquel la plume flotte. -->
   <rect width="256" height="256" rx="56" fill="#000000"/>
-  <path fill="#ffffff" d="M62 56h66l66 72h-66Zm0 72h66l66 71h-66Z"/>
+  <g transform="translate(40 22) scale(7.4)" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
+    <path d="M16 8 2 22"/>
+    <path d="M17.5 15H9"/>
+  </g>
+  <path d="M118 224h68" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.4"/>
 </svg>

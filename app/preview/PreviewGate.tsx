@@ -47,10 +47,9 @@ export default function PreviewGate() {
 				}}
 			/>
 			<div className="flex items-center gap-3">
-				<svg width="30" height="32" viewBox="0 0 256 277" fill="#fff" aria-hidden="true">
-					<path d="M0 0h128l128 139H128Zm0 139h128l128 138H128Z" />
+				<svg width="30" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" /><path d="M16 8 2 22" /><path d="M17.5 15H9" />
 				</svg>
-				<span className="text-2xl font-bold tracking-tight">Framer mockup</span>
+				<span className="text-2xl font-bold tracking-tight">Mockiosa</span>
 			</div>
 			<form
 				onSubmit={submit}

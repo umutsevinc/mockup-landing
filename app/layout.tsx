@@ -6,7 +6,7 @@ const SITE_URL = 'https://mockup.memselon.com'
 
 export const metadata: Metadata = {
 	metadataBase: new URL(SITE_URL),
-	title: 'Framer Mockup 3D — Real-time 3D mockups for Framer',
+	title: 'Mockiosa — Real-time 3D mockups for Framer',
 	description:
 		'Drop your screenshot, get a live 3D device with orbit camera and 4K export. iPhone 17 Pro, iPhone Air, iPad, MacBook Pro, Apple Watch Ultra — all in Framer. No Blender, no Rotato.',
 	keywords: [
@@ -25,19 +25,19 @@ export const metadata: Metadata = {
 	openGraph: {
 		type: 'website',
 		url: SITE_URL,
-		title: 'Framer Mockup 3D — Real 3D. Real-time. In Framer.',
+		title: 'Mockiosa — Real 3D. Real-time. In Framer.',
 		description: 'Stop exporting PNGs. Ship real 3D mockups live in your Framer site.',
 	},
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Framer Mockup 3D — Real 3D. Real-time. In Framer.',
+		title: 'Mockiosa — Real 3D. Real-time. In Framer.',
 		description: 'The first real-time 3D mockup studio for Framer.',
 		site: '@memselon',
 		creator: '@memselon',
 	},
 	icons: {
 		// ?v=2 : cache-bust — les navigateurs gardent les favicons très longtemps.
-		icon: '/icon.svg?v=2',
+		icon: '/icon.svg?v=3',
 	},
 }
 
@@ -49,7 +49,7 @@ const JSON_LD = {
 	'@graph': [
 		{
 			'@type': 'SoftwareApplication',
-			name: 'Framer Mockup 3D',
+			name: 'Mockiosa',
 			applicationCategory: 'DesignApplication',
 			operatingSystem: 'Web (Framer plugin)',
 			url: SITE_URL,
@@ -67,7 +67,7 @@ const JSON_LD = {
 			mainEntity: [
 				{
 					'@type': 'Question',
-					name: 'What is Framer Mockup 3D?',
+					name: 'What is Mockiosa?',
 					acceptedAnswer: {
 						'@type': 'Answer',
 						text: 'A Framer plugin that renders real-time 3D device mockups (iPhone 17 Pro, iPhone Air, iPad Pro, Apple Watch Ultra, iMac). You drop a screenshot or video on the screen, orbit the camera, pick device colors, then publish the live 3D scene on your Framer site or export 4K images and videos.',

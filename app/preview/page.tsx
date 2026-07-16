@@ -5,7 +5,7 @@ import PreviewGate from './PreviewGate'
 // Non indexée — à retirer (ou garder) au lancement.
 export const metadata: Metadata = {
 	robots: { index: false, follow: false },
-	title: 'Preview — Framer Mockup 3D',
+	title: 'Preview — Mockiosa',
 }
 
 export default function PreviewPage() {
