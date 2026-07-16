@@ -1,4 +1,4 @@
-# Memselon Mockup
+# Framer Mockup
 
 > Real-time 3D device mockup plugin for Framer. Drop a screenshot or video
 > on a real 3D Apple device (iPhone 17 Pro, iPhone Air, iPad Pro, Apple

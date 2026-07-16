@@ -5,7 +5,7 @@ import {Canvas} from '@react-three/fiber'
 import {Plus, Minus} from 'lucide-react'
 import {MockupScene} from './mockup/MockupScene'
 import type {Mockup} from '@/lib/mockup-types'
-import {PLAYGROUND_DEVICES} from '@/lib/playground-devices'
+import {PLAYGROUND_DEVICES, defaultFinishColor, deviceFinishColors} from '@/lib/playground-devices'
 import {useInView} from '@/lib/useInView'
 
 /**
@@ -17,7 +17,6 @@ import {useInView} from '@/lib/useInView'
 
 const CL_DEVICES = PLAYGROUND_DEVICES
 
-const COLORS = ['#FF9500', '#1F2A44', '#FFFFFF', '#FF2D55', '#34C759', '#000000']
 const FINISHES = [
 	{id: '', label: 'Factory'},
 	{id: 'mat', label: 'Matte'},
@@ -86,12 +85,13 @@ export default function CloserLook() {
 	const [open, setOpen] = useState<FeatureId | null>(null)
 	const [deviceId, setDeviceId] = useState(CL_DEVICES[0].id)
 	const device = CL_DEVICES.find((d) => d.id === deviceId) || CL_DEVICES[0]
-	const [color, setColor] = useState('#FF9500')
+	const [color, setColor] = useState(defaultFinishColor(CL_DEVICES[0].id))
 	const [finish, setFinish] = useState('')
 	const [followCursor, setFollowCursor] = useState(false)
 	const [autoRotate, setAutoRotate] = useState(false)
 	const [float, setFloat] = useState(true)
-	const [light, setLight] = useState(0.65)
+	// Défaut aligné sur la waitlist — 0.65 délavait l'orange Cosmic.
+	const [light, setLight] = useState(0.22)
 	const [exposure, setExposure] = useState(0.5)
 	const [media, setMedia] = useState<{url: string; type: 'image' | 'video'} | null>(null)
 	const fileRef = useRef<HTMLInputElement>(null)
@@ -154,6 +154,10 @@ export default function CloserLook() {
 
 	return (
 		<section ref={viewRef as any} className="relative px-6 md:px-16 py-24 md:py-32 max-w-[1560px] mx-auto" aria-label="Product features explorer">
+			<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4 px-2 flex items-center gap-3">
+				<span className="w-8 h-px bg-[#e8702a]" />
+				The studio
+			</div>
 			<h2 className="text-4xl sm:text-6xl font-semibold tracking-tight mb-10 px-2">Take a closer look.</h2>
 
 			<div className="relative bg-[#0b0b0d] border border-white/[0.06] rounded-[2.2rem] overflow-hidden min-h-[620px] grid grid-cols-1 lg:grid-cols-[minmax(0,4fr)_minmax(0,6fr)]">
@@ -165,7 +169,7 @@ export default function CloserLook() {
 							<b className="text-white">Colours.</b> Repaint the whole device — Apple palette or any hex,
 							the notch and screen bezel stay untouched.
 							<div className="flex items-center gap-2.5 mt-4">
-								{COLORS.map((c) => (
+								{deviceFinishColors(deviceId).map((c) => (
 									<button
 										key={c}
 										type="button"
@@ -177,6 +181,24 @@ export default function CloserLook() {
 										style={{backgroundColor: c}}
 									/>
 								))}
+								{/* "Any hex" — vrai color picker natif */}
+								<label
+									aria-label="Custom color"
+									className={`relative w-7 h-7 rounded-full border-2 cursor-pointer overflow-hidden transition-transform hover:scale-110 ${
+										!deviceFinishColors(deviceId).includes(color) ? 'border-white scale-110' : 'border-white/20'
+									}`}
+									style={{
+										background:
+											'conic-gradient(from 0deg, #ff5f5f, #ffc14d, #7ee081, #57c8ff, #a97fff, #ff5f5f)',
+									}}
+								>
+									<input
+										type="color"
+										value={color || defaultFinishColor(deviceId)}
+										onChange={(e) => setColor(e.target.value)}
+										className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+									/>
+								</label>
 							</div>
 						</Card>
 					)}
@@ -278,7 +300,11 @@ export default function CloserLook() {
 							<button
 								key={d.id}
 								type="button"
-								onClick={() => setDeviceId(d.id)}
+								onClick={() => {
+									setDeviceId(d.id)
+									// Chaque mockup arrive avec SA finition par défaut.
+									setColor(defaultFinishColor(d.id))
+								}}
 								aria-pressed={deviceId === d.id}
 								className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
 									deviceId === d.id ? 'bg-white text-black' : 'text-white/75 hover:text-white'

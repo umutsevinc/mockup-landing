@@ -2,11 +2,10 @@
 
 import {Suspense, useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {Canvas} from '@react-three/fiber'
-import {RotateCcw} from 'lucide-react'
 import {MockupScene} from './mockup/MockupScene'
 import {PixelCatRunner} from './PixelCatRunner'
 import type {Device, Mockup} from '@/lib/mockup-types'
-import {PLAYGROUND_DEVICES} from '@/lib/playground-devices'
+import {PLAYGROUND_DEVICES, defaultFinishColor, deviceFinishColors} from '@/lib/playground-devices'
 import {useInView} from '@/lib/useInView'
 
 /** Mascotte de chargement — le pixel cat galope en boucle pendant que
@@ -50,22 +49,6 @@ function MascotLoading({visible}: {visible: boolean}) {
 
 const DEVICES = PLAYGROUND_DEVICES
 
-const APPLE_COLORS = [
-	'#000000',
-	'#FFFFFF',
-	'#FF3B30',
-	'#FF9500',
-	'#FFCC00',
-	'#34C759',
-	'#007AFF',
-	'#AF52DE',
-	'#FF2D55',
-]
-
-// Vraies finitions iPhone 17 Pro (apple.com) — la coque rendue matche
-// ces pastilles : Cosmic Orange / Deep Blue / Silver.
-const APPLE_FINISH_COLORS = ['#E0762C', '#2F3B4E', '#F1F2F4']
-
 const DEMO_UPLOAD_FN = 'https://slfsatozvrdsbozzqgcx.supabase.co/functions/v1/demo-upload-url'
 // 5 Mo max (image ET vidéo) — protège le quota Cloudflare R2.
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024
@@ -103,7 +86,7 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 	// Mode teaser (waitlist) : iPhone uniquement, pas d'upload — les
 	// interactions verrouillées répondent "Coming soon".
 	const [deviceId, setDeviceId] = useState<string>(DEVICES[0].id)
-	const [color, setColor] = useState<string>(teaser ? '#E0762C' : '')
+	const [color, setColor] = useState<string>(defaultFinishColor(DEVICES[0].id))
 	const [media, setMedia] = useState<DroppedMedia>(null)
 	const [dragOver, setDragOver] = useState(false)
 	const [modelReady, setModelReady] = useState(false)
@@ -245,9 +228,9 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 		void uploadDemoFile(file)
 	}, [teaser])
 
-	// Synthetic scene payload — device switch keeps color + content
-	// because only `device` changes; MockupScene re-resolves the screen
-	// mesh and re-applies the same media/color on the new model.
+	// Synthetic scene payload — device switch keeps the content; the
+	// color snaps to the new device's default finish (see bottom bar).
+	// MockupScene re-resolves the screen mesh on the new model.
 	const payload = useMemo(() => {
 		const mockup = {
 			id: 'hero-playground',
@@ -258,9 +241,9 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 			screen_video_url: media?.type === 'video' ? media.url : null,
 			environment_id: 'studio',
 			environment_offset: 0.5,
-			// Teaser (waitlist) : lumière plus douce — à 0.65 l'orange
+			// Même lumière que la waitlist partout — à 0.65 l'orange
 			// Cosmic vire au jaune délavé face au render Apple.
-			light_intensity: teaser ? 0.22 : 0.65,
+			light_intensity: 0.22,
 			camera_position: 'free',
 			is_locked: false,
 			animations: {
@@ -415,19 +398,7 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 					onTouchStart={(e) => e.stopPropagation()}
 					onTouchEnd={(e) => e.stopPropagation()}
 				>
-					{!teaser && (
-					<button
-						type="button"
-						aria-label="Original color"
-						onClick={() => setColor('')}
-						className={`w-8 h-8 rounded-full border-2 flex items-center justify-center bg-white/10 transition-transform hover:scale-110 ${
-							color === '' ? 'border-white' : 'border-white/20'
-						}`}
-					>
-						<RotateCcw size={13} className="text-white/85" />
-					</button>
-					)}
-					{(teaser ? APPLE_FINISH_COLORS : APPLE_COLORS).map((c) => (
+					{deviceFinishColors(device.id).map((c) => (
 						<button
 							key={c}
 							type="button"
@@ -439,6 +410,27 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 							style={{backgroundColor: c}}
 						/>
 					))}
+					{/* Pastille "couleur libre" — hero uniquement, la waitlist
+					    garde ses 3 finitions verrouillées. */}
+					{!teaser && (
+						<label
+							aria-label="Custom color"
+							className={`relative w-8 h-8 rounded-full border-2 cursor-pointer overflow-hidden transition-transform hover:scale-110 ${
+								!deviceFinishColors(device.id).includes(color) ? 'border-white scale-110' : 'border-white/20'
+							}`}
+							style={{
+								background:
+									'conic-gradient(from 0deg, #ff5f5f, #ffc14d, #7ee081, #57c8ff, #a97fff, #ff5f5f)',
+							}}
+						>
+							<input
+								type="color"
+								value={color || defaultFinishColor(device.id)}
+								onChange={(e) => setColor(e.target.value)}
+								className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+							/>
+						</label>
+					)}
 				</div>
 			</div>
 
@@ -453,7 +445,12 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 						<button
 							key={d.id}
 							type="button"
-							onClick={() => (teaser ? showComingSoon() : setDeviceId(d.id))}
+							onClick={() => {
+								if (teaser) return showComingSoon()
+								setDeviceId(d.id)
+								// Chaque mockup arrive avec SA finition par défaut.
+								setColor(defaultFinishColor(d.id))
+							}}
 							aria-pressed={deviceId === d.id}
 							className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
 								deviceId === d.id ? 'bg-white text-black' : 'text-white/70 hover:text-white'

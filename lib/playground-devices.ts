@@ -8,6 +8,23 @@ import type {Device} from './mockup-types'
  */
 export type PlaygroundDevice = Device & {chip: string}
 
+/**
+ * Finitions officielles par device (max 3 pour l'instant — même rail
+ * que la waitlist). La PREMIÈRE couleur est la sélection par défaut.
+ */
+export const DEVICE_FINISH_COLORS: Record<string, string[]> = {
+	iphone17pro: ['#E0762C', '#2F3B4E', '#F1F2F4'], // Cosmic Orange / Deep Blue / Silver
+	iphoneAir: ['#BFD3E0', '#E6DCC3', '#39393B'], // Sky Blue / Light Gold / Space Black
+	ipadPro: ['#2E2C2E', '#E3E4E5'], // Space Black / Silver
+	appleWatchUltra: ['#C6BDAE', '#3A3A3C'], // Natural / Black Titanium
+	imac: ['#4C6E8D', '#5F7A5E', '#E3E4E5'], // Blue / Green / Silver
+}
+
+export const deviceFinishColors = (id: string): string[] =>
+	DEVICE_FINISH_COLORS[id] ?? DEVICE_FINISH_COLORS.iphone17pro
+
+export const defaultFinishColor = (id: string): string => deviceFinishColors(id)[0]
+
 export const PLAYGROUND_DEVICES: PlaygroundDevice[] = [
 	{
 		id: 'iphone17pro',
