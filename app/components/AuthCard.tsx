@@ -29,7 +29,8 @@ export function AuthCard({
 				<Link href="/" className="flex items-center gap-2.5">
 					<svg width="22" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" /><path d="M16 8 2 22" /><path d="M17.5 15H9" />
 					</svg>
-					<span className="text-lg font-bold tracking-tight">Mockiosa</span>
+					{/* Logo — TOUJOURS font-playfair (poids 650), jamais une autre graisse. */}
+					<span className="text-lg font-playfair">Mockiosa</span>
 				</Link>
 				<Link
 					href="/"
@@ -44,7 +45,7 @@ export function AuthCard({
 				{/* form */}
 				<div className="flex flex-col justify-center px-6 sm:px-12 pt-24 pb-10">
 					<div className="w-full max-w-[400px] mx-auto">
-						<h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-2">{title}</h1>
+						<h1 className="text-[28px] sm:text-[32px] font-normal tracking-[-0.02em] leading-[1.1] mb-2">{title}</h1>
 						{subtitle ? (
 							<p className="text-[15px] text-white/50 mb-8 leading-relaxed">{subtitle}</p>
 						) : (

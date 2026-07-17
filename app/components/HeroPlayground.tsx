@@ -37,7 +37,7 @@ const DEVICES = PLAYGROUND_DEVICES
 
 const DEMO_UPLOAD_FN = 'https://slfsatozvrdsbozzqgcx.supabase.co/functions/v1/demo-upload-url'
 // 5 Mo max (image ET vidéo) — protège le quota Cloudflare R2.
-const MAX_UPLOAD_BYTES = 5 * 1024 * 1024
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 
 type DroppedMedia = {url: string; type: 'image' | 'video'} | null
 
@@ -200,7 +200,7 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 			return
 		}
 		if (file.size > MAX_UPLOAD_BYTES) {
-			setUploadError('Max upload 5 MB — compress your file and retry')
+			setUploadError('Max upload 10 MB — compress your file and retry')
 			setTimeout(() => setUploadError(null), 3200)
 			return
 		}

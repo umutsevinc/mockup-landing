@@ -69,6 +69,9 @@ type ScreenTexOpts = {
 	    Apple Watch is FORCED to contain like in the plugin. */
 	fitMode?: 'cover' | 'contain' | 'stretch'
 	deviceId?: string
+	/** true = média droppé par un visiteur (blob:) → filigrane plumes
+	    Mockiosa imprimé dans la texture (anti-screenshot). */
+	watermark?: boolean
 }
 
 /** Fit d'un média (ratio mediaAspect) dans un écran (screenAspect) —
@@ -130,6 +133,82 @@ function computeFitRect(
 	}
 }
 
+/* ── Filigrane "plumes Mockiosa" ──────────────────────────────────────
+   Imprimé DANS la texture écran quand le média vient d'un drop visiteur
+   (URL blob:) — une capture d'écran du playground emporte donc la
+   marque. Motif diagonal : plume du logo + wordmark, double passe
+   (ombre sombre + trait blanc) pour rester lisible sur contenu clair
+   comme sombre. Canvas caché par taille (le pipeline vidéo le redessine
+   à chaque frame → un drawImage suffit). */
+const FEATHER_PATHS = [
+	'M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z',
+	'M16 8 2 22',
+	'M17.5 15H9',
+]
+const wmCanvasCache = new Map<string, HTMLCanvasElement>()
+
+function getWatermarkCanvas(w: number, h: number): HTMLCanvasElement {
+	const key = `${w}x${h}`
+	const cached = wmCanvasCache.get(key)
+	if (cached) return cached
+
+	const canvas = document.createElement('canvas')
+	canvas.width = w
+	canvas.height = h
+	const ctx = canvas.getContext('2d')!
+
+	const s = Math.min(w, h) / 1024 // échelle par rapport à une base 1024
+	const iconSize = 44 * s
+	const fontSize = Math.round(38 * s)
+	const stepX = 340 * s
+	const stepY = 250 * s
+	ctx.font = `500 ${fontSize}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif`
+	ctx.textBaseline = 'middle'
+
+	ctx.save()
+	ctx.translate(w / 2, h / 2)
+	ctx.rotate((-24 * Math.PI) / 180)
+	const span = Math.hypot(w, h)
+	let row = 0
+	for (let y = -span / 2; y < span / 2; y += stepY, row++) {
+		// Décalage un rang sur deux (motif en quinconce)
+		const offset = (row % 2) * (stepX / 2)
+		for (let x = -span / 2 - offset; x < span / 2; x += stepX) {
+			// Plume (paths du logo, viewBox 24 → iconSize)
+			ctx.save()
+			ctx.translate(x, y - iconSize / 2)
+			ctx.scale(iconSize / 24, iconSize / 24)
+			ctx.lineWidth = 2
+			ctx.lineCap = 'round'
+			ctx.lineJoin = 'round'
+			for (const pass of [
+				{stroke: 'rgba(0,0,0,0.10)', dx: 0.6, dy: 0.6},
+				{stroke: 'rgba(255,255,255,0.16)', dx: 0, dy: 0},
+			]) {
+				ctx.save()
+				ctx.translate(pass.dx, pass.dy)
+				ctx.strokeStyle = pass.stroke
+				for (const p of FEATHER_PATHS) ctx.stroke(new Path2D(p))
+				ctx.restore()
+			}
+			ctx.restore()
+			// Wordmark
+			ctx.fillStyle = 'rgba(0,0,0,0.10)'
+			ctx.fillText('Mockiosa', x + iconSize + 10 * s + 0.6, y + 0.6)
+			ctx.fillStyle = 'rgba(255,255,255,0.16)'
+			ctx.fillText('Mockiosa', x + iconSize + 10 * s, y)
+		}
+	}
+	ctx.restore()
+
+	wmCanvasCache.set(key, canvas)
+	return canvas
+}
+
+function drawMockiosaWatermark(ctx: CanvasRenderingContext2D, w: number, h: number) {
+	ctx.drawImage(getWatermarkCanvas(w, h), 0, 0)
+}
+
 function applyScreenTexTransform(tex: THREE.Texture, opts?: ScreenTexOpts) {
 	const deg = opts?.rotationDeg ?? 0
 	if (deg !== 0) {
@@ -177,6 +256,7 @@ function drawImageHeightCoverTex(
 	ctx.filter = `brightness(${100 + (exposure - 0.5) * 200}%)`
 	ctx.drawImage(img, rect.dx, rect.dy, rect.dw, rect.dh)
 	ctx.filter = 'none'
+	if (opts?.watermark) drawMockiosaWatermark(ctx, TARGET_W, TARGET_H)
 
 	const tex = new THREE.CanvasTexture(canvas)
 	tex.colorSpace = THREE.SRGBColorSpace
@@ -255,6 +335,7 @@ function drawVideoHeightCoverTex(
 			ctx.filter = brightnessFilter
 			ctx.drawImage(video, 0, 0, vidW, vidH, rect.dx, rect.dy, rect.dw, rect.dh)
 			ctx.filter = 'none'
+			if (opts?.watermark) drawMockiosaWatermark(ctx, TARGET_W, TARGET_H)
 			tex.needsUpdate = true
 		} catch {}
 		rafId = requestAnimationFrame(renderFrame)
@@ -577,6 +658,12 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false, inV
 			screenExposure: typeof anims.screenExposure === 'number' ? anims.screenExposure : 0.5,
 			fitMode: (device as any).screen_fit_mode ?? undefined,
 			deviceId: device.id,
+			// blob: = média droppé par le visiteur → filigrane plumes.
+			watermark:
+				(mockup.media_type === 'video'
+					? mockup.screen_video_url
+					: mockup.screen_image_url
+				)?.startsWith('blob:') ?? false,
 		}
 
 		// Guard: async fallbacks (video error, image error) from a PREVIOUS
@@ -1011,8 +1098,22 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false, inV
 			{/* environmentIntensity suit le knob light_intensity : l'IBL est
 			    la source principale de lumière — sans ça le slider "Studio
 			    light" ne changeait presque rien à l'image. */}
+			{/* HDR "studio" auto-hébergé (/public/hdr) — le CDN drei échouait
+			    par moments ("Could not load studio_small_03_1k.hdr"). Les
+			    autres presets restent sur le CDN drei. */}
 			{transparentBg ? (
-				<Environment preset={envPreset} environmentIntensity={0.35 + lightIntensity * 1.5} />
+				envPreset === 'studio' ? (
+					<Environment files="/hdr/studio_small_03_1k.hdr" environmentIntensity={0.35 + lightIntensity * 1.5} />
+				) : (
+					<Environment preset={envPreset} environmentIntensity={0.35 + lightIntensity * 1.5} />
+				)
+			) : envPreset === 'studio' ? (
+				<Environment
+					files="/hdr/studio_small_03_1k.hdr"
+					background
+					backgroundBlurriness={0.6}
+					environmentIntensity={0.35 + lightIntensity * 1.5}
+				/>
 			) : (
 				<Environment
 					preset={envPreset}

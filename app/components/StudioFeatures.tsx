@@ -1,6 +1,7 @@
 'use client'
 
 import { RotateCw, Video, Smartphone, RefreshCw, Sun, Layers } from 'lucide-react'
+import { motion } from 'motion/react'
 
 /**
  * « Inside the studio » — les fonctionnalités récentes du plugin,
@@ -77,7 +78,6 @@ function VignetteLandscape() {
 					<div className="absolute inset-x-2 top-2 h-[6px] rounded bg-white/15" />
 					<div className="absolute left-2 bottom-2 w-1/3 h-[5px] rounded bg-white/10" />
 				</div>
-				<div className="absolute left-1/2 -translate-x-1/2 top-[5px] w-[5px] h-[16px] rounded-full bg-black" />
 			</div>
 			{/* barre droite du plugin */}
 			<div className="flex flex-col gap-2">
@@ -272,7 +272,7 @@ const VIGNETTE_CSS = `
 
 export default function StudioFeatures() {
 	return (
-		<section className="relative bg-[#0a0a0a] px-6 md:px-16 py-32 md:py-40 border-t border-white/[0.07]">
+		<section className="relative bg-[#0a0a0a] px-6 md:px-16 py-20 md:py-28 border-t border-white/[0.07]">
 			<style dangerouslySetInnerHTML={{ __html: VIGNETTE_CSS }} />
 			<div className="max-w-[1560px] mx-auto">
 				<div data-reveal className="reveal-up mb-16 max-w-3xl">
@@ -280,30 +280,55 @@ export default function StudioFeatures() {
 						<span className="w-8 h-px bg-[#e8702a]" />
 						Inside the studio
 					</div>
-					<h2 className="text-4xl sm:text-6xl md:text-7xl leading-[0.98] tracking-tight">
-						<span className="font-playfair italic font-normal">Every detail</span>{' '}
-						<span className="text-white/70">works for you.</span>
+					<h2 className="text-3xl sm:text-[40px] font-normal tracking-[-0.025em] leading-[1.1] m-0">
+						<span className="text-white">Every detail</span>{' '}
+						<span className="text-white/45">works for you.</span>
 					</h2>
 				</div>
 
+				{/* Cartes animées avec Motion (motion.dev) : entrée staggerée en
+				    spring physique au scroll, léger lift + bordure au hover, et
+				    la vignette rebondit d'un cran à l'entrée. Uniquement
+				    transform/opacity — pas de layout thrash. */}
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-					{FEATURES.map(({ icon: Icon, title, body, Vignette }) => (
-						<div
+					{FEATURES.map(({ icon: Icon, title, body, Vignette }, i) => (
+						<motion.div
 							key={title}
-							data-reveal
-							className="reveal-up rounded-3xl border border-white/[0.08] bg-white/[0.03] p-7 flex flex-col gap-6 hover:border-white/[0.15] transition-colors"
+							initial={{ opacity: 0, y: 28, scale: 0.97 }}
+							whileInView={{ opacity: 1, y: 0, scale: 1 }}
+							viewport={{ once: true, margin: '0px 0px -12% 0px' }}
+							transition={{
+								type: 'spring',
+								stiffness: 120,
+								damping: 19,
+								mass: 0.9,
+								delay: (i % 3) * 0.09 + Math.floor(i / 3) * 0.05,
+							}}
+							whileHover={{ y: -4 }}
+							className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-7 flex flex-col gap-6 hover:border-white/[0.16] transition-colors will-change-transform"
 						>
-							<div className="h-[150px] flex items-center justify-center rounded-2xl bg-black/40 border border-white/[0.05] px-4">
+							<motion.div
+								initial={{ opacity: 0, scale: 0.92 }}
+								whileInView={{ opacity: 1, scale: 1 }}
+								viewport={{ once: true, margin: '0px 0px -12% 0px' }}
+								transition={{
+									type: 'spring',
+									stiffness: 200,
+									damping: 16,
+									delay: (i % 3) * 0.09 + 0.16,
+								}}
+								className="h-[150px] flex items-center justify-center rounded-2xl bg-black/40 border border-white/[0.05] px-4"
+							>
 								<Vignette />
-							</div>
+							</motion.div>
 							<div>
 								<div className="flex items-center gap-2.5 mb-2.5">
 									<Icon size={15} strokeWidth={1.7} className="text-[#e8702a]" />
-									<h3 className="text-base font-semibold text-white">{title}</h3>
+									<h3 className="text-base font-medium text-white">{title}</h3>
 								</div>
 								<p className="text-sm text-white/55 leading-relaxed">{body}</p>
 							</div>
-						</div>
+						</motion.div>
 					))}
 				</div>
 			</div>

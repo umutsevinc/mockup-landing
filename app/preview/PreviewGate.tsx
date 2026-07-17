@@ -49,7 +49,7 @@ export default function PreviewGate() {
 			<div className="flex items-center gap-3">
 				<svg width="30" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" /><path d="M16 8 2 22" /><path d="M17.5 15H9" />
 				</svg>
-				<span className="text-2xl font-bold tracking-tight">Mockiosa</span>
+				<span className="text-2xl font-playfair">Mockiosa</span>
 			</div>
 			<form
 				onSubmit={submit}

@@ -65,7 +65,7 @@ export default function SignUpPage() {
 	return (
 		<AuthCard
 			title="Create your account"
-			subtitle="Get started with 2 free credits / month."
+			subtitle="Plans from $9.99/mo — cancel anytime."
 			footer={
 				<Link href="/sign-in" style={{ fontSize: 13, color: '#e8702a', textDecoration: 'none' }}>
 					Already have an account? Sign in

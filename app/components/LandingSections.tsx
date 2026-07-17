@@ -5,6 +5,7 @@ import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import StudioFeatures from './StudioFeatures'
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useInView } from '@/lib/useInView'
 
 // Section interactive "Take a closer look" — 3D chargée client-only.
@@ -12,7 +13,7 @@ const CloserLook = dynamic(() => import('./CloserLook'), {
 	ssr: false,
 	loading: () => <div className="min-h-[620px]" aria-hidden="true" />,
 })
-import { ArrowRight, Download, Check, MousePointer2, RotateCw, Wind, Zap } from 'lucide-react'
+import { ArrowRight, Check } from 'lucide-react'
 
 /**
  * Tiny scroll-reveal hook. Adds an `is-in` class to children when they
@@ -43,6 +44,183 @@ function useScrollReveal() {
 }
 
 /**
+ * Easter egg : un clic sur Hermione lâche une volée de plumes à
+ * physique réelle (rAF) — burst initial, gravité freinée par la
+ * traînée (vitesse terminale de plume), balancement pendulaire
+ * gauche-droite pendant la chute. Rendu en portal plein écran :
+ * les plumes retombent sur TOUTE la section, pas juste sur le gif.
+ */
+type FeatherSim = {
+	x: number; y: number; vx: number; vy: number
+	term: number; swayFreq: number; swayAmp: number; phase: number
+	rot0: number; spin: number; t: number; life: number
+}
+
+function HermioneEasterEgg() {
+	const btnRef = useRef<HTMLButtonElement>(null)
+	const [feathers, setFeathers] = useState<{ id: number; size: number }[]>([])
+	const simRef = useRef(new Map<number, FeatherSim>())
+	const nodesRef = useRef(new Map<number, HTMLSpanElement>())
+	const rafRef = useRef(0)
+	const lastRef = useRef(0)
+	const idRef = useRef(0)
+	const [mounted, setMounted] = useState(false)
+	useEffect(() => setMounted(true), [])
+	useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }, [])
+
+	const tick = (now: number) => {
+		const dt = Math.min((now - lastRef.current) / 1000, 0.05)
+		lastRef.current = now
+		const vh = window.innerHeight
+		const dead: number[] = []
+		simRef.current.forEach((f, id) => {
+			f.t += dt
+			// Gravité + traînée : une plume n'accélère pas indéfiniment,
+			// elle plafonne à sa vitesse terminale (lente).
+			f.vy = Math.min(f.vy + 900 * dt, f.term)
+			f.vx *= Math.exp(-2.2 * dt)
+			// Balancement pendulaire pendant la descente
+			const sway = Math.sin(f.t * f.swayFreq + f.phase) * f.swayAmp
+			f.x += (f.vx + sway) * dt
+			f.y += f.vy * dt
+			// L'inclinaison suit le balancement (cos = dérivée du sin)
+			const rot = f.rot0 + Math.cos(f.t * f.swayFreq + f.phase) * 42 + f.spin * f.t
+			const o = Math.min(1, f.t / 0.12) * Math.max(0, Math.min(1, (f.life - f.t) / 0.6))
+			const node = nodesRef.current.get(id)
+			if (node) {
+				node.style.transform = `translate(${f.x.toFixed(1)}px, ${f.y.toFixed(1)}px) rotate(${rot.toFixed(1)}deg)`
+				node.style.opacity = o.toFixed(2)
+			}
+			if (f.t >= f.life || f.y > vh + 60) dead.push(id)
+		})
+		if (dead.length) {
+			dead.forEach((id) => { simRef.current.delete(id); nodesRef.current.delete(id) })
+			setFeathers((arr) => arr.filter((f) => !dead.includes(f.id)))
+		}
+		if (simRef.current.size > 0) rafRef.current = requestAnimationFrame(tick)
+		else rafRef.current = 0
+	}
+
+	const pop = () => {
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+		const rect = btnRef.current?.getBoundingClientRect()
+		if (!rect) return
+		const cx = rect.left + rect.width / 2
+		const cy = rect.top + rect.height / 2
+		const batch: { id: number; size: number }[] = []
+		for (let i = 0; i < 18; i++) {
+			const id = idRef.current++
+			// Départ sur le POURTOUR du gif (elles émergent de derrière),
+			// vélocité en éventail vers le haut.
+			const ang = -Math.PI * Math.random()
+			const speed = 240 + Math.random() * 420
+			simRef.current.set(id, {
+				x: cx + Math.cos(ang) * rect.width * 0.55,
+				y: cy + Math.sin(ang) * rect.height * 0.45,
+				vx: Math.cos(ang) * speed * 0.8,
+				vy: Math.sin(ang) * speed,
+				term: 55 + Math.random() * 70,
+				swayFreq: 1.6 + Math.random() * 1.8,
+				swayAmp: 40 + Math.random() * 70,
+				phase: Math.random() * Math.PI * 2,
+				rot0: (Math.random() - 0.5) * 60,
+				spin: (Math.random() - 0.5) * 30,
+				t: 0,
+				life: 4.5 + Math.random() * 2.5,
+			})
+			batch.push({ id, size: 13 + Math.random() * 13 })
+		}
+		setFeathers((arr) => [...arr, ...batch])
+		if (!rafRef.current) {
+			lastRef.current = performance.now()
+			rafRef.current = requestAnimationFrame(tick)
+		}
+	}
+
+	return (
+		<>
+			<button
+				ref={btnRef}
+				type="button"
+				onClick={pop}
+				aria-label="Wingardium Leviosa"
+				className="relative z-10 inline-block p-0 border-0 bg-transparent cursor-pointer mb-8"
+			>
+				{/* eslint-disable-next-line @next/next/no-img-element */}
+				<img
+					src="/hermione-mockiosa.gif"
+					alt=""
+					loading="lazy"
+					className="w-[180px] sm:w-[220px] rounded-2xl border border-white/[0.08]"
+				/>
+			</button>
+
+			{/* Calque plein écran en portal : échappe aux ancêtres transformés
+			    (reveal-up) qui casseraient un position:fixed local. */}
+			{mounted && feathers.length > 0 &&
+				createPortal(
+					<div className="fixed inset-0 pointer-events-none z-[95]" aria-hidden>
+						{feathers.map((f) => (
+							<span
+								key={f.id}
+								ref={(n) => {
+									if (!n) return
+									nodesRef.current.set(f.id, n)
+									// Positionne immédiatement (évite un flash en 0,0)
+									const s = simRef.current.get(f.id)
+									if (s) n.style.transform = `translate(${s.x}px, ${s.y}px)`
+								}}
+								className="absolute top-0 left-0 opacity-0 will-change-transform"
+							>
+								<svg width={f.size} height={f.size} viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+									<path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" />
+									<path d="M16 8 2 22" />
+									<path d="M17.5 15H9" />
+								</svg>
+							</span>
+						))}
+					</div>,
+					document.body,
+				)}
+		</>
+	)
+}
+
+/**
+ * Vidéo démo autoplay/loop/muted (pattern Dropshot : radius 14, fond
+ * #111, object-cover). Tant que le fichier n'existe pas dans
+ * /public/videos/, la tuile affiche un placeholder avec le nom du
+ * fichier attendu — dépose le .mp4 et elle se remplace toute seule.
+ */
+function DemoVideo({ src, aspect, hint }: { src: string; aspect: string; hint?: string }) {
+	const [missing, setMissing] = useState(false)
+	return (
+		<div
+			className="relative rounded-[14px] overflow-hidden bg-[#111] border border-white/[0.06]"
+			style={{ aspectRatio: aspect }}
+		>
+			{missing ? (
+				<div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
+					<div className="text-[11px] font-mono uppercase tracking-[0.14em] text-white/35">Video placeholder</div>
+					<div className="text-xs font-mono text-[#e8702a]">{src}</div>
+					{hint ? <div className="text-[11px] text-white/30 leading-relaxed max-w-[260px]">{hint}</div> : null}
+				</div>
+			) : (
+				<video
+					src={src}
+					autoPlay
+					muted
+					loop
+					playsInline
+					onError={() => setMissing(true)}
+					className="absolute inset-0 w-full h-full object-cover"
+				/>
+			)}
+		</div>
+	)
+}
+
+/**
  * Carousel "The latest" à la Apple : cartes larges, titre + sous-titre
  * EN HAUT, photo produit EN BAS, scroll-snap horizontal, avance
  * automatique (pause au hover), flèches de navigation.
@@ -67,29 +245,31 @@ function DeviceCarousel() {
 					<div
 						key={d.name}
 						data-card
-						className="snap-start relative flex-shrink-0 w-[290px] sm:w-[340px] h-[440px] rounded-3xl overflow-hidden bg-white/[0.05] border border-white/[0.07] transition-transform hover:scale-[1.01]"
+						className="snap-start relative flex-shrink-0 w-[290px] sm:w-[340px] h-[440px] rounded-3xl overflow-hidden bg-white border border-white/[0.07] transition-transform hover:scale-[1.01]"
 					>
-						{/* Photo pleine carte (blanc jusqu'en haut), qualité max —
-						    le device est ancré en bas à droite DANS l'image, et
-						    object-right protège ce coin du crop mobile. */}
+						{/* Images rognées au contenu (plus de marges blanches intégrées) :
+						    pleine largeur de carte, ratio préservé, collées au bord bas. */}
 						{d.img ? (
 							<Image
 								src={d.img}
 								alt={d.name}
-								fill
+								width={800}
+								height={800}
 								quality={95}
-								className="object-cover object-right"
-								sizes="(max-width: 640px) 290px, 680px"
+								className="absolute bottom-0 left-0 w-full h-auto"
+								sizes="(max-width: 640px) 290px, 340px"
 							/>
 						) : (
-							<div className="absolute inset-0 flex items-center justify-center">
-								<div className="text-4xl font-semibold text-white/15">{d.name.split(' ')[0]}</div>
+							<div className="absolute inset-0 bg-white flex items-center justify-center">
+								<div className="text-4xl font-semibold text-neutral-900/10">{d.name.split(' ')[0]}</div>
 							</div>
 						)}
-						{/* Titre superposé — sans bandeau, juste un voile doux */}
-						<div className="absolute top-0 left-0 right-0 p-6 pb-10 bg-gradient-to-b from-black/45 to-transparent">
-							<div className="text-xl font-semibold leading-tight text-white">{d.name}</div>
-							<div className="mt-1 text-sm text-white/70">Production-grade GLB · {d.tier} plan</div>
+						{/* Titre superposé — texte sombre directement sur le fond blanc
+						    de la photo. Plus de mention de plan : dans la grille finale
+						    (Ground/Float/Orbit) tous les devices sont dans tous les plans. */}
+						<div className="absolute top-0 left-0 right-0 p-6 pb-10">
+							<div className="text-xl font-semibold leading-tight text-neutral-900">{d.name}</div>
+							<div className="mt-1 text-sm text-neutral-500">Production-grade GLB</div>
 						</div>
 					</div>
 				))}
@@ -131,11 +311,12 @@ function ExportFormatsSection() {
 	}, [inView])
 	return (
 		<section className="relative bg-black border-t border-white/[0.07] overflow-hidden">
-			<div className="max-w-[1560px] mx-auto px-6 md:px-16 pt-24 md:pt-32">
+			<div className="max-w-[1560px] mx-auto px-6 md:px-16 pt-20 md:pt-28">
 				<div data-reveal className="reveal-up text-center mb-14">
-					<div className="text-sm font-semibold text-[#e8702a] mb-3">Exports</div>
-					<h2 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight">
-						A big export forward.
+					<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4">Exports</div>
+					<h2 className="text-3xl sm:text-[40px] font-normal tracking-[-0.025em] leading-[1.1] m-0">
+						<span className="text-white">A big export</span>{' '}
+						<span className="text-white/45">forward.</span>
 					</h2>
 				</div>
 			</div>
@@ -147,17 +328,21 @@ function ExportFormatsSection() {
 				    Pas de reveal ici (demande : aucun fade in/out sur la vidéo)
 				    et collé au bord gauche en mobile. */}
 				<div ref={mediaRef} className="relative h-[420px] sm:h-[560px] lg:h-[640px] overflow-hidden mr-6 md:mr-16 lg:mx-0">
-					{/* Poster instantané — capture LOCALE de la scène (18 Ko webp,
-					    même cadrage que l'iframe), eager + fetchPriority high :
-					    l'ancienne URL CDN 404ait, d'où la zone vide puis le fondu. */}
+					{/* Poster instantané — capture LOCALE de la scène (18 Ko webp),
+					    eager + fetchPriority high. Dimensionné par la HAUTEUR
+					    uniquement (comme la caméra 3D de l'iframe : fov vertical →
+					    la scène remplit la hauteur), centré sur le même point que
+					    l'iframe (x=20%, y=50%) — sinon object-contain faisait
+					    varier la taille du device selon le ratio du viewport et le
+					    poster ne matchait plus la scène live au swap. */}
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img
 						src="/exports-poster.webp"
 						alt="Video 3D mockup"
 						loading="eager"
 						fetchPriority="high"
-						className="absolute object-contain pointer-events-none"
-						style={{ width: '300%', maxWidth: 'none', height: '280%', left: '-130%', top: '-90%' }}
+						className="absolute pointer-events-none"
+						style={{ height: '280%', width: 'auto', maxWidth: 'none', left: '20%', top: '50%', transform: 'translate(-50%, -50%)' }}
 					/>
 					{everInView && (
 						<iframe
@@ -173,17 +358,17 @@ function ExportFormatsSection() {
 				<div data-reveal className="reveal-up flex flex-col gap-10 px-6 md:px-16 lg:px-0 pb-20 lg:pb-0">
 					<div>
 						<div className="text-sm text-white/60 mb-1">Photo export up to</div>
-						<div className="text-5xl font-semibold text-[#e8702a] tracking-tight">4K</div>
+						<div className="text-4xl font-medium text-[#e8702a] tracking-tight">4K</div>
 						<div className="text-sm text-white/60 mt-1">PNG with transparency — WebP coming</div>
 					</div>
 					<div>
 						<div className="text-sm text-white/60 mb-1">Video export</div>
-						<div className="text-5xl font-semibold text-[#e8702a] tracking-tight">4K&nbsp;60s</div>
+						<div className="text-4xl font-medium text-[#e8702a] tracking-tight">4K&nbsp;60s</div>
 						<div className="text-sm text-white/60 mt-1">transparent WebM, rendered offline in your browser</div>
 					</div>
 					<div>
 						<div className="text-sm text-white/60 mb-1">Or skip exports entirely</div>
-						<div className="text-3xl font-semibold text-white tracking-tight">Live 3D embed</div>
+						<div className="text-2xl font-medium text-white tracking-tight">Live 3D embed</div>
 						<div className="text-sm text-white/60 mt-1">the real scene, interactive, on your published Framer site</div>
 					</div>
 				</div>
@@ -192,45 +377,83 @@ function ExportFormatsSection() {
 	)
 }
 
-// Photos = les cartes officielles du catalogue du plugin (device-models/<id>/card.jpg).
+// Miroir EXACT du catalogue du plugin (table Supabase `devices`, 17/07) :
+// 7 devices. Photos = cartes officielles (device-models/<id>/card.jpg).
 const DEVICES = [
-	{ name: 'iPhone 17 Pro',        tier: 'Pro',    img: '/cards/iphone17pro-apple.webp' },
-	{ name: 'iPhone Air',           tier: 'Pro',    img: '/cards/iphoneAir-apple.webp' },
-	{ name: 'iPad',                 tier: 'Pro',    img: '/cards/ipadPro-apple.webp' },
-	{ name: 'MacBook Pro 16"',      tier: 'Pro',    img: '/cards/macbookPro-apple.webp' },
-	{ name: 'iMac',                 tier: 'Pro',    img: '/cards/imac-apple.webp' },
-	{ name: 'Apple Pro Display XDR',tier: 'Studio',  img: '/cards/appleProDisplayXDR.jpg' },
-	{ name: 'Apple Watch Ultra',    tier: 'Pro',    img: '/cards/appleWatchUltra.jpg' },
-	{ name: 'Samsung Galaxy S25',   tier: 'Pro' },
-	{ name: 'Macintosh 1984',       tier: 'Pro' },
+	{ name: 'iPhone 17 Pro',    img: '/cards/iphone17pro-apple.webp' },
+	{ name: 'iPhone Air',       img: '/cards/iphoneAir-apple.webp' },
+	{ name: 'iPad Pro',         img: '/cards/ipadPro-apple.webp' },
+	{ name: 'MacBook Pro 14"',  img: '/cards/macbookPro-apple.webp' },
+	{ name: 'iMac',             img: '/cards/imac-apple.webp' },
+	{ name: 'Studio Display',   img: '/cards/appleProDisplayXDR.jpg' },
+	{ name: 'Apple Watch Ultra',img: '/cards/appleWatchUltra.jpg' },
 ]
 
+// Pattern Dropshot "Drop. Tweak. Shot." — 3 vidéos verticales 3:4,
+// numéro + label + une phrase. Vidéos à enregistrer (voir /public/videos/README.md).
 const STEPS = [
 	{
-		n: '01',
-		title: 'Drop your screenshot',
-		body: 'Paste any image or video on the canvas. The plugin auto-fits the screen of the device — portrait, landscape, even Lottie.',
-		icon: <MousePointer2 size={20} strokeWidth={1.5} />,
+		n: '1',
+		label: 'Drop',
+		src: '/videos/step-1-drop.mp4',
+		desc: 'Paste any image or video on the canvas. The plugin auto-fits the device screen — portrait, landscape, even Lottie.',
+		hint: 'Screen recording verticale : glisser un screenshot sur le canvas du plugin, auto-fit sur l’écran de l’iPhone.',
 	},
 	{
-		n: '02',
-		title: 'Pose the device',
-		body: 'Orbit the camera, tilt the device, swap the HDRI environment, dial the light. Everything previews live in Framer.',
-		icon: <RotateCw size={20} strokeWidth={1.5} />,
+		n: '2',
+		label: 'Pose',
+		src: '/videos/step-2-pose.mp4',
+		desc: 'Orbit the camera, tilt the device, swap the HDRI, dial the light. Everything previews live in Framer.',
+		hint: 'Screen recording verticale : orbite caméra + changement de couleur + HDRI dans le panneau du plugin.',
 	},
 	{
-		n: '03',
-		title: 'Ship 4K — or embed live',
-		body: 'Export 4K PNG with transparency, MP4 video of the animation, or paste a Framer code component that renders the scene live on your landing.',
-		icon: <Download size={20} strokeWidth={1.5} />,
+		n: '3',
+		label: 'Ship',
+		src: '/videos/step-3-ship.mp4',
+		desc: 'Export 4K PNG or video — or paste the code component that renders the live scene on your landing.',
+		hint: 'Screen recording verticale : clic export 4K, puis le composant embed collé sur une page Framer publiée.',
 	},
 ]
 
-const ANIMATIONS = [
-	{ icon: <MousePointer2 size={18} strokeWidth={1.5} />, title: 'Follow cursor', body: 'The device tracks the visitor’s mouse on your published landing.' },
-	{ icon: <RotateCw size={18} strokeWidth={1.5} />, title: 'Orbit camera', body: 'Free or locked orbit with adjustable speed.' },
-	{ icon: <Wind size={18} strokeWidth={1.5} />, title: 'Float', body: 'Slow weightless hover — perfect for hero sections.' },
-	{ icon: <Zap size={18} strokeWidth={1.5} />, title: 'Scroll move', body: 'The device rotates as the visitor scrolls the page.' },
+// Pattern Dropshot "Features" — grille 2 colonnes, une vidéo 4:3 par
+// fonctionnalité, titre 16px + description dessous.
+const FEATURES = [
+	{
+		src: '/videos/feature-follow-cursor.mp4',
+		title: 'Follow cursor',
+		desc: 'The device tracks the visitor’s mouse on your published landing. Page-wide, spring-smoothed.',
+		hint: 'Capture 4:3 : le device qui suit la souris sur une landing publiée.',
+	},
+	{
+		src: '/videos/feature-orbit.mp4',
+		title: 'Orbit camera',
+		desc: 'Free or locked orbit with adjustable speed. Pose the exact angle, or let it drift.',
+		hint: 'Capture 4:3 : orbite libre autour de l’iPhone puis orbite auto lente.',
+	},
+	{
+		src: '/videos/feature-float.mp4',
+		title: 'Float',
+		desc: 'Slow weightless hover — perfect for hero sections that need to breathe.',
+		hint: 'Capture 4:3 : device en lévitation lente sur fond sombre.',
+	},
+	{
+		src: '/videos/feature-scroll.mp4',
+		title: 'Scroll move',
+		desc: 'The device rotates as the visitor scrolls the page. Direction and amplitude are yours.',
+		hint: 'Capture 4:3 : scroll d’une landing, le device tourne en rythme.',
+	},
+	{
+		src: '/videos/feature-live-embed.mp4',
+		title: 'Live 3D embed',
+		desc: 'A Framer code component renders the real scene — interactive — on your published site. No export at all.',
+		hint: 'Capture 4:3 : copier le composant embed, le coller sur un site publié, interagir avec la scène.',
+	},
+	{
+		src: '/videos/feature-video-screens.mp4',
+		title: 'Video screens',
+		desc: 'Drop an MP4 and the device plays it on screen, looped, synced with your camera motion.',
+		hint: 'Capture 4:3 : une vidéo (le chat samurai) qui joue sur l’écran du device pendant une orbite.',
+	},
 ]
 
 const COMPARE = [
@@ -239,112 +462,128 @@ const COMPARE = [
 	{ feature: 'Video / animated screens',            lithos: true,  rotato: true,  smart: false, native: false },
 	{ feature: '4K transparent export',               lithos: true,  rotato: true,  smart: false, native: false },
 	{ feature: 'Embed live 3D scene on published site',lithos: true,  rotato: false, smart: false, native: false },
-	{ feature: 'No subscription lock-out on landing',  lithos: 'Studio', rotato: '—', smart: '—',   native: '—'   },
+	{ feature: 'No subscription lock-out on landing',  lithos: 'Orbit', rotato: '—', smart: '—',   native: '—'   },
 	{ feature: 'Updates automatically when design changes', lithos: true,  rotato: false, smart: false, native: true },
 ]
 
-// Grille canonique — Notion « Brief Pricing 19/49/99 » (10/07/2026)
-// + correction 14/07 : pas de trial, garantie remboursé 7 jours.
+// Grille canonique — Notion « Launch Kit » (17/07/2026) :
+// Ground $9.99 · Float $29 · Orbit $39, mensuel USD, pas de free plan,
+// PAS de refund (cf. terms). Les limites (pas de 3D sur Ground, 3D
+// iPhone-only sur Float) sont affichées AVANT l'achat — consigne Merve.
 const PLANS = [
 	{
-		name: 'Starter',
-		blurb: 'For getting started.',
-		monthly: '19',
-		yearly: '190',
-		cta: 'Go Starter',
+		name: 'Ground',
+		blurb: 'For static shots.',
+		monthly: '9.99',
+		cta: 'Go Ground',
 		highlight: false,
 		bullets: [
-			'Photo mode only',
-			'50 exports / month, up to 1080p',
-			'No watermark',
 			'All devices',
-			'Orbit camera',
+			'Photo & video screen content',
+			'Light intensity on your content',
+			'Screen positioning, zoom & pan',
+			'Drop shadow + shadow distance',
+			'1 GB storage',
+			'No 3D animations on this plan',
 		],
 	},
 	{
-		name: 'Pro',
-		blurb: 'For freelance designers.',
-		monthly: '49',
-		yearly: '490',
-		cta: 'Go Pro',
+		name: 'Float',
+		blurb: 'For motion.',
+		monthly: '29',
+		cta: 'Go Float',
 		highlight: true,
 		bullets: [
-			'Unlimited exports, up to 4K + transparency',
-			'All animations (follow cursor, orbit, float, scroll)',
-			'Video export (MP4)',
-			'Save scenes (cloud sync)',
-			'Lottie screens',
-			'Priority support',
+			'Everything in Ground',
+			'Real-time 3D + all animations',
+			'Grab & rotate, auto-rotate, follow-cursor, float, scroll zoom',
+			'Custom animation speed',
+			'3D animations on iPhone only (for now)',
+			'2 GB storage',
 		],
 	},
 	{
-		name: 'Studio',
-		blurb: 'For studios + agencies.',
-		monthly: '99',
-		yearly: '990',
-		cta: 'Go Studio',
+		name: 'Orbit',
+		blurb: 'Full access.',
+		monthly: '39',
+		cta: 'Go Orbit',
 		highlight: false,
 		bullets: [
-			'Everything in Pro',
-			'Live 3D embeds on published sites (up to 10 sites)',
-			'Static video 3D component',
-			'White-label (no backlink)',
-			'Performance guarantee — Lighthouse-friendly embeds',
+			'Everything in Float',
+			'All 3D animations on every device',
+			'10 GB storage',
 		],
 	},
 ]
 
+// FAQ — alignée sur le Notion « Launch Kit » (section 7, réponses
+// standard) + 2 questions techniques complémentaires (embed, OS).
+// Liste devices harmonisée sur les 7 du catalogue réel.
 const FAQ = [
 	{
-		q: 'Does it run inside Framer or as a separate app?',
-		a: 'Entirely inside Framer — the plugin opens in a side panel and renders the 3D device live on your canvas. No second app, no re-import loop.',
+		q: 'Why no free plan / free trial?',
+		a: 'We’d rather let you try before you buy: there’s a free tool at /free to get a taste, and every plan is monthly — cancel anytime, no lock-in.',
+	},
+	{
+		q: 'Why not just use a free mockup tool?',
+		a: 'Free tools export files. Mockiosa lives in your Framer canvas and on your published site — change your design, your mockup updates. No export, no re-import, ever.',
+	},
+	{
+		q: 'Won’t a 3D embed kill my page speed?',
+		a: 'That’s the part we’re most proud of: instant poster image, lazy 3D loading, adaptive quality per device and connection. Your Lighthouse score survives — that’s the whole point.',
+	},
+	{
+		q: 'What devices are available?',
+		a: 'iPhone 17 Pro, iPhone Air, iPad Pro, MacBook Pro 14", iMac, Studio Display and Apple Watch Ultra — with more on the way.',
 	},
 	{
 		q: 'How does the live 3D embed work?',
-		a: 'Studio users get a Framer code component that they drop on the canvas. It renders the saved scene on the published landing, and checks the owner’s subscription on every mount (cached 30 minutes). If the subscription lapses, the component falls back to a watermarked PNG.',
+		a: 'Orbit users get a Framer code component that they drop on the canvas. It renders the saved scene on the published landing, and checks the owner’s subscription on every mount (cached 30 minutes). If the subscription lapses, the component falls back to a watermarked PNG.',
 	},
 	{
-		q: 'Can I bring my own 3D models?',
-		a: 'Custom GLB and USDZ upload is on the V2 roadmap. For now the plugin ships with 10 production-ready Apple + Samsung devices.',
-	},
-	{
-		q: 'Will this slow down my Framer file?',
-		a: 'No. The plugin renders only inside the plugin panel during editing. On the published landing, the embed component is opt-in, lazy-loaded, and capped at adaptive DPR + a frame budget.',
+		q: 'Can I use the mockups commercially?',
+		a: 'Yes, on every paid plan.',
 	},
 	{
 		q: 'What about Windows / Linux?',
 		a: 'Mockiosa runs in the browser via WebGL — anywhere Framer runs, the plugin runs. Mac, Windows, Linux, ChromeOS.',
 	},
 	{
-		q: 'Can I cancel anytime?',
-		a: 'Yes — manage your subscription from the Stripe customer portal, any time.',
+		q: 'What does the name mean?',
+		a: 'A wink to levitation — our mockups float.',
 	},
 ]
 
 export default function LandingSections() {
 	const containerRef = useScrollReveal()
-	const [yearly, setYearly] = useState(false)
+	// FAQ en accordéon exclusif : ouvrir un bloc ferme le précédent.
+	const [openFaq, setOpenFaq] = useState<number | null>(null)
 
 	return (
 		<div ref={containerRef} className="bg-[#0a0a0a] text-white overflow-hidden">
 			{/* ════════════ Section 1 — Pitch ════════════ */}
-			<section className="relative px-6 md:px-16 py-32 md:py-48 max-w-[1560px] mx-auto">
+			<section className="relative px-6 md:px-16 py-20 md:py-28 max-w-[1560px] mx-auto">
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 					<div data-reveal className="reveal-up">
 						<div className="text-xs sm:text-sm font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-6 flex items-center gap-3">
 							<span className="w-8 h-px bg-[#e8702a]" />
 							The plugin
 						</div>
-						<h2 className="text-4xl sm:text-6xl md:text-7xl leading-[0.95] tracking-tight">
-							<span className="font-playfair italic font-normal" style={{ letterSpacing: '-0.04em' }}>Stop exporting.</span>{' '}
-							<span className="text-white/70">Start designing</span>{' '}
-							<span className="font-playfair italic font-normal" style={{ letterSpacing: '-0.04em' }}>in 3D.</span>
-						</h2>
-						<p className="mt-10 max-w-2xl text-base sm:text-lg text-white/70 leading-relaxed">
-							You design in Framer. Then you open another tool — Rotato, Blender, After Effects. You
-							re-import. You re-export. Every time the mockup changes, you do it again. Mockiosa
-							ends that loop — the device lives on your canvas, your screenshot is its screen, and the
-							published landing renders the same 3D scene you just posed.
+						{/* Manifesto façon Dropshot : un seul paragraphe 20/28px,
+						    hiérarchie par la couleur (blanc / blanc 45%), weight 400. */}
+						<p className="text-xl sm:text-[28px] leading-[1.4] font-normal tracking-[-0.01em] m-0">
+							<span className="text-white">Stop exporting. Start designing in 3D.</span>
+							<br />
+							<br />
+							<span className="text-white/45">
+								You design in Framer, then you open another tool — Rotato, Blender, After Effects.
+								Re-import, re-export, every time the mockup changes. Mockiosa ends that loop: the
+								device lives on your canvas, your screenshot is its screen, and the published landing
+								renders the same 3D scene you just posed.
+							</span>
+							<br />
+							<br />
+							<span className="text-white">No Blender. No After Effects. All in Framer.</span>
 						</p>
 					</div>
 
@@ -367,7 +606,7 @@ export default function LandingSections() {
 			<CloserLook />
 
 			{/* ════════════ Section 2 — Showcase devices ════════════ */}
-			<section id="showcase" className="relative px-6 md:px-16 pt-20 pb-32 border-t border-white/[0.07]">
+			<section id="showcase" className="relative px-6 md:px-16 py-20 md:py-28 border-t border-white/[0.07]">
 				<div className="max-w-[1560px] mx-auto">
 					<div data-reveal className="reveal-up flex items-end justify-between flex-wrap gap-6 mb-14">
 						<div>
@@ -375,8 +614,10 @@ export default function LandingSections() {
 								<span className="w-8 h-px bg-[#e8702a]" />
 								The library
 							</div>
-							<h2 className="text-3xl sm:text-5xl md:text-6xl tracking-tight">
-								<span className="font-playfair italic font-normal">Ten</span> production-grade devices.
+							<h2 className="text-3xl sm:text-[40px] font-normal tracking-[-0.025em] leading-[1.1] m-0">
+								<span className="text-white">Seven production-grade devices.</span>
+								<br />
+								<span className="text-white/45">Updated as Apple ships.</span>
 							</h2>
 						</div>
 						<p className="max-w-md text-sm sm:text-base text-white/60 leading-relaxed">
@@ -389,98 +630,73 @@ export default function LandingSections() {
 				</div>
 			</section>
 
-			{/* ════════════ Section 3 — How it works ════════════ */}
-			<section className="relative bg-[#f5f4ef] text-[#0a0a0a] px-6 md:px-16 py-32 md:py-40">
+			{/* ════════════ Section 3 — How it works (pattern Dropshot :
+			    "Drop. Pose. Ship." + 3 vidéos verticales 3:4) ════════════ */}
+			<section className="relative px-6 md:px-16 py-20 md:py-28 border-t border-white/[0.07]">
 				<div className="max-w-[1560px] mx-auto">
-					<div data-reveal className="reveal-up max-w-3xl mb-20">
+					<div data-reveal className="reveal-up mb-12 md:mb-14">
 						<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4 flex items-center gap-3">
 							<span className="w-8 h-px bg-[#e8702a]" />
 							How it works
 						</div>
-						<h2 className="text-4xl sm:text-6xl md:text-7xl leading-[1.02] tracking-tight">
-							<span className="font-playfair italic font-normal">Three clicks</span> from a flat screenshot to a 3D
-							mockup ready to ship.
+						<h2 className="text-3xl sm:text-[40px] font-normal tracking-[-0.025em] leading-[1.1] m-0">
+							<span className="text-white">Drop.</span>{' '}
+							<span className="text-white/45">Pose.</span>{' '}
+							<span className="text-white">Ship.</span>
 						</h2>
 					</div>
 
-					<div className="grid md:grid-cols-3 gap-8 md:gap-12">
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-6">
 						{STEPS.map((s, i) => (
 							<div
 								key={s.n}
 								data-reveal
-								className="reveal-up relative"
-								style={{ transitionDelay: `${i * 80}ms` }}
+								className="reveal-up"
+								style={{ transitionDelay: `${i * 100}ms` }}
 							>
-								<div className="text-8xl font-playfair italic text-[#e8702a]/15 leading-none mb-4">{s.n}</div>
-								<div className="flex items-center gap-3 mb-3">
-									<div className="w-9 h-9 rounded-full bg-[#0a0a0a] text-white flex items-center justify-center">
-										{s.icon}
-									</div>
-									<h3 className="text-xl font-semibold tracking-tight">{s.title}</h3>
+								<DemoVideo src={s.src} aspect="3/4" hint={s.hint} />
+								<div className="mt-4 flex items-baseline gap-2.5">
+									<span className="text-[13px] font-semibold text-[#e8702a]">{s.n}</span>
+									<span className="text-xl font-medium tracking-[-0.01em] text-white">{s.label}</span>
 								</div>
-								<p className="text-base text-[#0a0a0a]/65 leading-relaxed">{s.body}</p>
+								<p className="mt-1.5 text-base text-white/35 leading-[1.45] m-0">{s.desc}</p>
 							</div>
 						))}
 					</div>
 				</div>
 			</section>
 
-			{/* ════════════ Section 4 — Animations ════════════ */}
-			<section className="relative px-6 md:px-16 py-32 md:py-40 border-t border-white/[0.07]">
+			{/* ════════════ Section 4 — Features (pattern Dropshot :
+			    grille 2 col, une vidéo 4:3 par fonctionnalité) ════════════ */}
+			<section className="relative px-6 md:px-16 py-20 md:py-28 border-t border-white/[0.07]">
 				<div className="max-w-[1560px] mx-auto">
-					<div data-reveal className="reveal-up max-w-3xl mb-16">
+					<div data-reveal className="reveal-up mb-12 md:mb-14">
 						<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4 flex items-center gap-3">
 							<span className="w-8 h-px bg-[#e8702a]" />
-							The movement
+							Features
 						</div>
-						<h2 className="text-4xl sm:text-6xl md:text-7xl leading-[1.02] tracking-tight">
-							<span className="font-playfair italic font-normal">Four animations</span>, no Blender.
+						<h2 className="text-3xl sm:text-[40px] font-normal tracking-[-0.025em] leading-[1.1] m-0">
+							<span className="text-white">Built for motion.</span>
+							<br />
+							<span className="text-white/45">No Blender required.</span>
 						</h2>
-						<p className="mt-6 text-base sm:text-lg text-white/65 leading-relaxed max-w-2xl">
-							Toggle one behavior. The device responds in real time on your canvas, and on the published
-							landing once you embed the 3D component.
-						</p>
 					</div>
 
-					{/* Bento à la Apple : grande tuile héro + tuiles compactes,
-					    coins très arrondis, photos catalogue en fond. */}
-					<div className="grid grid-cols-2 lg:grid-cols-4 auto-rows-[190px] gap-4">
-						{/* Grande tuile — Follow cursor */}
-						<div data-reveal className="reveal-up col-span-2 row-span-2 relative rounded-[2rem] overflow-hidden bg-white/[0.04] border border-white/[0.07] p-8 flex flex-col justify-between hover:border-white/[0.15] transition-all">
-							<div>
-								<div className="w-11 h-11 rounded-2xl bg-[#e8702a]/15 text-[#e8702a] flex items-center justify-center mb-5">
-									{ANIMATIONS[0].icon}
-								</div>
-								<div className="text-2xl font-semibold mb-2">{ANIMATIONS[0].title}</div>
-								<div className="text-sm text-white/60 leading-relaxed max-w-sm">{ANIMATIONS[0].body}</div>
-							</div>
-							<div className="absolute right-[-40px] bottom-[-60px] w-[280px] h-[280px] opacity-70 pointer-events-none">
-								<Image src="/cards/iphone17pro.jpg" alt="" fill className="object-cover rounded-3xl rotate-6" sizes="280px" />
-							</div>
-							<div className="text-xs text-white/40">Replays page-wide on your published Framer site</div>
-						</div>
-						{/* Tuiles compactes */}
-						{ANIMATIONS.slice(1).map((a, i) => (
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-6 md:gap-y-14">
+						{FEATURES.map((f, i) => (
 							<div
-								key={a.title}
+								key={f.title}
 								data-reveal
-								className="reveal-up col-span-1 row-span-1 p-6 rounded-[2rem] bg-white/[0.04] border border-white/[0.07] hover:border-white/[0.15] transition-all flex flex-col justify-between"
-								style={{ transitionDelay: `${i * 60}ms` }}
+								className="reveal-up"
+								style={{ transitionDelay: `${(i % 2) * 80}ms` }}
 							>
-								<div className="w-10 h-10 rounded-xl bg-[#e8702a]/15 text-[#e8702a] flex items-center justify-center">
-									{a.icon}
-								</div>
-								<div>
-									<div className="text-base font-semibold mb-1">{a.title}</div>
-									<div className="text-xs text-white/55 leading-relaxed">{a.body}</div>
+								<DemoVideo src={f.src} aspect="4/3" hint={f.hint} />
+								<div className="mt-3.5">
+									<div className="text-base font-normal text-white mb-1">{f.title}</div>
+									<div className="text-base text-white/35 leading-[1.45]">{f.desc}</div>
 								</div>
 							</div>
 						))}
-						{/* Tuile stat 4K */}
-						<div data-reveal className="reveal-up col-span-1 row-span-1 p-6 rounded-[2rem] bg-[#e8702a] text-white flex flex-col justify-between">
-							<div className="text-4xl font-bold tracking-tight">4K</div>
-							<div className="text-xs leading-relaxed text-white/85">PNG & transparent video export, rendered offline in your browser</div>
-						</div>
 					</div>
 				</div>
 			</section>
@@ -491,17 +707,21 @@ export default function LandingSections() {
 			{/* ════════════ Section 4.5 — Exports (à la Apple) ════════════ */}
 			<ExportFormatsSection />
 
-			{/* ════════════ Section 5 — Comparison ════════════ */}
-			<section className="relative px-6 md:px-16 py-32 md:py-40 border-t border-white/[0.07]">
-				<div className="max-w-6xl mx-auto">
+			{/* ════════════ Section 5 — Comparison ════════════
+			    Tableau volontairement plus étroit que les autres sections :
+			    à 1560px les colonnes s'étalent et les ✓ flottent loin des
+			    labels — 1024px garde les lignes lisibles. */}
+			<section className="relative px-6 md:px-16 py-20 md:py-28 border-t border-white/[0.07]">
+				<div className="max-w-5xl mx-auto">
 					<div data-reveal className="reveal-up text-center mb-16">
 						<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4 inline-flex items-center gap-3">
 							<span className="w-8 h-px bg-[#e8702a]" />
 							The benchmark
 							<span className="w-8 h-px bg-[#e8702a]" />
 						</div>
-						<h2 className="text-4xl sm:text-6xl tracking-tight">
-							<span className="font-playfair italic font-normal">Why</span> Mockiosa.
+						<h2 className="text-3xl sm:text-[40px] font-normal tracking-[-0.025em] leading-[1.1] m-0">
+							<span className="text-white">Why</span>{' '}
+							<span className="text-white/45">Mockiosa.</span>
 						</h2>
 					</div>
 
@@ -532,48 +752,24 @@ export default function LandingSections() {
 				</div>
 			</section>
 
-			{/* ════════════ Section 6 — Pricing ════════════ */}
-			<section id="pricing" className="relative bg-[#0a0a0a] px-6 md:px-16 py-32 md:py-40 border-t border-white/[0.07]">
-				<div className="max-w-[1560px] mx-auto">
+			{/* ════════════ Section 6 — Pricing ════════════
+			    Comme le tableau comparatif : 1024px max — 3 cartes à 1560px
+			    devenaient des paquebots illisibles. */}
+			<section id="pricing" className="relative bg-[#0a0a0a] px-6 md:px-16 py-20 md:py-28 border-t border-white/[0.07]">
+				<div className="max-w-5xl mx-auto">
 					<div data-reveal className="reveal-up text-center mb-12">
 						<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4 inline-flex items-center gap-3">
 							<span className="w-8 h-px bg-[#e8702a]" />
 							Pricing
 							<span className="w-8 h-px bg-[#e8702a]" />
 						</div>
-						<h2 className="text-4xl sm:text-6xl md:text-7xl tracking-tight">
-							<span className="font-playfair italic font-normal">Pay</span> what fits.
+						<h2 className="text-3xl sm:text-[40px] font-normal tracking-[-0.025em] leading-[1.1] m-0">
+							<span className="text-white">Pay</span>{' '}
+							<span className="text-white/45">what fits.</span>
 						</h2>
 						<p className="mt-6 text-base sm:text-lg text-white/65 max-w-xl mx-auto">
-							7-day money-back guarantee, no questions asked. Cancel any time.
+							Monthly plans, no lock-in. Cancel any time from the Stripe portal.
 						</p>
-
-						{/* Monthly / yearly toggle */}
-						<div className="mt-10 inline-flex items-center gap-1 p-1 rounded-full bg-white/[0.06] border border-white/[0.08]">
-							<button
-								type="button"
-								onClick={() => setYearly(false)}
-								className={
-									'text-sm px-5 py-2 rounded-full transition-all ' +
-									(!yearly ? 'bg-white text-[#0a0a0a] font-semibold' : 'text-white/70 hover:text-white')
-								}
-							>
-								Monthly
-							</button>
-							<button
-								type="button"
-								onClick={() => setYearly(true)}
-								className={
-									'text-sm px-5 py-2 rounded-full transition-all flex items-center gap-2 ' +
-									(yearly ? 'bg-white text-[#0a0a0a] font-semibold' : 'text-white/70 hover:text-white')
-								}
-							>
-								Yearly
-								<span className={'text-[10px] font-bold px-1.5 py-0.5 rounded-full ' + (yearly ? 'bg-[#e8702a] text-white' : 'bg-[#e8702a]/20 text-[#e8702a]')}>
-									-28%
-								</span>
-							</button>
-						</div>
 					</div>
 
 					<div className="grid md:grid-cols-3 gap-4 md:gap-6 mt-14">
@@ -597,8 +793,8 @@ export default function LandingSections() {
 								<div className="mb-2 text-sm font-semibold uppercase tracking-wider text-white/70">{p.name}</div>
 								<div className="text-sm text-white/55 mb-6">{p.blurb}</div>
 								<div className="mb-2 flex items-baseline gap-1">
-									<span className="text-5xl font-bold tracking-tight">${yearly ? p.yearly : p.monthly}</span>
-									<span className="text-sm text-white/55">/{yearly ? 'year' : 'month'}</span>
+									<span className="text-4xl font-medium tracking-tight">${p.monthly}</span>
+									<span className="text-sm text-white/55">/month</span>
 								</div>
 								<Link
 									href={'/sign-up'}
@@ -627,45 +823,47 @@ export default function LandingSections() {
 			</section>
 
 			{/* ════════════ Section 7 — FAQ ════════════ */}
-			<section id="docs" className="relative px-6 md:px-16 py-32 md:py-40 border-t border-white/[0.07]">
-				<div className="max-w-4xl mx-auto">
+			<section id="docs" className="relative px-6 md:px-16 py-20 md:py-28 border-t border-white/[0.07]">
+				<div className="max-w-[1560px] mx-auto">
 					<div data-reveal className="reveal-up mb-14">
 						<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4 flex items-center gap-3">
 							<span className="w-8 h-px bg-[#e8702a]" />
 							Questions
 						</div>
-						<h2 className="text-4xl sm:text-6xl tracking-tight">
-							<span className="font-playfair italic font-normal">Answers</span>, before you ask.
+						<h2 className="text-3xl sm:text-[40px] font-normal tracking-[-0.025em] leading-[1.1] m-0">
+							<span className="text-white">Answers,</span>{' '}
+							<span className="text-white/45">before you ask.</span>
 						</h2>
 					</div>
 					<div className="divide-y divide-white/[0.08] border-y border-white/[0.08]">
-						{FAQ.map((item) => (
-							<FaqRow key={item.q} q={item.q} a={item.a} />
+						{FAQ.map((item, i) => (
+							<FaqRow
+								key={item.q}
+								q={item.q}
+								a={item.a}
+								open={openFaq === i}
+								onToggle={() => setOpenFaq(openFaq === i ? null : i)}
+							/>
 						))}
 					</div>
 				</div>
 			</section>
 
 			{/* ════════════ Section 8 — Final CTA ════════════ */}
-			<section id="live" className="relative px-6 md:px-16 py-32 md:py-44 border-t border-white/[0.07] overflow-hidden">
+			<section className="relative px-6 md:px-16 py-20 md:py-28 border-t border-white/[0.07] overflow-hidden">
 				<div className="absolute inset-0 pointer-events-none">
 					<div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-[#e8702a]/[0.08] blur-3xl" />
 				</div>
-				<div data-reveal className="reveal-up relative max-w-4xl mx-auto text-center">
-					{/* Hermione à la place de l'icône — on prononce bien le nom. */}
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-					<img
-						src="/hermione-mockiosa.gif"
-						alt=""
-						loading="lazy"
-						className="mx-auto mb-8 w-[180px] sm:w-[220px] rounded-2xl border border-white/[0.08]"
-					/>
-					<h2 className="text-5xl sm:text-7xl md:text-8xl leading-[0.98] tracking-tight">
-						It&apos;s <span className="font-playfair italic font-normal">Mockiosa</span>,{' '}
-						<span className="text-white/65">not Mockiosaaaaaaa.</span>
+				<div data-reveal className="reveal-up relative max-w-[1560px] mx-auto text-center">
+					{/* Hermione à la place de l'icône — on prononce bien le nom.
+					    Clique dessus : Wingardium Leviosa 🪶 */}
+					<HermioneEasterEgg />
+					<h2 className="text-[34px] sm:text-5xl font-normal tracking-[-0.02em] leading-[1.05] m-0">
+						It&apos;s <span className="font-playfair">Mockiosa</span>,{' '}
+						<span className="text-white/45">not Mockiosaaaaaaa.</span>
 					</h2>
 					<p className="mt-8 text-base sm:text-lg text-white/65 max-w-xl mx-auto">
-						The plugin is free to install — try it in demo mode, then go paid with a 7-day money-back guarantee.
+						The plugin is free to install — try it in demo mode, then go paid when you’re ready. Cancel anytime.
 					</p>
 					<div className="mt-10 flex items-center justify-center gap-3 flex-wrap">
 						<Link
@@ -688,26 +886,71 @@ export default function LandingSections() {
 
 			{/* ════════════ Footer ════════════ */}
 			<footer className="relative border-t border-white/[0.07] px-6 md:px-16 py-14">
-				<div className="max-w-[1560px] mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+				{/* Footer en colonnes : marque à gauche, 4 colonnes de liens. */}
+				<div className="max-w-[1560px] mx-auto grid grid-cols-1 md:grid-cols-[1fr_auto] gap-12">
 					<div>
 						<div className="flex items-center gap-2 mb-3">
 							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" /><path d="M16 8 2 22" /><path d="M17.5 15H9" />
 							</svg>
-							<span className="font-playfair italic text-xl">Mockiosa</span>
+							<span className="font-playfair text-xl">Mockiosa</span>
 						</div>
 						<p className="text-xs text-white/45 max-w-xs leading-relaxed">
 							Real-time 3D mockups for Framer. Crafted by a human, one cloud at a time ☁
 						</p>
 					</div>
-					<nav className="flex flex-wrap gap-x-6 gap-y-3 text-xs text-white/60">
-						<a href="#showcase" className="hover:text-white">Devices</a>
-						<a href="#pricing" className="hover:text-white">Pricing</a>
-						<a href="#docs" className="hover:text-white">Docs</a>
-						<Link href="/sign-in" className="hover:text-white">Sign in</Link>
-						<Link href="/sign-up" className="hover:text-white">Sign up</Link>
-						<Link href="/privacy" className="hover:text-white">Privacy</Link>
-						<Link href="/terms" className="hover:text-white">Terms</Link>
-						<a href="mailto:hi@memselon.com" className="hover:text-white">hi@memselon.com</a>
+
+					<nav className="grid grid-cols-2 sm:grid-cols-4 gap-x-14 gap-y-3 text-xs" aria-label="Footer">
+						{[
+							{
+								title: 'Product',
+								links: [
+									{ label: 'Devices', href: '#showcase' },
+									{ label: 'Pricing', href: '#pricing' },
+									{ label: 'Docs', href: '#docs' },
+									{ label: 'Live demo', href: '#live' },
+								],
+							},
+							{
+								title: 'Resources',
+								links: [
+									{ label: '3D Mockups', href: '/mockups' },
+									{ label: 'Guides', href: '/guides' },
+									{ label: 'Changelog', href: '/changelog' },
+									{ label: 'Compare', href: '/compare' },
+								],
+							},
+							{
+								title: 'Account',
+								links: [
+									{ label: 'Sign in', href: '/sign-in' },
+									{ label: 'Sign up', href: '/sign-up' },
+									{ label: 'Report a bug', href: '/report-bug' },
+								],
+							},
+							{
+								title: 'Legal',
+								links: [
+									{ label: 'Privacy', href: '/privacy' },
+									{ label: 'Terms', href: '/terms' },
+									{ label: 'hi@memselon.com', href: 'mailto:hi@memselon.com' },
+								],
+							},
+						].map((col) => (
+							<div key={col.title} className="flex flex-col gap-3">
+								<div className="text-[10px] font-medium uppercase tracking-[0.14em] text-white/35">{col.title}</div>
+								{col.links.map((l) =>
+									l.href.startsWith('#') || l.href.startsWith('mailto:') ? (
+										<a key={l.label} href={l.href} className="text-white/60 hover:text-white transition-colors">
+											{l.label}
+										</a>
+									) : (
+										<Link key={l.label} href={l.href} className="text-white/60 hover:text-white transition-colors">
+											{l.label}
+										</Link>
+									),
+								)}
+							</div>
+						))}
 					</nav>
 				</div>
 				<div className="max-w-[1560px] mx-auto mt-10 pt-6 border-t border-white/[0.05] text-[10px] tracking-wider uppercase text-white/40 flex flex-wrap items-center justify-between gap-3">
@@ -736,13 +979,13 @@ function Cell({ v, highlight = false }: { v: boolean | string; highlight?: boole
 	return <td className={base + ' text-white/30'}>—</td>
 }
 
-function FaqRow({ q, a }: { q: string; a: string }) {
-	const [open, setOpen] = useState(false)
+function FaqRow({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
 	return (
 		<div className="py-2" data-reveal style={{ /* reveal-up applied via JS */ }}>
 			<button
 				type="button"
-				onClick={() => setOpen((v) => !v)}
+				onClick={onToggle}
+				aria-expanded={open}
 				className="w-full flex items-center justify-between gap-6 py-5 text-left group"
 			>
 				<span className="text-base sm:text-lg text-white/90 group-hover:text-white transition-colors">{q}</span>

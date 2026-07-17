@@ -14,7 +14,7 @@ export default function TermsPage() {
         <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56, padding: "0 24px" }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
             <Image src="/logo/white.png" alt="Mockiosa" width={22} height={22} style={{ borderRadius: 6 }} />
-            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)" }}>Mockiosa</span>
+            <span className="font-playfair" style={{ fontSize: 14, color: "var(--text-primary)" }}>Mockiosa</span>
           </Link>
           <Link href="/" style={{ fontSize: 13, color: "var(--text-secondary)", textDecoration: "none" }}>← Back to home</Link>
         </div>
@@ -26,13 +26,13 @@ export default function TermsPage() {
 
         <Section title="1. Agreement">
           <p>By using Mockiosa (the &ldquo;Service&rdquo;) — including the Framer plugin, the web app, and any related services — you agree to these Terms of Service. If you don&apos;t agree, please don&apos;t use the Service.</p>
-          <p>The Service is operated by Umut Sevinc, currently registered as a sole proprietor in France (with planned migration to a private limited company in Estonia).</p>
+          <p>The Service is operated by Umut Sevinc, registered as a sole proprietor in France.</p>
         </Section>
 
         <Section title="2. Plans and billing">
           <ul style={ulStyle}>
             <li><strong style={strongStyle}>7-day Ultra trial</strong>: full Ultra access for 7 days when you install the plugin. No credit card required.</li>
-            <li><strong style={strongStyle}>Paid plans</strong> (Pro, Ultra): billed in EUR, monthly or yearly, via Stripe. Stripe may display local currency based on your billing country.</li>
+            <li><strong style={strongStyle}>Paid plans</strong> (Ground, Float, Orbit): billed in USD, monthly, via Stripe. Stripe may display local currency based on your billing country.</li>
             <li><strong style={strongStyle}>Founder Lifetime</strong>: one-time payment for lifetime access to Ultra features and all future major features. Limited to 50 spots.</li>
           </ul>
           <p>You can upgrade or downgrade at any time. Upgrades are billed prorated. Downgrades take effect at the end of the current billing period.</p>
@@ -70,7 +70,7 @@ export default function TermsPage() {
         </Section>
 
         <Section title="9. Governing law">
-          <p>These Terms are governed by French law (and Estonian law upon completion of the company migration). Disputes are subject to the competent courts of France.</p>
+          <p>These Terms are governed by French law. Disputes are subject to the competent courts of France.</p>
         </Section>
 
         <Section title="10. Contact">

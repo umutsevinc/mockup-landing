@@ -104,7 +104,7 @@ export default function CloserLook() {
 		const isImage = file.type.startsWith('image/')
 		const isVideo = file.type.startsWith('video/')
 		if (!isImage && !isVideo) return
-		if (file.size > 5 * 1024 * 1024) return
+		if (file.size > 10 * 1024 * 1024) return
 		setMedia({url: URL.createObjectURL(file), type: isImage ? 'image' : 'video'})
 	}, [])
 
@@ -154,12 +154,15 @@ export default function CloserLook() {
 	)
 
 	return (
-		<section ref={viewRef as any} className="relative px-6 md:px-16 py-24 md:py-32 max-w-[1560px] mx-auto" aria-label="Product features explorer">
+		<section id="live" ref={viewRef as any} className="relative px-6 md:px-16 py-20 md:py-28 max-w-[1560px] mx-auto scroll-mt-20" aria-label="Product features explorer">
 			<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4 px-2 flex items-center gap-3">
 				<span className="w-8 h-px bg-[#e8702a]" />
 				The studio
 			</div>
-			<h2 className="text-4xl sm:text-6xl font-semibold tracking-tight mb-10 px-2">Take a closer look.</h2>
+			<h2 className="text-3xl sm:text-[40px] font-normal tracking-[-0.025em] leading-[1.1] mb-10 px-2 m-0">
+				<span className="text-white">Take a</span>{' '}
+				<span className="text-white/45">closer look.</span>
+			</h2>
 
 			<div className="relative bg-[#0b0b0d] border border-white/[0.06] rounded-[2.2rem] overflow-hidden min-h-[620px] grid grid-cols-1 lg:grid-cols-[minmax(0,4fr)_minmax(0,6fr)]">
 				{/* Left: pills + per-feature simplified plugin UI */}
@@ -249,7 +252,7 @@ export default function CloserLook() {
 								onClick={() => fileRef.current?.click()}
 								className="mt-4 w-full border border-dashed border-white/25 hover:border-white/60 rounded-xl py-3 text-xs text-white/70 hover:text-white transition-colors"
 							>
-								Click to load an image or video (5 MB max)
+								Click to load an image or video (10 MB max)
 							</button>
 							<div className="mt-4">
 								<label className="text-xs text-white/55">Screen exposure</label>

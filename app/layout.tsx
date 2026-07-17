@@ -61,9 +61,9 @@ const JSON_LD = {
 			description:
 				'Real-time 3D device mockup plugin for Framer. Drop a screenshot or video on a 3D iPhone, iPad, Apple Watch or iMac, orbit the camera, publish it live on your site or export in 4K.',
 			offers: [
-				{ '@type': 'Offer', name: 'Starter', price: '19', priceCurrency: 'USD' },
-				{ '@type': 'Offer', name: 'Pro', price: '49', priceCurrency: 'USD' },
-				{ '@type': 'Offer', name: 'Studio', price: '99', priceCurrency: 'USD' },
+				{ '@type': 'Offer', name: 'Ground', price: '9.99', priceCurrency: 'USD' },
+				{ '@type': 'Offer', name: 'Float', price: '29', priceCurrency: 'USD' },
+				{ '@type': 'Offer', name: 'Orbit', price: '39', priceCurrency: 'USD' },
 			],
 			author: { '@type': 'Organization', name: 'Memselon', url: 'https://memselon.com' },
 		},
@@ -107,10 +107,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 					type="application/ld+json"
 					dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
 				/>
+				{/* Trafic interne : /?internal=1 pose un flag localStorage qui
+				    désactive GA sur CE navigateur pour toujours (plus fiable
+				    qu'un filtre IP avec une IP résidentielle qui tourne).
+				    localhost est toujours exclu. Doit s'exécuter AVANT gtag,
+				    donc dans le head. */}
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `(function(){try{var id='${process.env.NEXT_PUBLIC_GA_ID ?? 'G-ZQ6Y1NWK9Y'}';if(new URLSearchParams(location.search).get('internal')==='1'){localStorage.setItem('memselon-internal','1');}if(localStorage.getItem('memselon-internal')==='1'||location.hostname==='localhost'){window['ga-disable-'+id]=true;}}catch(e){}})();`,
+					}}
+				/>
 			</head>
 			<body>{children}</body>
-			{/* GA4 — flux "Memselon" (couvre memselon.com et ses sous-domaines) */}
-			<GoogleAnalytics gaId="G-XD2DLH1KLL" />
+			{/* GA4 — flux dédié "Mockiosa" (propriété séparée de memselon.com).
+			    Surchargable via NEXT_PUBLIC_GA_ID dans les env Vercel. */}
+			<GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID ?? 'G-ZQ6Y1NWK9Y'} />
 		</html>
 	)
 }

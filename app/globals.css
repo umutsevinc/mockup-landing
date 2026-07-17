@@ -26,6 +26,14 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Ancres de la nav : défilement fluide (le pill animé suit en spring). */
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
 ::selection { background: rgba(232, 112, 42, 0.35); color: #fff; }
 
 /* ──────────────────────────────────────────────────────────────────

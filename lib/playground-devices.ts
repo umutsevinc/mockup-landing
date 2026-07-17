@@ -1,10 +1,11 @@
 import type {Device} from './mockup-types'
 
 /**
- * Devices interactifs de la landing (hero + Take a closer look) —
- * source UNIQUE. GLB servis depuis /public/3d ; les champs écran
- * correspondent aux modèles LOCAUX (qui diffèrent parfois des modèles
- * Supabase du plugin — voir commentaires).
+ * Devices interactifs de la landing (hero + Take a closer look +
+ * viewers /mockups) — MIROIR du catalogue du plugin (table Supabase
+ * `devices`, sync 17/07/2026) : GLB téléchargés depuis R2 dans
+ * /public/3d, configs écran/scale = valeurs exactes de la table
+ * (éprouvées dans l'embed avec ces mêmes modèles).
  */
 export type PlaygroundDevice = Device & {chip: string}
 
@@ -18,6 +19,8 @@ export const DEVICE_FINISH_COLORS: Record<string, string[]> = {
 	ipadPro: ['#2E2C2E', '#E3E4E5'], // Space Black / Silver
 	appleWatchUltra: ['#C6BDAE', '#3A3A3C'], // Natural / Black Titanium
 	imac: ['#4C6E8D', '#5F7A5E', '#E3E4E5'], // Blue / Green / Silver
+	macbookPro: ['#2E2C2E', '#E3E4E5'], // Space Black / Silver
+	appleProDisplayXDR: ['#E3E4E5'], // Silver (Studio Display)
 }
 
 export const deviceFinishColors = (id: string): string[] =>
@@ -31,7 +34,7 @@ export const PLAYGROUND_DEVICES: PlaygroundDevice[] = [
 		description: null,
 		title: 'iPhone 17 Pro',
 		model_url: '/3d/iphone17pro.glb',
-		default_scale: 0.42,
+		default_scale: 0.35,
 		screen_mesh_name: 'Object_49',
 		screen_material_name: 'BsXHDwLKqtDOfrW',
 		screen_parent_name: null,
@@ -45,14 +48,11 @@ export const PLAYGROUND_DEVICES: PlaygroundDevice[] = [
 		description: null,
 		title: 'iPhone Air',
 		model_url: '/3d/iphoneAir.glb',
-		default_scale: 0.32,
-		// GLB local ≠ modèle Supabase (noms Cube.006_*) — écran = dalle
-		// plate émissive texturée, UVs tête-bêche → rot 180 + miroir X.
-		screen_mesh_name: 'Cube.006_Material.004_0',
-		screen_material_name: 'Material.004',
-		screen_parent_name: null,
-		screen_rotation_deg: 180,
-		screen_mirror_x: true,
+		default_scale: 0.2,
+		screen_mesh_name: 'Object_7',
+		screen_material_name: '17Air_Screen',
+		screen_parent_name: 'IPhone 17 Air_0',
+		screen_rotation_deg: 0,
 		screen_orientation: 'vertical',
 		screen_fit_mode: 'cover',
 		chip: '/cards/iphoneAir.jpg',
@@ -61,13 +61,13 @@ export const PLAYGROUND_DEVICES: PlaygroundDevice[] = [
 		id: 'ipadPro',
 		description: null,
 		title: 'iPad Pro',
-		model_url: '/3d/ipad.glb',
-		default_scale: 0.36,
-		screen_mesh_name: 'Display',
-		screen_material_name: 'Display',
+		model_url: '/3d/ipadPro.glb',
+		default_scale: 3.2,
+		screen_mesh_name: 'Object_10',
+		screen_material_name: 'HlUmGTGdgbnvPsa',
 		screen_parent_name: null,
-		screen_rotation_deg: 0,
-		screen_orientation: 'horizontal',
+		screen_rotation_deg: 180,
+		screen_orientation: 'vertical',
 		screen_fit_mode: 'cover',
 		chip: '/cards/ipadPro.jpg',
 	},
@@ -76,7 +76,7 @@ export const PLAYGROUND_DEVICES: PlaygroundDevice[] = [
 		description: null,
 		title: 'Apple Watch Ultra',
 		model_url: '/3d/appleWatchUltra.glb',
-		default_scale: 0.48,
+		default_scale: 0.4,
 		// Origine du GLB décalée vers le bas — remonté dans le frame.
 		y_offset: 0.28,
 		screen_mesh_name: 'wmnqxNpNCdRfDfA',
@@ -92,13 +92,41 @@ export const PLAYGROUND_DEVICES: PlaygroundDevice[] = [
 		description: null,
 		title: 'iMac',
 		model_url: '/3d/imac.glb',
-		default_scale: 0.03,
-		screen_mesh_name: 'Display',
-		screen_material_name: 'Display',
+		default_scale: 1.15,
+		screen_mesh_name: 'Retina_screen_vray_screen_0',
+		screen_material_name: 'vray_screen',
 		screen_parent_name: null,
-		screen_rotation_deg: 180,
+		screen_rotation_deg: 0,
 		screen_orientation: 'horizontal',
 		screen_fit_mode: 'cover',
 		chip: '/cards/imac.jpg',
+	},
+	{
+		id: 'macbookPro',
+		description: null,
+		title: 'MacBook Pro 14"',
+		model_url: '/3d/macbookPro.glb',
+		default_scale: 2.5,
+		screen_mesh_name: 'tfTbkkzhxqpKRgC',
+		screen_material_name: 'HlQwFCAPWzetDQy',
+		screen_parent_name: 'JySHOmMobJSAPQv',
+		screen_rotation_deg: 0,
+		screen_orientation: 'horizontal',
+		screen_fit_mode: 'cover',
+		chip: '/cards/macbookPro.jpg',
+	},
+	{
+		id: 'appleProDisplayXDR',
+		description: null,
+		title: 'Studio Display',
+		model_url: '/3d/appleProDisplayXDR.glb',
+		default_scale: 1,
+		screen_mesh_name: 'IyklIWCEUuwKzOr',
+		screen_material_name: 'YZsKmgdmwlRdfBy',
+		screen_parent_name: 'QjRcrcXBbYCUKZS',
+		screen_rotation_deg: 0,
+		screen_orientation: 'horizontal',
+		screen_fit_mode: 'cover',
+		chip: '/cards/appleProDisplayXDR.jpg',
 	},
 ]
