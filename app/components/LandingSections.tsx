@@ -327,14 +327,13 @@ function ExportFormatsSection() {
 				    déborde du cadre à gauche, chat samurai qui joue en boucle.
 				    Pas de reveal ici (demande : aucun fade in/out sur la vidéo)
 				    et collé au bord gauche en mobile. */}
+				{/* Rendu IDENTIQUE au composant vidéo du plugin
+				    (Framer_3D_Video_Mockups : embed staticScene plein cadre,
+				    zoom 1) — l'ancien agrandissement manuel 300 %/280 % zoomait
+				    beaucoup trop la scène (bug signalé 18/07). */}
 				<div ref={mediaRef} className="relative h-[420px] sm:h-[560px] lg:h-[640px] overflow-hidden mr-6 md:mr-16 lg:mx-0">
-					{/* Poster instantané — capture LOCALE de la scène (18 Ko webp),
-					    eager + fetchPriority high. Dimensionné par la HAUTEUR
-					    uniquement (comme la caméra 3D de l'iframe : fov vertical →
-					    la scène remplit la hauteur), centré sur le même point que
-					    l'iframe (x=20%, y=50%) — sinon object-contain faisait
-					    varier la taille du device selon le ratio du viewport et le
-					    poster ne matchait plus la scène live au swap. */}
+					{/* Poster instantané — même cadrage que l'iframe (plein
+					    cadre, la caméra 3D remplit la hauteur, scène centrée). */}
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img
 						src="/exports-poster.webp"
@@ -342,14 +341,13 @@ function ExportFormatsSection() {
 						loading="eager"
 						fetchPriority="high"
 						className="absolute pointer-events-none"
-						style={{ height: '280%', width: 'auto', maxWidth: 'none', left: '20%', top: '50%', transform: 'translate(-50%, -50%)' }}
+						style={{ height: '100%', width: 'auto', maxWidth: 'none', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
 					/>
 					{everInView && (
 						<iframe
 							src="https://framer-3d-mockup-embed.vercel.app/embed/b2e6ee46-51d2-4f31-b781-40453ccafdbb?static=true&bg=transparent&showSignature=false&dpr=1&tier=STANDARD"
 							title="Video 3D mockup — live static scene"
-							className="absolute border-0 pointer-events-none"
-							style={{ width: '300%', height: '280%', left: '-130%', top: '-90%' }}
+							className="absolute inset-0 w-full h-full border-0 pointer-events-none"
 						/>
 					)}
 				</div>
