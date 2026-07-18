@@ -437,12 +437,6 @@ const FEATURES = [
 		hint: 'Capture 4:3 : device en lévitation lente sur fond sombre.',
 	},
 	{
-		src: '/videos/feature-scroll.mp4',
-		title: 'Scroll move',
-		desc: 'The device rotates as the visitor scrolls the page. Direction and amplitude are yours.',
-		hint: 'Capture 4:3 : scroll d’une landing, le device tourne en rythme.',
-	},
-	{
 		src: '/videos/feature-live-embed.mp4',
 		title: 'Live 3D embed',
 		desc: 'A Framer code component renders the real scene — interactive — on your published site. No export at all.',
