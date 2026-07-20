@@ -383,6 +383,7 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 								snapBack={teaser && isTouch}
 								inViewport={inView}
 								webURL={teaser ? null : siteEmbed}
+								webInteractive={siteScroll}
 							/>
 						</Suspense>
 					</Canvas>

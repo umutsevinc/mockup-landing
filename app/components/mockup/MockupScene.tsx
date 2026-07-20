@@ -37,6 +37,8 @@ interface MockupSceneProps {
 	pose?: {rotateY?: number; zoom?: number}
 	/** URL web posée en iframe LIVE sur l'écran (CSS3D, scrollable). */
 	webURL?: string | null
+	/** false = l'iframe est inerte (pas de scroll/clics sur le site). */
+	webInteractive?: boolean
 	/** Retour élastique à la Apple : au relâchement d'un drag, la caméra
 	    revient en douceur à la vue de face. */
 	snapBack?: boolean
@@ -374,7 +376,7 @@ function webViewportWidthFor(deviceId?: string): number {
  * ignorée en transform), distanceFactor=400 (sinon ÷40), occluder
  * interne neutralisé (three trie les opaques par programme shader).
  */
-function WebScreenLayer({screen, webURL, deviceId}: {screen: MeshAny; webURL: string; deviceId?: string}) {
+function WebScreenLayer({screen, webURL, deviceId, interactive = true}: {screen: MeshAny; webURL: string; deviceId?: string; interactive?: boolean}) {
 	const layout = React.useMemo(() => {
 		const geo = screen.geometry
 		const posAttr = geo.attributes.position as THREE.BufferAttribute | undefined
@@ -491,12 +493,29 @@ function WebScreenLayer({screen, webURL, deviceId}: {screen: MeshAny; webURL: st
 					zIndexRange={[8, 0]}
 					distanceFactor={400}
 					material={<meshBasicMaterial colorWrite={false} depthWrite={false} depthTest={false} />}
-					style={{width: wPx, height: hPx, overflow: 'hidden', background: '#ffffff', borderRadius: cornerPx}}
+					// Scrollable décoché : l'iframe devient INERTE — sans ça le
+					// holder CSS3D (pointer-events auto) laissait passer scroll et
+					// clics vers le site même canvas réactivé (bug 20/07).
+					style={{
+						width: wPx,
+						height: hPx,
+						overflow: 'hidden',
+						background: '#ffffff',
+						borderRadius: cornerPx,
+						pointerEvents: interactive ? 'auto' : 'none',
+					}}
 				>
 					<iframe
 						src={webURL}
 						title="Website preview"
-						style={{width: '100%', height: '100%', border: 'none', display: 'block', background: '#ffffff'}}
+						style={{
+							width: '100%',
+							height: '100%',
+							border: 'none',
+							display: 'block',
+							background: '#ffffff',
+							pointerEvents: interactive ? 'auto' : 'none',
+						}}
 						referrerPolicy="no-referrer"
 						allow="autoplay; fullscreen"
 					/>
@@ -507,7 +526,7 @@ function WebScreenLayer({screen, webURL, deviceId}: {screen: MeshAny; webURL: st
 	)
 }
 
-export function MockupScene({payload, transparentBg, pose, snapBack = false, inViewport = true, webURL = null}: MockupSceneProps) {
+export function MockupScene({payload, transparentBg, pose, snapBack = false, inViewport = true, webURL = null, webInteractive = true}: MockupSceneProps) {
 	const {mockup, device} = payload
 
 	// Charger le modèle avec optimisations (draco activé si disponible)
@@ -1351,7 +1370,7 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false, inV
 						<group position={[0, (device as any).y_offset || 0, 0]}>
 							<primitive object={root} scale={device.default_scale || 1} rotation={[0, -Math.PI / 2, 0]} />
 							{webURL && webScreenMesh && (
-								<WebScreenLayer screen={webScreenMesh} webURL={webURL} deviceId={device.id} />
+								<WebScreenLayer screen={webScreenMesh} webURL={webURL} deviceId={device.id} interactive={webInteractive} />
 							)}
 						</group>
 					</PoseRig>
