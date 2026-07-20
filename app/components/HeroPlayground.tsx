@@ -531,7 +531,10 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 								type="button"
 								aria-label="Put a website on the screen"
 								title="Website"
-								onClick={() => setSiteOpen((v) => !v)}
+								onClick={() => {
+									setAnimOpen(false)
+									setSiteOpen((v) => !v)
+								}}
 								className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
 									siteOpen ? 'bg-white text-black' : 'text-white/80 hover:text-white hover:bg-white/10'
 								}`}
@@ -599,7 +602,10 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 								type="button"
 								aria-label="Animation options"
 								title="Animation"
-								onClick={() => setAnimOpen((v) => !v)}
+								onClick={() => {
+									setSiteOpen(false)
+									setAnimOpen((v) => !v)
+								}}
 								className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
 									animOpen || animActive ? 'bg-white text-black' : 'text-white/80 hover:text-white hover:bg-white/10'
 								}`}
