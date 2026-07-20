@@ -133,6 +133,11 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 	const [mediaSource, setMediaSource] = useState<'image' | 'video' | 'site' | null>(null)
 	const [siteUrl, setSiteUrl] = useState('')
 	const [siteCapturing, setSiteCapturing] = useState(false)
+	// Embed LIVE du site sur l'écran 3D (iframe CSS3D dans MockupScene).
+	const [siteEmbed, setSiteEmbed] = useState<string | null>(null)
+	// Scrollable = la souris pilote le SITE (canvas pointer-events none) ;
+	// décoché = interactions 3D normales, l'iframe reste affichée.
+	const [siteScroll, setSiteScroll] = useState(true)
 	// Popup Animation : follow-cursor (vitesse + rotation) et auto-rotate.
 	const [animOpen, setAnimOpen] = useState(false)
 	const [animFollow, setAnimFollow] = useState(false)
@@ -140,36 +145,19 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 	const [animFollowRotation, setAnimFollowRotation] = useState(0.6)
 	const [animAutoRotate, setAnimAutoRotate] = useState(false)
 	const animActive = animFollow || animAutoRotate
+	// Embed LIVE (plus de capture photo — demande 20/07) : le site est
+	// une vraie iframe scrollable sur l'écran du device.
 	const captureSite = useCallback(async () => {
 		let u = siteUrl.trim()
 		if (!u) return
 		if (!/^https?:\/\//i.test(u)) u = `https://${u}`
 		setSiteCapturing(true)
-		try {
-			const res = await fetch('https://slfsatozvrdsbozzqgcx.supabase.co/functions/v1/capture-website', {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({url: u, width: 390, height: 844}),
-			})
-			if (!res.ok || !(res.headers.get('content-type') || '').includes('image')) throw new Error('capture')
-			const blob = await res.blob()
-			const url = URL.createObjectURL(blob)
-			setMedia((prev) => {
-				if (prev?.url.startsWith('blob:')) {
-					try {
-						URL.revokeObjectURL(prev.url)
-					} catch {}
-				}
-				return {url, type: 'image'}
-			})
-			setMediaSource('site')
-			setSiteOpen(false)
-		} catch {
-			setUploadError('Could not capture this website')
-			setTimeout(() => setUploadError(null), 3200)
-		} finally {
-			setSiteCapturing(false)
-		}
+		// Micro-délai pour l'affordance du spinner (l'iframe charge ensuite
+		// en direct sur l'écran).
+		await new Promise((r) => setTimeout(r, 250))
+		setSiteEmbed(u)
+		setMediaSource('site')
+		setSiteCapturing(false)
 	}, [siteUrl])
 	// Distingue un CLIC (ouvre le sélecteur de fichier) d'un DRAG
 	// (grab-rotate du modèle) : seuil de 6px entre down et up.
@@ -267,6 +255,7 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 			}
 			return {url, type: isImage ? 'image' : 'video'}
 		})
+		setSiteEmbed(null)
 		setMediaSource(isImage ? 'image' : 'video')
 		void uploadDemoFile(file)
 	}, [teaser])
@@ -280,6 +269,7 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 			}
 			return null
 		})
+		setSiteEmbed(null)
 		setMediaSource(null)
 	}, [])
 
@@ -379,10 +369,21 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 							premultipliedAlpha: false,
 							powerPreference: 'high-performance',
 						}}
-						style={{background: 'transparent'}}
+						style={{
+							background: 'transparent',
+							// Scrollable : la souris traverse le canvas et va au SITE
+							// (l'iframe CSS3D est derrière, pointer-events auto).
+							pointerEvents: siteEmbed && siteScroll ? 'none' : 'auto',
+						}}
 					>
 						<Suspense fallback={null}>
-							<MockupScene payload={payload} transparentBg snapBack={teaser && isTouch} inViewport={inView} />
+							<MockupScene
+								payload={payload}
+								transparentBg
+								snapBack={teaser && isTouch}
+								inViewport={inView}
+								webURL={teaser ? null : siteEmbed}
+							/>
 						</Suspense>
 					</Canvas>
 				</div>
@@ -541,7 +542,8 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 								</svg>
 							</button>
 							{siteOpen && (
-								<div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 flex items-center gap-1.5 bg-[#1c1c1e]/95 border border-white/[0.1] rounded-xl p-1.5 whitespace-nowrap">
+								<div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 flex flex-col gap-2 bg-[#1c1c1e]/95 border border-white/[0.1] rounded-xl p-2 whitespace-nowrap">
+									<div className="flex items-center gap-1.5">
 									<input
 										type="url"
 										autoFocus
@@ -578,6 +580,16 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 											'Go'
 										)}
 									</button>
+									</div>
+									<label className="flex items-center gap-2 text-white/85 text-xs font-medium cursor-pointer select-none">
+										<input
+											type="checkbox"
+											checked={siteScroll}
+											onChange={(e) => setSiteScroll(e.target.checked)}
+											className="accent-[#e8702a] w-3.5 h-3.5"
+										/>
+										Scrollable (mouse controls the site)
+									</label>
 								</div>
 							)}
 						</div>
@@ -601,7 +613,11 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 										<input
 											type="checkbox"
 											checked={animFollow}
-											onChange={(e) => setAnimFollow(e.target.checked)}
+											onChange={(e) => {
+												setAnimFollow(e.target.checked)
+												// Exclusif avec Auto rotate (demande 20/07).
+												if (e.target.checked) setAnimAutoRotate(false)
+											}}
 											className="accent-[#e8702a] w-3.5 h-3.5"
 										/>
 										Follow cursor
@@ -640,7 +656,11 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 										<input
 											type="checkbox"
 											checked={animAutoRotate}
-											onChange={(e) => setAnimAutoRotate(e.target.checked)}
+											onChange={(e) => {
+												setAnimAutoRotate(e.target.checked)
+												// Exclusif avec Follow cursor (demande 20/07).
+												if (e.target.checked) setAnimFollow(false)
+											}}
 											className="accent-[#e8702a] w-3.5 h-3.5"
 										/>
 										Auto rotate
@@ -714,10 +734,13 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 							type="button"
 							onClick={() => {
 								if (teaser) return showComingSoon()
-								// Hero : on ne swappe pas le modèle — les autres devices
-								// s'essaient dans « The studio » (#live) juste en dessous.
+								// Landing : les autres devices s'essaient dans « The
+								// studio » (#live). Waitlist (pas de section #live) :
+								// on swappe réellement le modèle.
 								if (d.id !== deviceId) {
-									document.getElementById('live')?.scrollIntoView({behavior: 'smooth'})
+									const live = document.getElementById('live')
+									if (live) live.scrollIntoView({behavior: 'smooth'})
+									else setDeviceId(d.id)
 								}
 							}}
 							aria-pressed={deviceId === d.id}
@@ -731,7 +754,11 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 					{!teaser && (
 						<button
 							type="button"
-							onClick={() => document.getElementById('live')?.scrollIntoView({behavior: 'smooth'})}
+							onClick={() => {
+								const live = document.getElementById('live')
+								if (live) live.scrollIntoView({behavior: 'smooth'})
+								else showComingSoon()
+							}}
 							className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors text-white/70 hover:text-white"
 						>
 							and more…

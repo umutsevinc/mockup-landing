@@ -1,8 +1,8 @@
 'use client'
 
-import {useEffect, useMemo, useRef} from 'react'
-import {OrbitControls, useGLTF, Environment} from '@react-three/drei'
-import {useFrame} from '@react-three/fiber'
+import React, {useEffect, useMemo, useRef, useState} from 'react'
+import {OrbitControls, useGLTF, Environment, Html} from '@react-three/drei'
+import {useFrame, createPortal} from '@react-three/fiber'
 import * as THREE from 'three'
 import type {Device, Mockup} from '@/lib/mockup-types'
 import {generateWatermarkDataURL} from '@/lib/generateWatermark'
@@ -35,6 +35,8 @@ interface MockupSceneProps {
 	    modèle + zoom caméra, LERPÉS en douceur (Take a closer look :
 	    ouvrir Colours/Finish/Light tourne le device de 3/4 et zoome). */
 	pose?: {rotateY?: number; zoom?: number}
+	/** URL web posée en iframe LIVE sur l'écran (CSS3D, scrollable). */
+	webURL?: string | null
 	/** Retour élastique à la Apple : au relâchement d'un drag, la caméra
 	    revient en douceur à la vue de face. */
 	snapBack?: boolean
@@ -351,7 +353,161 @@ function drawVideoHeightCoverTex(
 	return {tex, stop}
 }
 
-export function MockupScene({payload, transparentBg, pose, snapBack = false, inViewport = true}: MockupSceneProps) {
+
+/** Largeur CSS (px) de l'iframe selon la famille de device. */
+function webViewportWidthFor(deviceId?: string): number {
+	const id = (deviceId || '').toLowerCase()
+	if (/watch/.test(id)) return 190
+	if (/ipad|tablet/.test(id)) return 834
+	if (/iphone|phone|pixel|galaxy/.test(id)) return 390
+	if (/imac|mac|display|xdr|studio/.test(id)) return 1366
+	return 800
+}
+
+/**
+ * Couche web CSS3D — PORT du plugin (PhoneModel.WebScreenLayer, 20/07) :
+ * iframe LIVE alignée sur le mesh écran via un portal R3F, trou dans le
+ * canvas via un punch NoBlending qui réutilise la GÉOMÉTRIE de l'écran
+ * (coins arrondis exacts), repère calculé depuis les normales moyennées
+ * de la géométrie (l'inclinaison peut être cuite dans les sommets).
+ * Pièges drei réglés : scale sur le GROUP (la prop scale de <Html> est
+ * ignorée en transform), distanceFactor=400 (sinon ÷40), occluder
+ * interne neutralisé (three trie les opaques par programme shader).
+ */
+function WebScreenLayer({screen, webURL, deviceId}: {screen: MeshAny; webURL: string; deviceId?: string}) {
+	const layout = React.useMemo(() => {
+		const geo = screen.geometry
+		const posAttr = geo.attributes.position as THREE.BufferAttribute | undefined
+		if (!posAttr) return null
+		const n = new THREE.Vector3()
+		const nAttr = geo.attributes.normal as THREE.BufferAttribute | undefined
+		if (nAttr) {
+			const tmp = new THREE.Vector3()
+			const ref = new THREE.Vector3().fromBufferAttribute(nAttr, 0)
+			for (let i = 0; i < nAttr.count; i++) {
+				tmp.fromBufferAttribute(nAttr, i)
+				n.add(tmp.dot(ref) < 0 ? tmp.negate() : tmp)
+			}
+		}
+		if (n.lengthSq() < 1e-8) {
+			geo.computeBoundingBox()
+			const size = geo.boundingBox!.getSize(new THREE.Vector3())
+			const dims = [size.x, size.y, size.z]
+			let nIdx = 0
+			if (dims[1] < dims[nIdx]) nIdx = 1
+			if (dims[2] < dims[nIdx]) nIdx = 2
+			n.set(0, 0, 0).setComponent(nIdx, 1)
+		}
+		n.normalize()
+		screen.updateWorldMatrix(true, false)
+		const nWorld = n.clone().transformDirection(screen.matrixWorld)
+		if (nWorld.z < 0) n.negate()
+		const invWorld = new THREE.Matrix4().copy(screen.matrixWorld).invert()
+		let up = new THREE.Vector3(0, 1, 0).transformDirection(invWorld)
+		up.addScaledVector(n, -up.dot(n))
+		if (up.lengthSq() < 1e-6) up = Math.abs(n.y) > 0.9 ? new THREE.Vector3(0, 0, -1) : new THREE.Vector3(0, 1, 0)
+		up.normalize()
+		const right = new THREE.Vector3().crossVectors(up, n).normalize()
+		let minR = Infinity
+		let maxR = -Infinity
+		let minU = Infinity
+		let maxU = -Infinity
+		let sumN = 0
+		const v = new THREE.Vector3()
+		for (let i = 0; i < posAttr.count; i++) {
+			v.fromBufferAttribute(posAttr, i)
+			const r = v.dot(right)
+			const u = v.dot(up)
+			if (r < minR) minR = r
+			if (r > maxR) maxR = r
+			if (u < minU) minU = u
+			if (u > maxU) maxU = u
+			sumN += v.dot(n)
+		}
+		const w = maxR - minR
+		const h = maxU - minU
+		if (!(w > 0) || !(h > 0)) return null
+		const quaternion = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(right, up, n))
+		const position = new THREE.Vector3()
+			.addScaledVector(right, (minR + maxR) / 2)
+			.addScaledVector(up, (minU + maxU) / 2)
+			.addScaledVector(n, sumN / posAttr.count + Math.max(w, h) * 0.004)
+		return {position, quaternion, w, h}
+	}, [screen, webURL])
+
+	// L'écran WebGL ne peint plus pendant que l'iframe est active.
+	const punchedRef = useRef<Set<THREE.Material>>(new Set())
+	useFrame(() => {
+		const mats = (Array.isArray(screen.material) ? screen.material : [screen.material]) as THREE.Material[]
+		for (const m of mats) {
+			if (m && (m as any).colorWrite !== false) {
+				;(m as any).colorWrite = false
+				punchedRef.current.add(m)
+			}
+		}
+	})
+	useEffect(() => {
+		const punched = punchedRef.current
+		return () => {
+			punched.forEach((m) => {
+				try {
+					;(m as any).colorWrite = true
+				} catch {}
+			})
+			punched.clear()
+		}
+	}, [screen, webURL])
+
+	if (!layout) return null
+	const wPx = webViewportWidthFor(deviceId)
+	const hPx = Math.max(1, Math.round(wPx * (layout.h / layout.w)))
+	const scale = layout.w / wPx
+	const idLower = (deviceId || '').toLowerCase()
+	const cornerPx = /watch/.test(idLower)
+		? Math.round(wPx * 0.24)
+		: /iphone|phone/.test(idLower)
+			? Math.round(wPx * 0.13)
+			: /ipad/.test(idLower)
+				? Math.round(wPx * 0.045)
+				: 10
+	return createPortal(
+		<>
+			<mesh geometry={screen.geometry} renderOrder={99999}>
+				<shaderMaterial
+					fragmentShader="void main() { gl_FragColor = vec4(0.0); }"
+					side={THREE.DoubleSide}
+					blending={THREE.NoBlending}
+					transparent
+					depthWrite={false}
+					polygonOffset
+					polygonOffsetFactor={-2}
+					polygonOffsetUnits={-2}
+				/>
+			</mesh>
+			<group position={layout.position} quaternion={layout.quaternion} scale={scale}>
+				<Html
+					transform
+					occlude="blending"
+					zIndexRange={[8, 0]}
+					distanceFactor={400}
+					material={<meshBasicMaterial colorWrite={false} depthWrite={false} depthTest={false} />}
+					style={{width: wPx, height: hPx, overflow: 'hidden', background: '#ffffff', borderRadius: cornerPx}}
+				>
+					<iframe
+						src={webURL}
+						title="Website preview"
+						style={{width: '100%', height: '100%', border: 'none', display: 'block', background: '#ffffff'}}
+						referrerPolicy="no-referrer"
+						allow="autoplay; fullscreen"
+					/>
+				</Html>
+			</group>
+		</>,
+		screen as unknown as THREE.Object3D,
+	)
+}
+
+export function MockupScene({payload, transparentBg, pose, snapBack = false, inViewport = true, webURL = null}: MockupSceneProps) {
 	const {mockup, device} = payload
 
 	// Charger le modèle avec optimisations (draco activé si disponible)
@@ -377,6 +533,8 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false, inV
 	}, [gltf])
 
 	const screenRef = useRef<MeshAny | null>(null)
+	// Copie React du mesh écran pour monter la couche web (portal CSS3D).
+	const [webScreenMesh, setWebScreenMesh] = useState<MeshAny | null>(null)
 	const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
 	const videoCleanupRef = useRef<(() => void) | null>(null)
 	// Vidéo d'écran active + visibilité courante (mécanisme in-viewport).
@@ -536,6 +694,7 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false, inV
 		}
 
 		screenRef.current = screenMesh
+		setWebScreenMesh((prev) => (prev === screenMesh ? prev : (screenMesh as MeshAny)))
 		const mesh = screenMesh as MeshAny
 
 		const mats = (Array.isArray(mesh.material) ? mesh.material : [mesh.material]) as THREE.Material[]
@@ -1191,6 +1350,9 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false, inV
 						    leur origine décalée vers le bas. */}
 						<group position={[0, (device as any).y_offset || 0, 0]}>
 							<primitive object={root} scale={device.default_scale || 1} rotation={[0, -Math.PI / 2, 0]} />
+							{webURL && webScreenMesh && (
+								<WebScreenLayer screen={webScreenMesh} webURL={webURL} deviceId={device.id} />
+							)}
 						</group>
 					</PoseRig>
 				</LoopFloatGroup>

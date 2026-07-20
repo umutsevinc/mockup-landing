@@ -121,7 +121,7 @@ export default function WaitlistPage() {
 
 					{/* Droite : le playground 3D (la démo vaut mille mots) */}
 					<div className="relative h-[52vh] sm:h-[60vh] lg:h-[78vh]">
-						<HeroPlayground teaser />
+						<HeroPlayground />
 					</div>
 				</div>
 			</section>
