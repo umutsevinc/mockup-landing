@@ -389,7 +389,8 @@ function webViewportWidthFor(deviceId?: string): number {
  */
 function knownScreenAspectHW(deviceId?: string): number | null {
 	const id = (deviceId || '').toLowerCase()
-	if (/iphone/.test(id)) return 2622 / 1206 // 2.174
+	if (/iphoneair/.test(id)) return 2740 / 1260 // 2.175 (Air 6.6")
+	if (/iphone/.test(id)) return 2622 / 1206 // 2.174 (17 Pro)
 	if (/ipad/.test(id)) return 2752 / 2064 // 1.333 (portrait)
 	if (/watch/.test(id)) return 251 / 205 // 1.224
 	if (/macbook/.test(id)) return 1964 / 3024 // 0.649 (landscape)
@@ -553,13 +554,18 @@ function WebScreenLayer({screen, webURL, deviceId, interactive = true}: {screen:
 	const hPx = Math.max(1, Math.round(wPx * effectiveAspect))
 	const scale = layout.w / wPx
 	const idLower = (deviceId || '').toLowerCase()
+	// Coins arrondis wrapper : match visuel du device réel.
+	// iPad = 0.022 (dalle 13" M4 ≈ 18px pour 834). Baissé 20/07
+	// (0.045 était trop rond, débordait les coins droits du device).
 	const cornerPx = /watch/.test(idLower)
 		? Math.round(wPx * 0.24)
-		: /iphone|phone/.test(idLower)
-			? Math.round(wPx * 0.13)
-			: /ipad/.test(idLower)
-				? Math.round(wPx * 0.045)
-				: 10
+		: /iphoneair/.test(idLower)
+			? Math.round(wPx * 0.14)
+			: /iphone|phone/.test(idLower)
+				? Math.round(wPx * 0.13)
+				: /ipad/.test(idLower)
+					? Math.round(wPx * 0.022)
+					: 10
 	return createPortal(
 		<>
 			<mesh geometry={screen.geometry} renderOrder={99999}>
