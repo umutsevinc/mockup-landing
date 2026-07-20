@@ -89,11 +89,24 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 	const [teaserMedia, setTeaserMedia] = useState<'image' | 'video'>('image')
 	// Mobile (pointer coarse) : pas de follow-cursor — drag libre au doigt.
 	const [isTouch, setIsTouch] = useState(false)
+	// Petit viewport (mobile/tablet portrait) : le CSS3D du WebScreenLayer
+	// débordait du device et le panel Site prenait trop de place → on
+	// bascule sur Coming soon pour l'option web. Includes iPad portrait.
+	const [isSmallViewport, setIsSmallViewport] = useState(false)
 	useEffect(() => {
 		try {
 			setIsTouch(window.matchMedia('(pointer: coarse)').matches)
 		} catch {}
+		const update = () => {
+			try {
+				setIsSmallViewport(window.innerWidth < 900)
+			} catch {}
+		}
+		update()
+		window.addEventListener('resize', update)
+		return () => window.removeEventListener('resize', update)
 	}, [])
+	const webUnavailable = isTouch || isSmallViewport
 	const demoVideoReady = useRef(false)
 	useEffect(() => {
 		if (!teaser) return
@@ -424,12 +437,10 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 								transparentBg
 								snapBack={teaser && isTouch}
 								inViewport={inView}
-								// Mobile (touch) : le WebScreenLayer débordait du device
-								// visuel (viewport trop contraint pour tenir un CSS3D
-								// stable) — on affiche le placeholder à la place. Le
-								// site continue d'exister en state, on le rebranchera
-								// dès que l'user passe sur desktop.
-								webURL={teaser || webPaused || isTouch ? null : siteEmbed}
+								// Mobile/petit viewport : WebScreenLayer désactivé —
+								// débordait du device visible (CSS3D contraint). Sur
+								// desktop uniquement, l'iframe live est rendue.
+								webURL={teaser || webPaused || webUnavailable ? null : siteEmbed}
 								webInteractive={siteScroll}
 							/>
 						</Suspense>
@@ -568,10 +579,10 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 								aria-label="Put a website on the screen"
 								title="Website"
 								onClick={() => {
-									// Mobile : Coming soon (WebScreenLayer débordait, la
-									// capture image marchait mais UX incomplète — remis
-									// au launch). Desktop : ouvre le panel.
-									if (isTouch) return showComingSoon()
+									// Mobile ou petit viewport : Coming soon (le
+									// WebScreenLayer CSS3D débordait, l'input panel ne
+									// tenait pas). Grand desktop uniquement pour l'instant.
+									if (webUnavailable) return showComingSoon()
 									setAnimOpen(false)
 									setSiteOpen((v) => !v)
 								}}
