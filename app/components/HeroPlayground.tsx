@@ -133,7 +133,13 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 	const [mediaSource, setMediaSource] = useState<'image' | 'video' | 'site' | null>(null)
 	const [siteUrl, setSiteUrl] = useState('')
 	const [siteCapturing, setSiteCapturing] = useState(false)
-	const [animate, setAnimate] = useState(false)
+	// Popup Animation : follow-cursor (vitesse + rotation) et auto-rotate.
+	const [animOpen, setAnimOpen] = useState(false)
+	const [animFollow, setAnimFollow] = useState(false)
+	const [animFollowSpeed, setAnimFollowSpeed] = useState(0.6)
+	const [animFollowRotation, setAnimFollowRotation] = useState(0.6)
+	const [animAutoRotate, setAnimAutoRotate] = useState(false)
+	const animActive = animFollow || animAutoRotate
 	const captureSite = useCallback(async () => {
 		let u = siteUrl.trim()
 		if (!u) return
@@ -300,13 +306,13 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 				// le grab y est verrouillé, le modèle suit la souris page-wide.
 				// Le bouton Animation de la colonne gauche active le
 				// follow-cursor aussi sur le hero.
-				followCursor: (teaser || animate) && !isTouch,
+				followCursor: (teaser || animFollow) && !isTouch,
 				// Teaser : suivi plus vif et plus ample (demande waitlist).
-				followCursorSpeed: teaser ? 0.7 : 0.45,
-				followCursorRotation: teaser ? 0.75 : 0.5,
+				followCursorSpeed: teaser ? 0.7 : animFollowSpeed,
+				followCursorRotation: teaser ? 0.75 : animFollowRotation,
 				followCursorInvert: true,
 				grabMove: true,
-				autoRotate: false,
+				autoRotate: !teaser && animAutoRotate,
 				loopAnimation: true,
 				loopAnimationSensitivity: 0.05,
 				scrollZoom: false,
@@ -320,7 +326,7 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 			},
 		} as unknown as Mockup
 		return {mockup, device: device as Device}
-	}, [device, color, media, teaser, isTouch, animate])
+	}, [device, color, media, teaser, isTouch, animFollow, animFollowSpeed, animFollowRotation, animAutoRotate])
 
 	return (
 		<div ref={viewRef} className="relative w-full h-full flex flex-col">
@@ -575,19 +581,73 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 								</div>
 							)}
 						</div>
-						<button
-							type="button"
-							aria-label="Toggle animation"
-							title="Animation"
-							onClick={() => setAnimate((v) => !v)}
-							className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
-								animate ? 'bg-white text-black' : 'text-white/80 hover:text-white hover:bg-white/10'
-							}`}
-						>
-							<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-								<polygon points="5 3 19 12 5 21 5 3" />
-							</svg>
-						</button>
+						<div className="relative">
+							<button
+								type="button"
+								aria-label="Animation options"
+								title="Animation"
+								onClick={() => setAnimOpen((v) => !v)}
+								className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+									animOpen || animActive ? 'bg-white text-black' : 'text-white/80 hover:text-white hover:bg-white/10'
+								}`}
+							>
+								<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+									<polygon points="5 3 19 12 5 21 5 3" />
+								</svg>
+							</button>
+							{animOpen && (
+								<div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-52 bg-[#1c1c1e]/95 border border-white/[0.1] rounded-xl p-3 flex flex-col gap-2.5">
+									<label className="flex items-center gap-2 text-white/85 text-xs font-medium cursor-pointer select-none">
+										<input
+											type="checkbox"
+											checked={animFollow}
+											onChange={(e) => setAnimFollow(e.target.checked)}
+											className="accent-[#e8702a] w-3.5 h-3.5"
+										/>
+										Follow cursor
+									</label>
+									{animFollow && (
+										<>
+											<div className="flex items-center justify-between text-[11px] text-white/55">
+												<span>Speed</span>
+												<span>{Math.round(animFollowSpeed * 100)}%</span>
+											</div>
+											<input
+												type="range"
+												min={0}
+												max={100}
+												value={Math.round(animFollowSpeed * 100)}
+												onChange={(e) => setAnimFollowSpeed(Number(e.target.value) / 100)}
+												className="w-full accent-[#e8702a] h-1"
+												aria-label="Follow cursor speed"
+											/>
+											<div className="flex items-center justify-between text-[11px] text-white/55">
+												<span>Rotation</span>
+												<span>{Math.round(animFollowRotation * 100)}%</span>
+											</div>
+											<input
+												type="range"
+												min={0}
+												max={100}
+												value={Math.round(animFollowRotation * 100)}
+												onChange={(e) => setAnimFollowRotation(Number(e.target.value) / 100)}
+												className="w-full accent-[#e8702a] h-1"
+												aria-label="Follow cursor rotation"
+											/>
+										</>
+									)}
+									<label className="flex items-center gap-2 text-white/85 text-xs font-medium cursor-pointer select-none border-t border-white/[0.08] pt-2.5">
+										<input
+											type="checkbox"
+											checked={animAutoRotate}
+											onChange={(e) => setAnimAutoRotate(e.target.checked)}
+											className="accent-[#e8702a] w-3.5 h-3.5"
+										/>
+										Auto rotate
+									</label>
+								</div>
+							)}
+						</div>
 					</div>
 				)}
 
