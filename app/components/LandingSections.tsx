@@ -192,8 +192,10 @@ function HermioneEasterEgg() {
  * /public/videos/, la tuile affiche un placeholder avec le nom du
  * fichier attendu — dépose le .mp4 et elle se remplace toute seule.
  */
-function DemoVideo({ src, aspect, hint }: { src: string; aspect: string; hint?: string }) {
-	const [missing, setMissing] = useState(false)
+function DemoVideo({ src, aspect, hint, pending }: { src: string; aspect: string; hint?: string; pending?: boolean }) {
+	// pending = fichier pas encore tourné : placeholder direct, sans
+	// requête réseau (les 404 polluaient la console).
+	const [missing, setMissing] = useState(!!pending)
 	return (
 		<div
 			className="relative rounded-[14px] overflow-hidden bg-[#111] border border-white/[0.06]"
@@ -345,7 +347,7 @@ function ExportFormatsSection() {
 					/>
 					{everInView && (
 						<iframe
-							src="https://framer-3d-mockup-embed.vercel.app/embed/b2e6ee46-51d2-4f31-b781-40453ccafdbb?static=true&bg=transparent&showSignature=false&dpr=1&tier=STANDARD"
+							src="https://framer-3d-mockup-embed.vercel.app/embed/7ef530eb-c9f0-46ae-ac45-f3511efc7091?static=true&bg=transparent&showSignature=false&dpr=1&tier=STANDARD"
 							title="Video 3D mockup — live static scene"
 							className="absolute inset-0 w-full h-full border-0 pointer-events-none"
 						/>
@@ -394,6 +396,7 @@ const STEPS = [
 		n: '1',
 		label: 'Drop',
 		src: '/videos/step-1-drop.mp4',
+		pending: true, // pas encore tournée — aucune requête (404 console)
 		desc: 'Paste any image or video on the canvas. The plugin auto-fits the device screen — portrait, landscape, even Lottie.',
 		hint: 'Screen recording verticale : glisser un screenshot sur le canvas du plugin, auto-fit sur l’écran de l’iPhone.',
 	},
@@ -401,6 +404,7 @@ const STEPS = [
 		n: '2',
 		label: 'Pose',
 		src: '/videos/step-2-pose.mp4',
+		pending: true, // pas encore tournée — aucune requête (404 console)
 		desc: 'Orbit the camera, tilt the device, swap the HDRI, dial the light. Everything previews live in Framer.',
 		hint: 'Screen recording verticale : orbite caméra + changement de couleur + HDRI dans le panneau du plugin.',
 	},
@@ -408,6 +412,7 @@ const STEPS = [
 		n: '3',
 		label: 'Ship',
 		src: '/videos/step-3-ship.mp4',
+		pending: true, // pas encore tournée — aucune requête (404 console)
 		desc: 'Export 4K PNG or video — or paste the code component that renders the live scene on your landing.',
 		hint: 'Screen recording verticale : clic export 4K, puis le composant embed collé sur une page Framer publiée.',
 	},
@@ -417,31 +422,32 @@ const STEPS = [
 // fonctionnalité, titre 16px + description dessous.
 const FEATURES = [
 	{
-		src: '/videos/feature-follow-cursor.mp4',
+		src: 'https://memselon-media.memselon.workers.dev/landing/feature-follow-cursor.mp4',
 		title: 'Follow cursor',
 		desc: 'The device tracks the visitor’s mouse on your published landing. Page-wide, spring-smoothed.',
 		hint: 'Capture 4:3 : le device qui suit la souris sur une landing publiée.',
 	},
 	{
-		src: '/videos/feature-orbit.mp4',
+		src: 'https://memselon-media.memselon.workers.dev/landing/feature-orbit.mp4',
 		title: 'Orbit camera',
 		desc: 'Free or locked orbit with adjustable speed. Pose the exact angle, or let it drift.',
 		hint: 'Capture 4:3 : orbite libre autour de l’iPhone puis orbite auto lente.',
 	},
 	{
-		src: '/videos/feature-float.mp4',
+		src: 'https://memselon-media.memselon.workers.dev/landing/feature-float.mp4',
 		title: 'Float',
 		desc: 'Slow weightless hover — perfect for hero sections that need to breathe.',
 		hint: 'Capture 4:3 : device en lévitation lente sur fond sombre.',
 	},
 	{
 		src: '/videos/feature-live-embed.mp4',
+		pending: true, // pas encore tournée — aucune requête (404 console)
 		title: 'Live 3D embed',
 		desc: 'A Framer code component renders the real scene — interactive — on your published site. No export at all.',
 		hint: 'Capture 4:3 : copier le composant embed, le coller sur un site publié, interagir avec la scène.',
 	},
 	{
-		src: '/videos/feature-video-screens.mp4',
+		src: 'https://memselon-media.memselon.workers.dev/landing/feature-video-screens.mp4',
 		title: 'Video screens',
 		desc: 'Drop an MP4 and the device plays it on screen, looped, synced with your camera motion.',
 		hint: 'Capture 4:3 : une vidéo (le chat samurai) qui joue sur l’écran du device pendant une orbite.',
@@ -646,7 +652,7 @@ export default function LandingSections() {
 								className="reveal-up"
 								style={{ transitionDelay: `${i * 100}ms` }}
 							>
-								<DemoVideo src={s.src} aspect="3/4" hint={s.hint} />
+								<DemoVideo src={s.src} pending={(s as any).pending} aspect="3/4" hint={s.hint} />
 								<div className="mt-4 flex items-baseline gap-2.5">
 									<span className="text-[13px] font-semibold text-[#e8702a]">{s.n}</span>
 									<span className="text-xl font-medium tracking-[-0.01em] text-white">{s.label}</span>
@@ -682,7 +688,7 @@ export default function LandingSections() {
 								className="reveal-up"
 								style={{ transitionDelay: `${(i % 2) * 80}ms` }}
 							>
-								<DemoVideo src={f.src} aspect="4/3" hint={f.hint} />
+								<DemoVideo src={f.src} pending={(f as any).pending} aspect="4/3" hint={f.hint} />
 								<div className="mt-3.5">
 									<div className="text-base font-normal text-white mb-1">{f.title}</div>
 									<div className="text-base text-white/35 leading-[1.45]">{f.desc}</div>

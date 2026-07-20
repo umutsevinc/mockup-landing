@@ -5,6 +5,19 @@ import {OrbitControls, useGLTF, Environment, Html} from '@react-three/drei'
 import {useFrame, createPortal} from '@react-three/fiber'
 import * as THREE from 'three'
 import type {Device, Mockup} from '@/lib/mockup-types'
+
+// three r18x déprécie THREE.Clock, mais @react-three/fiber l'instancie
+// encore en interne (events) — le warning n'est pas actionnable chez
+// nous. Filtré une fois au chargement du module (tous les Canvas de la
+// landing passent par MockupScene).
+if (typeof window !== 'undefined' && !(window as any).__mkClockWarnFiltered) {
+	;(window as any).__mkClockWarnFiltered = true
+	const origWarn = console.warn.bind(console)
+	console.warn = (...args: unknown[]) => {
+		if (typeof args[0] === 'string' && args[0].includes('THREE.Clock: This module has been deprecated')) return
+		origWarn(...args)
+	}
+}
 import {generateWatermarkDataURL} from '@/lib/generateWatermark'
 
 /**
