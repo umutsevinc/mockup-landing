@@ -146,18 +146,39 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 	const [animAutoRotate, setAnimAutoRotate] = useState(false)
 	const animActive = animFollow || animAutoRotate
 	// Embed LIVE (plus de capture photo — demande 20/07) : le site est
-	// une vraie iframe scrollable sur l'écran du device.
+	// une vraie iframe scrollable sur l'écran du device. AVANT d'iframer,
+	// on vérifie côté serveur que le site l'autorise — un refus
+	// X-Frame-Options/CSP n'est pas détectable en JS et laissait un
+	// écran blanc (apple.com, bug 20/07).
 	const captureSite = useCallback(async () => {
 		let u = siteUrl.trim()
 		if (!u) return
 		if (!/^https?:\/\//i.test(u)) u = `https://${u}`
 		setSiteCapturing(true)
-		// Micro-délai pour l'affordance du spinner (l'iframe charge ensuite
-		// en direct sur l'écran).
-		await new Promise((r) => setTimeout(r, 250))
-		setSiteEmbed(u)
-		setMediaSource('site')
-		setSiteCapturing(false)
+		try {
+			const res = await fetch('https://slfsatozvrdsbozzqgcx.supabase.co/functions/v1/capture-website', {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({url: u, check: true}),
+			})
+			const info = res.ok ? await res.json() : {embeddable: true}
+			if (info && info.embeddable === false) {
+				setUploadError('This site blocks embedding — try another URL')
+				setTimeout(() => setUploadError(null), 3600)
+				return
+			}
+			setSiteEmbed(u)
+			setMediaSource('site')
+			// URL validée → on referme le panel (demande 20/07).
+			setSiteOpen(false)
+		} catch {
+			// Vérif injoignable : on tente l'iframe quand même.
+			setSiteEmbed(u)
+			setMediaSource('site')
+			setSiteOpen(false)
+		} finally {
+			setSiteCapturing(false)
+		}
 	}, [siteUrl])
 	// Distingue un CLIC (ouvre le sélecteur de fichier) d'un DRAG
 	// (grab-rotate du modèle) : seuil de 6px entre down et up.
