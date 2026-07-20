@@ -192,12 +192,26 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 
 	// Fade entre les mockups : reset à chaque changement de device, la
 	// mascotte pixel cat couvre le chargement du GLB, puis le modèle
-	// fade-in au signal memselon:scene-ready.
+	// fade-in au signal memselon:scene-ready. Le WebScreenLayer est
+	// SUSPENDU pendant le swap (démontage → placeholder → re-mount une
+	// fois la nouvelle scène prête) : sans ça, un switch avec un site
+	// chargé crashait car l'iframe pointait vers l'ancien screen mesh
+	// démonté (bug 20/07).
+	const [webPaused, setWebPaused] = useState(false)
 	useEffect(() => {
 		setModelReady(false)
-		const onReady = () => setModelReady(true)
+		setWebPaused(true)
+		const onReady = () => {
+			setModelReady(true)
+			// Petit délai pour laisser le nouveau screen mesh se stabiliser
+			// avant de rebrancher l'iframe (matrixWorld, uniforms drei).
+			setTimeout(() => setWebPaused(false), 250)
+		}
 		window.addEventListener('memselon:scene-ready', onReady)
-		const t = setTimeout(() => setModelReady(true), 12000)
+		const t = setTimeout(() => {
+			setModelReady(true)
+			setWebPaused(false)
+		}, 12000)
 		return () => {
 			window.removeEventListener('memselon:scene-ready', onReady)
 			clearTimeout(t)
@@ -377,7 +391,11 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 					style={{opacity: modelReady ? 1 : 0, transition: 'opacity 0.55s ease'}}
 				>
 					<Canvas
-						frameloop={inView ? 'always' : 'never'}
+						// Site chargé → 'always' : sans ça, un resize ou un switch
+						// de device gardait l'ancien matrixWorld et l'iframe se
+						// désalignait (bug 20/07 : iframe fixée à 74×332 au re-
+						// switch iPhone au lieu de recomputer).
+						frameloop={siteEmbed || inView ? 'always' : 'never'}
 						camera={{position: [0, 0, teaser ? 3.35 : 3.1], fov: 20, near: 0.1, far: 1000}}
 						dpr={
 							typeof window !== 'undefined'
@@ -392,9 +410,12 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 						}}
 						style={{
 							background: 'transparent',
-							// Scrollable : la souris traverse le canvas et va au SITE
-							// (l'iframe CSS3D est derrière, pointer-events auto).
-							pointerEvents: siteEmbed && siteScroll ? 'none' : 'auto',
+							// Canvas TOUJOURS auto : le grab-rotate marche même avec
+							// un site chargé (demande 20/07). L'iframe reçoit ses
+							// events seule quand Scrollable est ON — hors iframe le
+							// canvas orbit-drag normalement, y compris au-dessus du
+							// site quand Scrollable est OFF (iframe pointer-events none).
+							pointerEvents: 'auto',
 						}}
 					>
 						<Suspense fallback={null}>
@@ -403,7 +424,12 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 								transparentBg
 								snapBack={teaser && isTouch}
 								inViewport={inView}
-								webURL={teaser ? null : siteEmbed}
+								// Mobile (touch) : le WebScreenLayer débordait du device
+								// visuel (viewport trop contraint pour tenir un CSS3D
+								// stable) — on affiche le placeholder à la place. Le
+								// site continue d'exister en state, on le rebranchera
+								// dès que l'user passe sur desktop.
+								webURL={teaser || webPaused || isTouch ? null : siteEmbed}
 								webInteractive={siteScroll}
 							/>
 						</Suspense>
@@ -535,24 +561,17 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 						</button>
 						</div>
 						<div className="relative">
-							{mediaSource === 'site' && (
-								<button
-									type="button"
-									aria-label="Remove"
-									onClick={(e) => {
-										e.stopPropagation()
-										clearMedia()
-									}}
-									className="absolute -top-1.5 -right-1.5 min-w-[18px] min-h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center z-10"
-								>
-									✕
-								</button>
-							)}
+							{/* Croix rouge retirée 20/07 — Remove link est dans le
+							    panel ci-dessous pour éviter les clics fantômes. */}
 							<button
 								type="button"
 								aria-label="Put a website on the screen"
 								title="Website"
 								onClick={() => {
+									// Mobile : Coming soon (WebScreenLayer débordait, la
+									// capture image marchait mais UX incomplète — remis
+									// au launch). Desktop : ouvre le panel.
+									if (isTouch) return showComingSoon()
 									setAnimOpen(false)
 									setSiteOpen((v) => !v)
 								}}
@@ -615,6 +634,19 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 										/>
 										Scrollable (mouse controls the site)
 									</label>
+									{mediaSource === 'site' && (
+										<button
+											type="button"
+											onClick={() => {
+												clearMedia()
+												setSiteUrl('')
+												setSiteOpen(false)
+											}}
+											className="h-7 px-2.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 text-xs font-medium text-left"
+										>
+											Remove link
+										</button>
+									)}
 								</div>
 							)}
 						</div>

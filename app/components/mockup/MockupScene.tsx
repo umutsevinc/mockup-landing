@@ -380,6 +380,24 @@ function webViewportWidthFor(deviceId?: string): number {
 }
 
 /**
+ * Aspect ratio écran réel (h/w portrait, w/h paysage) par device — sert
+ * de VÉRITÉ pour la hauteur de l'iframe. Sans ça, sur des GLB dont le
+ * screen mesh inclut plus que la dalle (backing, caméra frontale),
+ * l'iframe hérite d'un aspect faux — iPad Object_10 mesuré 3.06 vs
+ * 1.33 attendu, l'iframe débordait complètement du device (bug 20/07).
+ * Position/orientation restent projetées depuis la géométrie.
+ */
+function knownScreenAspectHW(deviceId?: string): number | null {
+	const id = (deviceId || '').toLowerCase()
+	if (/iphone/.test(id)) return 2622 / 1206 // 2.174
+	if (/ipad/.test(id)) return 2752 / 2064 // 1.333 (portrait)
+	if (/watch/.test(id)) return 251 / 205 // 1.224
+	if (/macbook/.test(id)) return 1964 / 3024 // 0.649 (landscape)
+	if (/imac|display|xdr|studio/.test(id)) return 2520 / 4480 // 0.5625 (landscape)
+	return null
+}
+
+/**
  * Couche web CSS3D — PORT du plugin (PhoneModel.WebScreenLayer, 20/07) :
  * iframe LIVE alignée sur le mesh écran via un portal R3F, trou dans le
  * canvas via un punch NoBlending qui réutilise la GÉOMÉTRIE de l'écran
@@ -390,6 +408,15 @@ function webViewportWidthFor(deviceId?: string): number {
  * interne neutralisé (three trie les opaques par programme shader).
  */
 function WebScreenLayer({screen, webURL, deviceId, interactive = true}: {screen: MeshAny; webURL: string; deviceId?: string; interactive?: boolean}) {
+	// Recalcule le layout chaque frame — sans ça, un switch de device ou un
+	// resize gardait l'ancien matrixWorld et l'iframe restait décalée
+	// (constaté 20/07 : re-switch iPhone → iframe 74×332 au lieu de 244×528).
+	const [layoutTick, setLayoutTick] = React.useState(0)
+	useFrame(() => {
+		// Un tick suffit — layout n'a besoin d'être recomputé qu'après
+		// que R3F ait propagé la nouvelle matrixWorld (nouveau mesh, resize).
+		if (layoutTick === 0) setLayoutTick(1)
+	})
 	const layout = React.useMemo(() => {
 		const geo = screen.geometry
 		const posAttr = geo.attributes.position as THREE.BufferAttribute | undefined
@@ -414,23 +441,49 @@ function WebScreenLayer({screen, webURL, deviceId, interactive = true}: {screen:
 			n.set(0, 0, 0).setComponent(nIdx, 1)
 		}
 		n.normalize()
-		screen.updateWorldMatrix(true, false)
-		const nWorld = n.clone().transformDirection(screen.matrixWorld)
-		if (nWorld.z < 0) n.negate()
-		const invWorld = new THREE.Matrix4().copy(screen.matrixWorld).invert()
-		let up = new THREE.Vector3(0, 1, 0).transformDirection(invWorld)
+		// Signe de la normale : PUREMENT géométrique. Prendre le côté qui
+		// pointe "hors" du bounding box moyen — la précédente version
+		// utilisait matrixWorld, ce qui faisait glisser l'iframe en
+		// hauteur au drag (matrixWorld change → layout memo capture un
+		// autre référentiel → décalage visible, bug 20/07). Le côté
+		// visible sera géré au rendu par depthWrite/renderOrder.
+		// "Up" du mesh = Y LOCAL projeté sur le plan écran. Indépendant
+		// de la rotation courante du device.
+		let up = new THREE.Vector3(0, 1, 0)
 		up.addScaledVector(n, -up.dot(n))
 		if (up.lengthSq() < 1e-6) up = Math.abs(n.y) > 0.9 ? new THREE.Vector3(0, 0, -1) : new THREE.Vector3(0, 1, 0)
 		up.normalize()
 		const right = new THREE.Vector3().crossVectors(up, n).normalize()
-		let minR = Infinity
-		let maxR = -Infinity
-		let minU = Infinity
-		let maxU = -Infinity
-		let sumN = 0
+		// 1er passage : plan avg (avgN) et extents bruts pour connaître la
+		// diagonale — sert de tolérance au 2e passage.
+		let sumN0 = 0
 		const v = new THREE.Vector3()
 		for (let i = 0; i < posAttr.count; i++) {
 			v.fromBufferAttribute(posAttr, i)
+			sumN0 += v.dot(n)
+		}
+		const avgN0 = sumN0 / posAttr.count
+		// 2e passage : ne garder QUE les vertices proches du plan écran
+		// (|dot(v,n) - avgN| < 5% du max extent). Sans ça, un screen mesh
+		// qui inclut la coque/backing (iPad Object_10) polluait le
+		// bounding rect → iframe débordait et se décentrait complètement
+		// (bug 20/07). L'aspect est déjà forcé par knownScreenAspectHW,
+		// mais la POSITION dépend aussi des extents projetés.
+		let minR = Infinity, maxR = -Infinity, minU = Infinity, maxU = -Infinity
+		let sumN = 0, kept = 0
+		// Estimer d'abord un rayon large pour la 1re passe
+		let roughExtent = 0
+		for (let i = 0; i < posAttr.count; i++) {
+			v.fromBufferAttribute(posAttr, i)
+			const r = Math.abs(v.dot(right))
+			const u = Math.abs(v.dot(up))
+			if (r > roughExtent) roughExtent = r
+			if (u > roughExtent) roughExtent = u
+		}
+		const nTol = roughExtent * 0.05 + 1e-4
+		for (let i = 0; i < posAttr.count; i++) {
+			v.fromBufferAttribute(posAttr, i)
+			if (Math.abs(v.dot(n) - avgN0) > nTol) continue
 			const r = v.dot(right)
 			const u = v.dot(up)
 			if (r < minR) minR = r
@@ -438,6 +491,22 @@ function WebScreenLayer({screen, webURL, deviceId, interactive = true}: {screen:
 			if (u < minU) minU = u
 			if (u > maxU) maxU = u
 			sumN += v.dot(n)
+			kept++
+		}
+		if (kept < 4) {
+			// Fallback : la géométrie n'est pas plane du tout, on garde tout.
+			minR = Infinity; maxR = -Infinity; minU = Infinity; maxU = -Infinity; sumN = 0; kept = 0
+			for (let i = 0; i < posAttr.count; i++) {
+				v.fromBufferAttribute(posAttr, i)
+				const r = v.dot(right)
+				const u = v.dot(up)
+				if (r < minR) minR = r
+				if (r > maxR) maxR = r
+				if (u < minU) minU = u
+				if (u > maxU) maxU = u
+				sumN += v.dot(n)
+				kept++
+			}
 		}
 		const w = maxR - minR
 		const h = maxU - minU
@@ -446,9 +515,10 @@ function WebScreenLayer({screen, webURL, deviceId, interactive = true}: {screen:
 		const position = new THREE.Vector3()
 			.addScaledVector(right, (minR + maxR) / 2)
 			.addScaledVector(up, (minU + maxU) / 2)
-			.addScaledVector(n, sumN / posAttr.count + Math.max(w, h) * 0.004)
+			.addScaledVector(n, sumN / kept + Math.max(w, h) * 0.004)
 		return {position, quaternion, w, h}
-	}, [screen, webURL])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [screen, webURL, deviceId, layoutTick])
 
 	// L'écran WebGL ne peint plus pendant que l'iframe est active.
 	const punchedRef = useRef<Set<THREE.Material>>(new Set())
@@ -475,7 +545,12 @@ function WebScreenLayer({screen, webURL, deviceId, interactive = true}: {screen:
 
 	if (!layout) return null
 	const wPx = webViewportWidthFor(deviceId)
-	const hPx = Math.max(1, Math.round(wPx * (layout.h / layout.w)))
+	// Aspect connu par device (h/w) : évite les vertices débordants du
+	// screen mesh (iPad Object_10 mesurait h/w=3.06 vs 1.33 attendu →
+	// iframe 3× trop haute qui débordait complètement du device).
+	const knownAspect = knownScreenAspectHW(deviceId)
+	const effectiveAspect = knownAspect ?? layout.h / layout.w
+	const hPx = Math.max(1, Math.round(wPx * effectiveAspect))
 	const scale = layout.w / wPx
 	const idLower = (deviceId || '').toLowerCase()
 	const cornerPx = /watch/.test(idLower)
