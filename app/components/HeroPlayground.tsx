@@ -35,6 +35,12 @@ function MascotLoading({visible}: {visible: boolean}) {
 
 const DEVICES = PLAYGROUND_DEVICES
 
+// Hero uniquement : le mockup reste l'iPhone 17 Pro — les autres pilules
+// renvoient vers la section « The studio » (#live) où tous les devices
+// sont essayables. MacBook Pro + Studio Display + iMac (retiré 20/07)
+// sont repliés derrière « and more… » pour garder la barre courte.
+const HERO_HIDDEN_DEVICES = new Set(['macbookPro', 'appleProDisplayXDR', 'imac', 'appleWatchUltra'])
+
 const DEMO_UPLOAD_FN = 'https://slfsatozvrdsbozzqgcx.supabase.co/functions/v1/demo-upload-url'
 // 5 Mo max (image ET vidéo) — protège le quota Cloudflare R2.
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024
@@ -117,6 +123,48 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 		return () => clearTimeout(t)
 	}, [teaser, teaserMedia])
 	const fileInputRef = useRef<HTMLInputElement>(null)
+	const imageInputRef = useRef<HTMLInputElement>(null)
+	const videoInputRef = useRef<HTMLInputElement>(null)
+	// Colonne d'options gauche (demande 20/07) : Image / Video / Site /
+	// Animation — miroir de la sidebar du plugin.
+	const [siteOpen, setSiteOpen] = useState(false)
+	// Quelle option a posé le média courant (badge croix rouge sur
+	// l'icône correspondante, demande 20/07).
+	const [mediaSource, setMediaSource] = useState<'image' | 'video' | 'site' | null>(null)
+	const [siteUrl, setSiteUrl] = useState('')
+	const [siteCapturing, setSiteCapturing] = useState(false)
+	const [animate, setAnimate] = useState(false)
+	const captureSite = useCallback(async () => {
+		let u = siteUrl.trim()
+		if (!u) return
+		if (!/^https?:\/\//i.test(u)) u = `https://${u}`
+		setSiteCapturing(true)
+		try {
+			const res = await fetch('https://slfsatozvrdsbozzqgcx.supabase.co/functions/v1/capture-website', {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({url: u, width: 390, height: 844}),
+			})
+			if (!res.ok || !(res.headers.get('content-type') || '').includes('image')) throw new Error('capture')
+			const blob = await res.blob()
+			const url = URL.createObjectURL(blob)
+			setMedia((prev) => {
+				if (prev?.url.startsWith('blob:')) {
+					try {
+						URL.revokeObjectURL(prev.url)
+					} catch {}
+				}
+				return {url, type: 'image'}
+			})
+			setMediaSource('site')
+			setSiteOpen(false)
+		} catch {
+			setUploadError('Could not capture this website')
+			setTimeout(() => setUploadError(null), 3200)
+		} finally {
+			setSiteCapturing(false)
+		}
+	}, [siteUrl])
 	// Distingue un CLIC (ouvre le sélecteur de fichier) d'un DRAG
 	// (grab-rotate du modèle) : seuil de 6px entre down et up.
 	const pointerDownRef = useRef<{x: number; y: number} | null>(null)
@@ -213,8 +261,21 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 			}
 			return {url, type: isImage ? 'image' : 'video'}
 		})
+		setMediaSource(isImage ? 'image' : 'video')
 		void uploadDemoFile(file)
 	}, [teaser])
+
+	const clearMedia = useCallback(() => {
+		setMedia((prev) => {
+			if (prev?.url.startsWith('blob:')) {
+				try {
+					URL.revokeObjectURL(prev.url)
+				} catch {}
+			}
+			return null
+		})
+		setMediaSource(null)
+	}, [])
 
 	// Synthetic scene payload — device switch keeps the content; the
 	// color snaps to the new device's default finish (see bottom bar).
@@ -237,7 +298,9 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 			animations: {
 				// Hero : drag (grab-rotate). Waitlist/teaser : follow-cursor —
 				// le grab y est verrouillé, le modèle suit la souris page-wide.
-				followCursor: teaser && !isTouch,
+				// Le bouton Animation de la colonne gauche active le
+				// follow-cursor aussi sur le hero.
+				followCursor: (teaser || animate) && !isTouch,
 				// Teaser : suivi plus vif et plus ample (demande waitlist).
 				followCursorSpeed: teaser ? 0.7 : 0.45,
 				followCursorRotation: teaser ? 0.75 : 0.5,
@@ -257,7 +320,7 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 			},
 		} as unknown as Mockup
 		return {mockup, device: device as Device}
-	}, [device, color, media, teaser, isTouch])
+	}, [device, color, media, teaser, isTouch, animate])
 
 	return (
 		<div ref={viewRef} className="relative w-full h-full flex flex-col">
@@ -372,6 +435,146 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 					</div>
 				)}
 
+				{/* Colonne d'options — gauche (hero uniquement) : Image, Video,
+				    Site (capture serveur), Animation. Même carte sombre que les
+				    swatches ; stopPropagation pour ne pas ouvrir le picker de la
+				    zone parente. */}
+				{!teaser && (
+					<div
+						className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20 bg-[#1c1c1e]/90 backdrop-blur border border-white/[0.08] rounded-2xl p-2.5"
+						role="group"
+						aria-label="Screen content options"
+						onPointerDown={(e) => e.stopPropagation()}
+						onPointerUp={(e) => e.stopPropagation()}
+						onClick={(e) => e.stopPropagation()}
+						onTouchStart={(e) => e.stopPropagation()}
+						onTouchEnd={(e) => e.stopPropagation()}
+					>
+						<div className="relative">
+							{mediaSource === 'image' && (
+								<button
+									type="button"
+									aria-label="Remove"
+									onClick={(e) => {
+										e.stopPropagation()
+										clearMedia()
+									}}
+									className="absolute -top-1.5 -right-1.5 min-w-[18px] min-h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center z-10"
+								>
+									✕
+								</button>
+							)}
+							<button
+							type="button"
+							aria-label="Set an image on the screen"
+							title="Image"
+							onClick={() => imageInputRef.current?.click()}
+							className="w-9 h-9 rounded-xl flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+						>
+							<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+								<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+								<circle cx="8.5" cy="8.5" r="1.5" />
+								<path d="m21 15-5-5L5 21" />
+							</svg>
+						</button>
+						</div>
+						<div className="relative">
+							{mediaSource === 'video' && (
+								<button
+									type="button"
+									aria-label="Remove"
+									onClick={(e) => {
+										e.stopPropagation()
+										clearMedia()
+									}}
+									className="absolute -top-1.5 -right-1.5 min-w-[18px] min-h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center z-10"
+								>
+									✕
+								</button>
+							)}
+							<button
+							type="button"
+							aria-label="Set a video on the screen"
+							title="Video"
+							onClick={() => videoInputRef.current?.click()}
+							className="w-9 h-9 rounded-xl flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+						>
+							<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+								<path d="m22 8-6 4 6 4V8Z" />
+								<rect x="2" y="6" width="14" height="12" rx="2" />
+							</svg>
+						</button>
+						</div>
+						<div className="relative">
+							{mediaSource === 'site' && (
+								<button
+									type="button"
+									aria-label="Remove"
+									onClick={(e) => {
+										e.stopPropagation()
+										clearMedia()
+									}}
+									className="absolute -top-1.5 -right-1.5 min-w-[18px] min-h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center z-10"
+								>
+									✕
+								</button>
+							)}
+							<button
+								type="button"
+								aria-label="Put a website on the screen"
+								title="Website"
+								onClick={() => setSiteOpen((v) => !v)}
+								className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+									siteOpen ? 'bg-white text-black' : 'text-white/80 hover:text-white hover:bg-white/10'
+								}`}
+							>
+								<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+									<circle cx="12" cy="12" r="10" />
+									<path d="M2 12h20" />
+									<path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+								</svg>
+							</button>
+							{siteOpen && (
+								<div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 flex items-center gap-1.5 bg-[#1c1c1e]/95 border border-white/[0.1] rounded-xl p-1.5 whitespace-nowrap">
+									<input
+										type="url"
+										autoFocus
+										placeholder="yoursite.com"
+										value={siteUrl}
+										onChange={(e) => setSiteUrl(e.target.value)}
+										onKeyDown={(e) => {
+											if (e.key === 'Enter') void captureSite()
+											if (e.key === 'Escape') setSiteOpen(false)
+										}}
+										className="w-36 h-8 px-2.5 rounded-lg bg-white/[0.06] border border-white/[0.1] text-white text-xs outline-none placeholder:text-white/30"
+									/>
+									<button
+										type="button"
+										onClick={() => void captureSite()}
+										disabled={siteCapturing}
+										className="h-8 px-3 rounded-lg bg-[#e8702a] text-white text-xs font-medium disabled:opacity-60"
+									>
+										{siteCapturing ? '…' : 'Go'}
+									</button>
+								</div>
+							)}
+						</div>
+						<button
+							type="button"
+							aria-label="Toggle animation"
+							title="Animation"
+							onClick={() => setAnimate((v) => !v)}
+							className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+								animate ? 'bg-white text-black' : 'text-white/80 hover:text-white hover:bg-white/10'
+							}`}
+						>
+							<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+								<polygon points="5 3 19 12 5 21 5 3" />
+							</svg>
+						</button>
+					</div>
+				)}
+
 				{/* Color swatches — right side. stopPropagation partout : la
 				    zone parente ouvre le sélecteur de fichier au clic, les
 				    couleurs ne doivent JAMAIS le déclencher. */}
@@ -429,15 +632,17 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 					role="group"
 					aria-label="Choose a device"
 				>
-					{DEVICES.map((d) => (
+					{DEVICES.filter((d) => !HERO_HIDDEN_DEVICES.has(d.id)).map((d) => (
 						<button
 							key={d.id}
 							type="button"
 							onClick={() => {
 								if (teaser) return showComingSoon()
-								setDeviceId(d.id)
-								// Chaque mockup arrive avec SA finition par défaut.
-								setColor(defaultFinishColor(d.id))
+								// Hero : on ne swappe pas le modèle — les autres devices
+								// s'essaient dans « The studio » (#live) juste en dessous.
+								if (d.id !== deviceId) {
+									document.getElementById('live')?.scrollIntoView({behavior: 'smooth'})
+								}
 							}}
 							aria-pressed={deviceId === d.id}
 							className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
@@ -447,12 +652,35 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 							{d.title}
 						</button>
 					))}
+					{!teaser && (
+						<button
+							type="button"
+							onClick={() => document.getElementById('live')?.scrollIntoView({behavior: 'smooth'})}
+							className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors text-white/70 hover:text-white"
+						>
+							and more…
+						</button>
+					)}
 				</div>
 
 				<input
 					ref={fileInputRef}
 					type="file"
 					accept="image/png,image/jpeg,image/webp,video/mp4,video/webm"
+					className="hidden"
+					onChange={(e) => handleFile(e.target.files?.[0])}
+				/>
+				<input
+					ref={imageInputRef}
+					type="file"
+					accept="image/png,image/jpeg,image/webp"
+					className="hidden"
+					onChange={(e) => handleFile(e.target.files?.[0])}
+				/>
+				<input
+					ref={videoInputRef}
+					type="file"
+					accept="video/mp4,video/webm"
 					className="hidden"
 					onChange={(e) => handleFile(e.target.files?.[0])}
 				/>
