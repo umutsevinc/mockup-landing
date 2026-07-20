@@ -106,7 +106,11 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 		window.addEventListener('resize', update)
 		return () => window.removeEventListener('resize', update)
 	}, [])
-	const webUnavailable = isTouch || isSmallViewport
+	// Website EN COMING SOON PARTOUT (demande 20/07 — l'iframe live était
+	// trop instable au drag/switch de device, mobile encore pire).
+	// L'input URL et l'iframe sont désactivés partout ; le bouton reste
+	// visible et cliquable, affichant simplement Coming soon.
+	const webUnavailable = true
 	const demoVideoReady = useRef(false)
 	useEffect(() => {
 		if (!teaser) return
