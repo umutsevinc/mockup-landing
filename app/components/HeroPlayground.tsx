@@ -552,9 +552,25 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 										type="button"
 										onClick={() => void captureSite()}
 										disabled={siteCapturing}
-										className="h-8 px-3 rounded-lg bg-[#e8702a] text-white text-xs font-medium disabled:opacity-60"
+										className="h-8 px-3 rounded-lg bg-[#e8702a] text-white text-xs font-medium disabled:opacity-60 flex items-center justify-center"
 									>
-										{siteCapturing ? '…' : 'Go'}
+										{siteCapturing ? (
+											<svg
+												width="14"
+												height="14"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="2.5"
+												strokeLinecap="round"
+												className="animate-spin"
+												aria-label="Capturing"
+											>
+												<path d="M21 12a9 9 0 1 1-6.219-8.56" />
+											</svg>
+										) : (
+											'Go'
+										)}
 									</button>
 								</div>
 							)}
