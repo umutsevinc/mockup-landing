@@ -899,7 +899,7 @@ export default function LandingSections() {
 									{ label: 'Devices', href: '#showcase' },
 									{ label: 'Pricing', href: '#pricing' },
 									{ label: 'Docs', href: '#docs' },
-									{ label: 'Live demo', href: '#live' },
+									{ label: 'Studio', href: '#live' },
 								],
 							},
 							{

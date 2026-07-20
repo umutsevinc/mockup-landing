@@ -16,10 +16,10 @@ import LandingSections from './components/LandingSections'
  */
 const NAV_ITEMS = [
 	{ id: 'plugin', label: 'Plugin', href: '#' },
+	{ id: 'live', label: 'Studio', href: '#live' },
 	{ id: 'showcase', label: 'Showcase', href: '#showcase' },
 	{ id: 'pricing', label: 'Pricing', href: '#pricing' },
 	{ id: 'docs', label: 'Docs', href: '#docs' },
-	{ id: 'live', label: 'Live demo', href: '#live' },
 ]
 // Ordre DOM réel des sections (le spy prend la DERNIÈRE passée sous le seuil)
 const SPY_ORDER = ['live', 'showcase', 'pricing', 'docs']
