@@ -885,6 +885,37 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false, inV
 		} catch {}
 	}, [root])
 
+	// Normalisation matériaux au chargement — PARITÉ PLUGIN (PhoneModel) :
+	// 1) combo metal=1+rough=1 (export Sketchfab) = charbon → métal brossé ;
+	// 2) noirs dielectriques quasi-miroir (lèvre d'écran) matifiés pour
+	//    rester SOMBRES sous l'éclairage (lentilles exclues par nom).
+	useEffect(() => {
+		if (!root) return
+		root.traverse((o: any) => {
+			if (!o.isMesh || !o.material) return
+			const meshNameLc = (o.name || '').toLowerCase()
+			const mats = Array.isArray(o.material) ? o.material : [o.material]
+			mats.forEach((m: any) => {
+				if (!m || !m.isMeshStandardMaterial) return
+				if (m.metalness >= 0.95 && m.roughness >= 0.95) {
+					m.metalness = 0.45
+					m.roughness = 0.55
+					m.envMapIntensity = 1.5
+					m.needsUpdate = true
+					return
+				}
+				const isLens = /lens|camera|glass/.test(meshNameLc) || /lens|camera|glass/.test((m.name || '').toLowerCase())
+				const c = m.color
+				const lum = c ? 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b : 1
+				if (!isLens && lum < 0.05 && m.metalness <= 0.2 && m.roughness <= 0.2) {
+					m.roughness = 0.75
+					m.envMapIntensity = 0.25
+					m.needsUpdate = true
+				}
+			})
+		})
+	}, [root])
+
 	// Device colors + finish — exact mirror of PhoneModel.tsx:
 	// body materials grouped by ORIGINAL hex (key of deviceColors),
 	// notch/camera/logo never repainted, finish = metalness/roughness
@@ -971,7 +1002,14 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false, inV
 				}
 			}
 			bodyMats.forEach(seed)
-			const bodyHexes = new Set(bodyMats.map((m) => m.userData.__origHex).filter(Boolean))
+			// Distance RGB (pas égalité stricte) — parité plugin cd27bbd :
+			// bouton latéral / logo = oranges VOISINS mais distincts du rail.
+			const toRgb = (h: string) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]
+			const bodyRgbs = [...new Set(bodyMats.map((m: any) => m.userData.__origHex).filter(Boolean))].map((h) => toRgb(h as string))
+			const nearBody = (hex: string) => {
+				const c = toRgb(hex)
+				return bodyRgbs.some((r) => Math.hypot(r[0] - c[0], r[1] - c[1], r[2] - c[2]) < 90)
+			}
 			const known = new Set(bodyMats)
 			root.traverse((child) => {
 				if (!isMesh(child)) return
@@ -983,7 +1021,7 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false, inV
 					if (!mat || known.has(mat)) return
 					if (mat.type !== 'MeshStandardMaterial' && mat.type !== 'MeshPhysicalMaterial') return
 					seed(mat)
-					if (mat.userData.__origHex && bodyHexes.has(mat.userData.__origHex)) {
+					if (mat.userData.__origHex && nearBody(mat.userData.__origHex)) {
 						bodyMats.push(mat)
 						known.add(mat)
 					}
@@ -1021,11 +1059,13 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false, inV
 			if (!hex) return true
 			const c = new THREE.Color(hex)
 			const lum = 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b
-			if (lum <= 0.09) return false
+			const mx = Math.max(c.r, c.g, c.b)
+			const mn = Math.min(c.r, c.g, c.b)
+			const sat = mx === 0 ? 0 : (mx - mn) / mx
+			// Sombre ET neutre = notch/joint/verre → jamais peint. Sombre
+			// mais SATURÉ (dos vert foncé iMac M1) = zone légitime.
+			if (lum <= 0.09 && sat < 0.35) return false
 			if (!mat.userData.__strictBody) {
-				const mx = Math.max(c.r, c.g, c.b)
-				const mn = Math.min(c.r, c.g, c.b)
-				const sat = mx === 0 ? 0 : (mx - mn) / mx
 				// Désaturé ET petit → pièce neutre (cerclage caméra, vis) :
 				// ne suit pas la coque. Désaturé mais GRAND (panneau dos
 				// gris) → suit la coque comme chez Apple.
@@ -1043,7 +1083,17 @@ export function MockupScene({payload, transparentBg, pose, snapBack = false, inV
 		}
 		const hasGroupColors = deviceColors && Object.keys(deviceColors).length > 0
 		groups.forEach((mats, hex) => {
-			const target = hasGroupColors ? deviceColors![hex] : deviceColor
+			// Zones d'origine quasi noire (rim écran, notch) : jamais
+			// repeintes implicitement — parité plugin 7df8528.
+			const lumG =
+				0.2126 * parseInt(hex.slice(1, 3), 16) +
+				0.7152 * parseInt(hex.slice(3, 5), 16) +
+				0.0722 * parseInt(hex.slice(5, 7), 16)
+			const isDarkOrigin = lumG < 40
+			const explicitRaw = hasGroupColors ? deviceColors![hex] : undefined
+			const explicit =
+				explicitRaw && isDarkOrigin && explicitRaw === deviceColor ? undefined : explicitRaw
+			const target = explicit ?? (isDarkOrigin ? '' : hasGroupColors ? deviceColor : deviceColor)
 			const c = new THREE.Color(target || hex)
 			for (const mat of mats) {
 				// Logo & co : la FORME vient de la texture (alpha/émissive) —
