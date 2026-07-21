@@ -138,7 +138,7 @@ function VignetteLibraries() {
 					</div>
 				</div>
 			))}
-			<div className="text-center text-[10px] text-white/35">Storage used: 2.1 GB / 25 GB</div>
+			<div className="text-center text-[10px] text-white/35">Storage used: 6.4 GB / 10 GB</div>
 		</div>
 	)
 }
@@ -214,7 +214,7 @@ const FEATURES = [
 	{
 		icon: Layers,
 		title: 'Two libraries, one storage',
-		body: '3D scenes and video scenes live in separate libraries with edit, re-insert and delete. Deleting a scene frees the real bytes — up to 25 GB of cloud storage on Studio.',
+		body: '3D scenes and video scenes live in separate libraries with edit, re-insert and delete. Deleting a scene frees the real bytes — up to 10 GB of cloud storage on Orbit.',
 		Vignette: VignetteLibraries,
 	},
 	{

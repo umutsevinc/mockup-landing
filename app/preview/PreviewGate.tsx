@@ -1,42 +1,36 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import HomePage from '../page'
+import {useState} from 'react'
 
-// Gate d'accès à la preview de la landing (lock pré-lancement).
-// Volontairement côté client : le but est d'écarter les curieux tombés
-// sur l'URL, pas de protéger un secret. Le code est mémorisé en
-// localStorage pour ne pas le retaper.
-const PREVIEW_CODE = 'MOCKUP3D'
-const LS_KEY = 'fm3d-preview-ok'
-
+// Formulaire d'accès à la preview. La validation est SERVEUR
+// (POST /preview/login compare à PREVIEW_PASSWORD) : le mot de passe
+// n'existe nulle part dans ce bundle. En cas de succès, un cookie
+// httpOnly est posé et on recharge — le serveur rend alors la landing.
 export default function PreviewGate() {
-	const [unlocked, setUnlocked] = useState(false)
-	const [ready, setReady] = useState(false)
 	const [code, setCode] = useState('')
 	const [shake, setShake] = useState(false)
+	const [busy, setBusy] = useState(false)
 
-	useEffect(() => {
-		try {
-			if (window.localStorage.getItem(LS_KEY) === '1') setUnlocked(true)
-		} catch {}
-		setReady(true)
-	}, [])
-
-	if (!ready) return <div className="min-h-screen bg-black" />
-	if (unlocked) return <HomePage />
-
-	const submit = (e: React.FormEvent) => {
+	const submit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		if (code.trim().toUpperCase() === PREVIEW_CODE) {
-			try {
-				window.localStorage.setItem(LS_KEY, '1')
-			} catch {}
-			setUnlocked(true)
-		} else {
-			setShake(true)
-			setTimeout(() => setShake(false), 500)
-		}
+		if (busy) return
+		setBusy(true)
+		try {
+			const res = await fetch('/preview/login', {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({password: code}),
+			})
+			if (res.ok) {
+				// Cookie posé → le serveur rendra HomePage au reload.
+				window.location.reload()
+				return
+			}
+		} catch {}
+		setBusy(false)
+		setCode('')
+		setShake(true)
+		setTimeout(() => setShake(false), 500)
 	}
 
 	return (
@@ -54,7 +48,7 @@ export default function PreviewGate() {
 			<form
 				onSubmit={submit}
 				className="flex items-center gap-3"
-				style={shake ? { animation: 'pgShake 0.4s ease' } : undefined}
+				style={shake ? {animation: 'pgShake 0.4s ease'} : undefined}
 			>
 				<input
 					type="password"
@@ -62,13 +56,15 @@ export default function PreviewGate() {
 					onChange={(e) => setCode(e.target.value)}
 					placeholder="Access code"
 					autoFocus
-					className="bg-white/[0.06] border border-white/15 rounded-full px-6 py-3.5 text-base outline-none focus:border-white/40 w-[220px] text-center tracking-widest placeholder:tracking-normal"
+					disabled={busy}
+					className="bg-white/[0.06] border border-white/15 rounded-full px-6 py-3.5 text-base outline-none focus:border-white/40 w-[220px] text-center tracking-widest placeholder:tracking-normal disabled:opacity-50"
 				/>
 				<button
 					type="submit"
-					className="bg-white text-black font-semibold rounded-full px-6 py-3.5 text-sm hover:scale-[1.03] transition-transform"
+					disabled={busy}
+					className="bg-white text-black font-semibold rounded-full px-6 py-3.5 text-sm hover:scale-[1.03] transition-transform disabled:opacity-60"
 				>
-					Enter
+					{busy ? '…' : 'Enter'}
 				</button>
 			</form>
 			<p className="text-white/30 text-xs">Private preview — launching soon.</p>
