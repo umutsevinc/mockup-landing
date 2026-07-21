@@ -77,8 +77,8 @@ export const PLAYGROUND_DEVICES: PlaygroundDevice[] = [
 		title: 'Apple Watch Ultra',
 		model_url: '/3d/appleWatchUltra.glb',
 		default_scale: 0.4,
-		// Origine du GLB décalée vers le bas — remonté dans le frame.
-		y_offset: 0.28,
+		// GLB (boîtier + bracelet) recentré plus bas dans le frame.
+		y_offset: 0.08,
 		screen_mesh_name: 'wmnqxNpNCdRfDfA',
 		screen_material_name: 'UlFjqascpPnJnyb',
 		screen_parent_name: 'JHqGJTYdBJjLpDK',
@@ -107,6 +107,9 @@ export const PLAYGROUND_DEVICES: PlaygroundDevice[] = [
 		title: 'MacBook Pro 14"',
 		model_url: '/3d/macbookPro.glb',
 		default_scale: 2.5,
+		// Origine du GLB au-dessus du centre visuel → le laptop flottait
+		// trop haut dans le frame. On le redescend pour le recentrer.
+		y_offset: -0.28,
 		screen_mesh_name: 'tfTbkkzhxqpKRgC',
 		screen_material_name: 'HlQwFCAPWzetDQy',
 		screen_parent_name: 'JySHOmMobJSAPQv',

@@ -104,7 +104,7 @@ export default function CloserLook() {
 		const isImage = file.type.startsWith('image/')
 		const isVideo = file.type.startsWith('video/')
 		if (!isImage && !isVideo) return
-		if (file.size > 10 * 1024 * 1024) return
+		if (file.size > 20 * 1024 * 1024) return
 		setMedia({url: URL.createObjectURL(file), type: isImage ? 'image' : 'video'})
 	}, [])
 
@@ -252,7 +252,7 @@ export default function CloserLook() {
 								onClick={() => fileRef.current?.click()}
 								className="mt-4 w-full border border-dashed border-white/25 hover:border-white/60 rounded-xl py-3 text-xs text-white/70 hover:text-white transition-colors"
 							>
-								Click to load an image or video (10 MB max)
+								Click to load an image or video (20 MB max)
 							</button>
 							<div className="mt-4">
 								<label className="text-xs text-white/55">Screen exposure</label>

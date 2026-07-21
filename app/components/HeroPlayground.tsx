@@ -41,9 +41,19 @@ const DEVICES = PLAYGROUND_DEVICES
 // sont repliés derrière « and more… » pour garder la barre courte.
 const HERO_HIDDEN_DEVICES = new Set(['macbookPro', 'appleProDisplayXDR', 'imac', 'appleWatchUltra'])
 
+// Tooltips au survol des boutons d'option (Image / Video / Website /
+// Animation) : les icônes seules ne disent pas ce qu'elles font. Un
+// libellé glisse à droite du bouton au hover — « pour comprendre ».
+// OPT_TIP : à droite (colonne d'options du hero, collée à gauche).
+// OPT_TIP_BELOW : sous le bouton (toggle waitlist, collé en haut).
+const OPT_TIP =
+	'pointer-events-none absolute left-full top-1/2 -translate-y-1/2 -translate-x-1 ml-3 z-40 whitespace-nowrap rounded-lg bg-black/90 border border-white/[0.1] px-2.5 py-1.5 text-[11px] font-medium text-white shadow-lg opacity-0 transition-all duration-150 group-hover:opacity-100 group-hover:translate-x-0'
+const OPT_TIP_BELOW =
+	'pointer-events-none absolute top-full left-1/2 -translate-x-1/2 translate-y-1 mt-2 z-40 whitespace-nowrap rounded-lg bg-black/90 border border-white/[0.1] px-2.5 py-1.5 text-[11px] font-medium text-white shadow-lg opacity-0 transition-all duration-150 group-hover:opacity-100 group-hover:translate-y-0'
+
 const DEMO_UPLOAD_FN = 'https://slfsatozvrdsbozzqgcx.supabase.co/functions/v1/demo-upload-url'
-// 5 Mo max (image ET vidéo) — protège le quota Cloudflare R2.
-const MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+// 20 Mo max (image ET vidéo) — protège le quota Cloudflare R2.
+const MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 
 type DroppedMedia = {url: string; type: 'image' | 'video'} | null
 
@@ -294,7 +304,7 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 			return
 		}
 		if (file.size > MAX_UPLOAD_BYTES) {
-			setUploadError('Max upload 10 MB — compress your file and retry')
+			setUploadError('Max upload 20 MB — compress your file and retry')
 			setTimeout(() => setUploadError(null), 3200)
 			return
 		}
@@ -481,11 +491,14 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 								type="button"
 								onClick={() => setTeaserMedia(m)}
 								aria-pressed={teaserMedia === m}
-								className={`px-4 py-1.5 rounded-full text-xs font-medium capitalize transition-colors ${
+								className={`group relative px-4 py-1.5 rounded-full text-xs font-medium capitalize transition-colors ${
 									teaserMedia === m ? 'bg-white text-black' : 'text-white/70 hover:text-white'
 								}`}
 							>
 								{m === 'image' ? 'Image' : 'Video'}
+								<span className={OPT_TIP_BELOW}>
+									{m === 'image' ? 'A screenshot on the screen' : 'A video on the screen'}
+								</span>
 							</button>
 						))}
 					</div>
@@ -537,15 +550,15 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 							<button
 							type="button"
 							aria-label="Set an image on the screen"
-							title="Image"
 							onClick={() => imageInputRef.current?.click()}
-							className="w-9 h-9 rounded-xl flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+							className="group relative w-9 h-9 rounded-xl flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors"
 						>
 							<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 								<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
 								<circle cx="8.5" cy="8.5" r="1.5" />
 								<path d="m21 15-5-5L5 21" />
 							</svg>
+							<span className={OPT_TIP}>Your screenshot, on the screen</span>
 						</button>
 						</div>
 						<div className="relative">
@@ -565,14 +578,14 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 							<button
 							type="button"
 							aria-label="Set a video on the screen"
-							title="Video"
 							onClick={() => videoInputRef.current?.click()}
-							className="w-9 h-9 rounded-xl flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+							className="group relative w-9 h-9 rounded-xl flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors"
 						>
 							<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 								<path d="m22 8-6 4 6 4V8Z" />
 								<rect x="2" y="6" width="14" height="12" rx="2" />
 							</svg>
+							<span className={OPT_TIP}>Your video, playing on the screen</span>
 						</button>
 						</div>
 						<div className="relative">
@@ -581,7 +594,6 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 							<button
 								type="button"
 								aria-label="Put a website on the screen"
-								title="Website"
 								onClick={() => {
 									// Mobile ou petit viewport : Coming soon (le
 									// WebScreenLayer CSS3D débordait, l'input panel ne
@@ -590,7 +602,7 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 									setAnimOpen(false)
 									setSiteOpen((v) => !v)
 								}}
-								className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+								className={`group relative w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
 									siteOpen ? 'bg-white text-black' : 'text-white/80 hover:text-white hover:bg-white/10'
 								}`}
 							>
@@ -599,6 +611,11 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 									<path d="M2 12h20" />
 									<path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
 								</svg>
+								{!siteOpen && (
+									<span className={OPT_TIP}>
+										{webUnavailable ? 'A live website on screen — coming soon' : 'A live website, right on the screen'}
+									</span>
+								)}
 							</button>
 							{siteOpen && (
 								<div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 flex flex-col gap-2 bg-[#1c1c1e]/95 border border-white/[0.1] rounded-xl p-2 whitespace-nowrap">
@@ -669,18 +686,20 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 							<button
 								type="button"
 								aria-label="Animation options"
-								title="Animation"
 								onClick={() => {
 									setSiteOpen(false)
 									setAnimOpen((v) => !v)
 								}}
-								className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+								className={`group relative w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
 									animOpen || animActive ? 'bg-white text-black' : 'text-white/80 hover:text-white hover:bg-white/10'
 								}`}
 							>
 								<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 									<polygon points="5 3 19 12 5 21 5 3" />
 								</svg>
+								{!animOpen && (
+									<span className={OPT_TIP}>Make it follow the cursor or spin</span>
+								)}
 							</button>
 							{animOpen && (
 								<div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-52 bg-[#1c1c1e]/95 border border-white/[0.1] rounded-xl p-3 flex flex-col gap-2.5">

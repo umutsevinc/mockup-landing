@@ -26,7 +26,7 @@ export default function DeviceMockupViewer({deviceId}: {deviceId: string}) {
 		const isImage = file.type.startsWith('image/')
 		const isVideo = file.type.startsWith('video/')
 		if (!isImage && !isVideo) return
-		if (file.size > 10 * 1024 * 1024) return
+		if (file.size > 20 * 1024 * 1024) return
 		setMedia({url: URL.createObjectURL(file), type: isImage ? 'image' : 'video'})
 	}, [])
 
