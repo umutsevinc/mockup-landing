@@ -915,6 +915,7 @@ export default function LandingSections() {
 									{ label: 'Guides', href: '/guides' },
 									{ label: 'Changelog', href: '/changelog' },
 									{ label: 'Compare', href: '/compare' },
+									{ label: 'Featured on', href: '/featured' },
 								],
 							},
 							{
