@@ -33,7 +33,7 @@ const FEATURES: Feature[] = [
 	},
 	{
 		name: 'Launch Llama',
-		href: 'https://tools.launchllama.co?utm_source=badge&utm_medium=referral',
+		href: 'https://tools.launchllama.co/products/mockiosa',
 		img: 'https://tools.launchllama.co/featured-badge-white.png?v=2',
 		width: 200,
 		height: 50,
