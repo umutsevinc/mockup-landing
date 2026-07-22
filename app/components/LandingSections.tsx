@@ -196,8 +196,25 @@ function DemoVideo({ src, aspect, hint, pending }: { src: string; aspect: string
 	// pending = fichier pas encore tourné : placeholder direct, sans
 	// requête réseau (les 404 polluaient la console).
 	const [missing, setMissing] = useState(!!pending)
+	// Lazy mount (audit perf 22/07) : les vidéos features chargeaient
+	// unconditionnellement ~6 MB au premier paint. On ne monte le
+	// <video> qu'à l'approche du viewport (300 px de marge), et on
+	// démonte quand la tuile sort — le browser libère les bytes.
+	const [inView, setInView] = useState(false)
+	const holderRef = useRef<HTMLDivElement | null>(null)
+	useEffect(() => {
+		const el = holderRef.current
+		if (!el || missing) return
+		const obs = new IntersectionObserver(
+			([entry]) => setInView(entry.isIntersecting),
+			{rootMargin: '300px'},
+		)
+		obs.observe(el)
+		return () => obs.disconnect()
+	}, [missing])
 	return (
 		<div
+			ref={holderRef}
 			className="relative rounded-[14px] overflow-hidden bg-[#111] border border-white/[0.06]"
 			style={{ aspectRatio: aspect }}
 		>
@@ -207,17 +224,18 @@ function DemoVideo({ src, aspect, hint, pending }: { src: string; aspect: string
 					<div className="text-xs font-mono text-[#e8702a]">{src}</div>
 					{hint ? <div className="text-[11px] text-white/30 leading-relaxed max-w-[260px]">{hint}</div> : null}
 				</div>
-			) : (
+			) : inView ? (
 				<video
 					src={src}
 					autoPlay
 					muted
 					loop
 					playsInline
+					preload="metadata"
 					onError={() => setMissing(true)}
 					className="absolute inset-0 w-full h-full object-cover"
 				/>
-			)}
+			) : null}
 		</div>
 	)
 }
