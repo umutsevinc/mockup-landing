@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import { Menu } from 'lucide-react'
 import LandingSections from './components/LandingSections'
+import ProductHuntBanner from './components/ProductHuntBanner'
 
 /**
  * Pill central de la nav — le highlight blanc GLISSE d'un onglet à
@@ -182,6 +183,9 @@ export default function HomePage() {
 
 			{/* ───── All sections below the hero ───── */}
 			<LandingSections />
+
+			{/* Lancement Product Hunt — carte dismissible en bas à droite */}
+			<ProductHuntBanner />
 		</div>
 	)
 }

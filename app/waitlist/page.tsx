@@ -5,6 +5,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import {ArrowRight, Check} from 'lucide-react'
 import {supabase} from '@/lib/supabase'
+import ProductHuntBanner from '../components/ProductHuntBanner'
 
 const HeroPlayground = dynamic(() => import('../components/HeroPlayground'), {
 	ssr: false,
@@ -125,6 +126,9 @@ export default function WaitlistPage() {
 					</div>
 				</div>
 			</section>
+
+			{/* Lancement Product Hunt — carte dismissible en bas à droite */}
+			<ProductHuntBanner />
 		</div>
 	)
 }
