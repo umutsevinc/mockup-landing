@@ -7,6 +7,7 @@ import { motion } from 'motion/react'
 import { Menu } from 'lucide-react'
 import LandingSections from './components/LandingSections'
 import ProductHuntBanner from './components/ProductHuntBanner'
+import PhNavBadge from './components/PhNavBadge'
 
 /**
  * Pill central de la nav — le highlight blanc GLISSE d'un onglet à
@@ -103,15 +104,18 @@ export default function HomePage() {
 				{/* Center pill — desktop only, highlight animé (spring) */}
 				<NavCenter />
 
-				<Link
-					href="/sign-up"
-					className="cta-skeu-light hidden md:block text-gray-900 text-sm font-semibold px-6 py-2.5 rounded-full transition-all hover:scale-[1.03]"
-				>
-					Sign Up
-				</Link>
-				<button type="button" aria-label="Open menu" className="md:hidden p-2 text-white">
-					<Menu size={22} strokeWidth={1.75} />
-				</button>
+				<div className="flex items-center gap-3">
+					<PhNavBadge />
+					<Link
+						href="/sign-up"
+						className="cta-skeu-light hidden md:block text-gray-900 text-sm font-semibold px-6 py-2.5 rounded-full transition-all hover:scale-[1.03]"
+					>
+						Sign Up
+					</Link>
+					<button type="button" aria-label="Open menu" className="md:hidden p-2 text-white">
+						<Menu size={22} strokeWidth={1.75} />
+					</button>
+				</div>
 			</nav>
 
 			{/* ───── Hero section ───── */}
@@ -120,7 +124,7 @@ export default function HomePage() {
 				style={{ minHeight: '100dvh' }}
 				aria-label="Interactive 3D mockup demo"
 			>
-				<div className="relative z-10 max-w-[1560px] mx-auto grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-6 lg:gap-0 items-center px-6 md:px-16 pt-28 lg:pt-20 pb-8 min-h-[100dvh]">
+				<div className="relative z-10 max-w-[1560px] mx-auto grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-6 lg:gap-0 items-center px-6 md:px-16 pt-28 lg:pt-12 pb-28 lg:pb-8 min-h-[100dvh]">
 					{/* Left: title + pitch + CTA */}
 					<div className="flex flex-col items-start gap-6 max-w-xl">
 						{/* Badge version → changelog (pattern Dropshot : montre que le produit vit) */}

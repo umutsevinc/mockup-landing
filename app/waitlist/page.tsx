@@ -63,7 +63,7 @@ export default function WaitlistPage() {
 			</nav>
 
 			<section className="relative w-full overflow-hidden" style={{minHeight: '100dvh'}} aria-label="Join the waiting list">
-				<div className="relative z-10 max-w-[1560px] mx-auto grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-14 lg:gap-0 items-center px-6 md:px-16 pt-28 lg:pt-20 pb-8 min-h-[100dvh]">
+				<div className="relative z-10 max-w-[1560px] mx-auto grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-14 lg:gap-0 items-center px-6 md:px-16 pt-28 lg:pt-20 pb-44 lg:pb-8 min-h-[100dvh]">
 					{/* Gauche : pitch + GROS input email */}
 					<div className="flex flex-col items-start gap-7 max-w-xl">
 						<h1 className="leading-[0.98]">
