@@ -66,6 +66,16 @@ export default function WaitlistPage() {
 				<div className="relative z-10 max-w-[1560px] mx-auto grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-14 lg:gap-0 items-center px-6 md:px-16 pt-28 lg:pt-20 pb-44 lg:pb-8 min-h-[100dvh]">
 					{/* Gauche : pitch + GROS input email */}
 					<div className="flex flex-col items-start gap-7 max-w-xl">
+						{/* Pill « Featured on » — même style que le badge version de la
+						    landing, pointe vers /featured (annuaires de lancement). */}
+						<Link
+							href="/featured"
+							className="inline-flex items-center gap-2 rounded-full bg-white/[0.04] border border-white/[0.1] px-4 py-2 text-[13px] text-white/80 hover:bg-white/[0.09] transition-colors"
+						>
+							<span className="font-mono text-[11px] tracking-[0.06em] uppercase text-[#e8702a]">Live</span>
+							Featured on Product Hunt &amp; Launch Llama
+							<span className="text-white/45">→</span>
+						</Link>
 						<h1 className="leading-[0.98]">
 							<span className="block font-semibold text-4xl sm:text-6xl lg:text-7xl tracking-[-0.045em]">
 								Real 3D mockups,
