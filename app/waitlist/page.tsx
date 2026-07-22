@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic'
 import {ArrowRight, Check} from 'lucide-react'
 import {supabase} from '@/lib/supabase'
 import ProductHuntBanner from '../components/ProductHuntBanner'
+import PhNavBadge from '../components/PhNavBadge'
 
 const HeroPlayground = dynamic(() => import('../components/HeroPlayground'), {
 	ssr: false,
@@ -58,6 +59,7 @@ export default function WaitlistPage() {
 					</svg>
 					<span className="text-white text-2xl font-playfair italic">Mockiosa</span>
 				</Link>
+				<PhNavBadge />
 			</nav>
 
 			<section className="relative w-full overflow-hidden" style={{minHeight: '100dvh'}} aria-label="Join the waiting list">
@@ -72,9 +74,10 @@ export default function WaitlistPage() {
 								live in Framer.
 							</span>
 						</h1>
-						<p className="text-base sm:text-lg text-white/70 leading-relaxed max-w-md">
-							Drop a screenshot or a video on a real 3D Apple device, orbit it, recolor it, and
-							publish it live on your Framer site. Launching soon — be first in.
+						<p className="text-base sm:text-lg text-white/70 leading-relaxed max-w-lg">
+							Drop a screenshot or a video onto 7+ real 3D Apple devices — iPhone, iPad, Mac, Watch.
+							Orbit it, recolor it, then publish it live in Framer <span className="text-white/90 font-medium">or export in 4K</span> for
+							App Store screenshots, social posts and ads. Launching soon — be first in.
 						</p>
 
 						{state === 'done' ? (
