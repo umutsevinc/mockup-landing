@@ -39,6 +39,14 @@ const FEATURES: Feature[] = [
 		height: 50,
 		alt: 'As seen on Launch Llama Newsletter',
 	},
+	{
+		name: 'Fazier',
+		href: 'https://fazier.com/launches/mockiosa.memselon.com',
+		img: 'https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=dark',
+		width: 120,
+		height: 50,
+		alt: 'Mockiosa — Launched on Fazier',
+	},
 ]
 
 export default function FeaturedPage() {
