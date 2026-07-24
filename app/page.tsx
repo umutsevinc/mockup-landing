@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import { Menu } from 'lucide-react'
 import LandingSections from './components/LandingSections'
+import MerveTutorial from './components/MerveTutorial'
 import ProductHuntBanner from './components/ProductHuntBanner'
 import PhNavBadge from './components/PhNavBadge'
 
@@ -105,7 +106,6 @@ export default function HomePage() {
 				<NavCenter />
 
 				<div className="flex items-center gap-3">
-					<PhNavBadge />
 					<Link
 						href="/sign-up"
 						className="cta-skeu-light hidden md:block text-gray-900 text-sm font-semibold px-6 py-2.5 rounded-full transition-all hover:scale-[1.03]"
@@ -185,11 +185,19 @@ export default function HomePage() {
 				</div>
 			</section>
 
+			{/* ───── Merve tutorial — juste après le hero ───── */}
+			<MerveTutorial />
+
 			{/* ───── All sections below the hero ───── */}
 			<LandingSections />
 
 			{/* Lancement Product Hunt — carte dismissible en bas à droite */}
 			<ProductHuntBanner />
+
+			{/* PH official badge floating bottom-right (au-dessus de la banner) */}
+			<div className="fixed bottom-4 right-4 z-[130] hidden sm:block">
+				<PhNavBadge />
+			</div>
 		</div>
 	)
 }

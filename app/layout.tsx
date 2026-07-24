@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import './globals.css'
 
@@ -107,18 +108,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 					type="application/ld+json"
 					dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
 				/>
+			</head>
+			<body>
 				{/* Trafic interne : /?internal=1 pose un flag localStorage qui
 				    désactive GA sur CE navigateur pour toujours (plus fiable
 				    qu'un filtre IP avec une IP résidentielle qui tourne).
-				    localhost est toujours exclu. Doit s'exécuter AVANT gtag,
-				    donc dans le head. */}
-				<script
-					dangerouslySetInnerHTML={{
-						__html: `(function(){try{var id='${process.env.NEXT_PUBLIC_GA_ID ?? 'G-ZQ6Y1NWK9Y'}';if(new URLSearchParams(location.search).get('internal')==='1'){localStorage.setItem('memselon-internal','1');}if(localStorage.getItem('memselon-internal')==='1'||location.hostname==='localhost'){window['ga-disable-'+id]=true;}}catch(e){}})();`,
-					}}
-				/>
-			</head>
-			<body>{children}</body>
+				    localhost est toujours exclu. Doit s'exécuter AVANT gtag —
+				    next/script beforeInteractive garantit l'ordre sans faire
+				    râler React 19 ("script tag inside component"). */}
+				<Script
+					id="internal-traffic-flag"
+					strategy="beforeInteractive"
+				>
+					{`(function(){try{var id='${process.env.NEXT_PUBLIC_GA_ID ?? 'G-ZQ6Y1NWK9Y'}';if(new URLSearchParams(location.search).get('internal')==='1'){localStorage.setItem('memselon-internal','1');}if(localStorage.getItem('memselon-internal')==='1'||location.hostname==='localhost'){window['ga-disable-'+id]=true;}}catch(e){}})();`}
+				</Script>
+				{children}
+			</body>
 			{/* GA4 — flux dédié "Mockiosa" (propriété séparée de memselon.com).
 			    Surchargable via NEXT_PUBLIC_GA_ID dans les env Vercel. */}
 			<GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID ?? 'G-ZQ6Y1NWK9Y'} />
