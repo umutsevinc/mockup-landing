@@ -822,7 +822,11 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 					role="group"
 					aria-label="Choose a device"
 				>
-					{DEVICES.filter((d) => !HERO_HIDDEN_DEVICES.has(d.id)).map((d) => (
+					{/* Tous les devices dans la pill (mobile-scrollable via
+					    overflow-x-auto). Fix 25/07 : plus de HERO_HIDDEN_DEVICES —
+					    au launch tous les 7 devices sont disponibles, autant qu'ils
+					    soient tous accessibles dans la pill. */}
+					{DEVICES.map((d) => (
 						<button
 							key={d.id}
 							type="button"
