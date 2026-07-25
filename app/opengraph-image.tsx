@@ -13,11 +13,13 @@ export const contentType = "image/png";
  * posé sur le fond noir à droite, plein bord en bas. Pas de box.
  */
 export default async function Image() {
-  const [iphone, interBold] = await Promise.all([
+  const [iphone, interBold, featherSvg] = await Promise.all([
     readFile(join(process.cwd(), "app/og-iphone.png")),
     readFile(join(process.cwd(), "app/Inter-Bold.woff")),
+    readFile(join(process.cwd(), "public/feather-pen-white.svg")),
   ]);
   const iphoneSrc = `data:image/png;base64,${iphone.toString("base64")}`;
+  const featherSrc = `data:image/svg+xml;base64,${featherSvg.toString("base64")}`;
 
   return new ImageResponse(
     (
@@ -45,22 +47,10 @@ export default async function Image() {
             width: 600,
           }}
         >
-          {/* Lockup Mockiosa — plume + wordmark, comme le header du site */}
+          {/* Lockup Mockiosa — nouveau feather-pen (SVG blanc) + wordmark */}
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 40 }}>
-            <svg
-              width="36"
-              height="36"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#FFFFFF"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" />
-              <path d="M16 8 2 22" />
-              <path d="M17.5 15H9" />
-            </svg>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={featherSrc} alt="" width={36} height={36} />
             <div style={{ display: "flex", fontSize: 32, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
               Mockiosa
             </div>
