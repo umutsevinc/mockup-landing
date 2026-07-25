@@ -49,9 +49,9 @@ export const CHANGELOG: ChangelogEntry[] = [
 		story: [
 			'The device picker used to be a grid of renders we shot ourselves — serviceable, but every card had its own lighting, its own crop, its own idea of where the device sat. The library now uses the official catalog artwork for every Apple device, trimmed to the pixel so each device anchors to the same corner of its card.',
 			{
-				video: '/changelog/1.4-device-cards.mp4',
+				video: 'https://memselon-media.memselon.workers.dev/marketing/videos/FullDevice.mp4',
 				aspect: '16/10',
-				caption: 'The device library — official artwork, white full-height cards, devices anchored bottom-right.',
+				caption: 'Every device, real 3D — the full library in motion.',
 			},
 			'The iMac M1 GLB also got recentered: its origin is now the screen center, so orbit and float animations pivot around the display instead of the stand.',
 		],
