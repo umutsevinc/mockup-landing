@@ -264,8 +264,9 @@ function DeviceCarousel() {
 						data-card
 						className="snap-start relative flex-shrink-0 w-[290px] sm:w-[340px] h-[440px] rounded-3xl overflow-hidden bg-white border border-white/[0.07] transition-transform hover:scale-[1.01]"
 					>
-						{/* Images rognées au contenu (plus de marges blanches intégrées) :
-						    pleine largeur de carte, ratio préservé, collées au bord bas. */}
+						{/* Images collées au bord bas, hauteur cappée pour laisser
+						    respirer le texte en haut (fix overlap 25/07). object-contain
+						    garantit qu'aucune photo n'est étirée. */}
 						{d.img ? (
 							<Image
 								src={d.img}
@@ -273,7 +274,8 @@ function DeviceCarousel() {
 								width={800}
 								height={800}
 								quality={95}
-								className="absolute bottom-0 left-0 w-full h-auto"
+								className="absolute bottom-0 left-0 w-full object-contain object-bottom"
+								style={{maxHeight: '68%', height: 'auto'}}
 								sizes="(max-width: 640px) 290px, 340px"
 							/>
 						) : (
@@ -396,8 +398,8 @@ function ExportFormatsSection() {
 // Miroir EXACT du catalogue du plugin (table Supabase `devices`, 17/07) :
 // 7 devices. Photos = cartes officielles (device-models/<id>/card.jpg).
 const DEVICES = [
-	{ name: 'iPhone 17 Pro',    img: '/cards/iphone17pro-apple.webp' },
-	{ name: 'iPhone Air',       img: '/cards/iphoneAir-apple.webp' },
+	{ name: 'iPhone 17 Pro',    img: '/cards/iphone17pro-apple.png' },
+	{ name: 'iPhone Air',       img: '/cards/iphoneAir-apple.png' },
 	{ name: 'iPad Pro',         img: '/cards/ipadPro-apple.webp' },
 	{ name: 'MacBook Pro 14"',  img: '/cards/macbookPro-apple.webp' },
 	{ name: 'iMac',             img: '/cards/imac-apple.webp' },
