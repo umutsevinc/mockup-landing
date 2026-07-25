@@ -894,12 +894,15 @@ export default function LandingSections() {
 				<div className="max-w-[1560px] mx-auto grid grid-cols-1 md:grid-cols-[1fr_auto] gap-12">
 					<div>
 						<div className="flex items-center gap-2 mb-3">
-							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" /><path d="M16 8 2 22" /><path d="M17.5 15H9" />
-							</svg>
+							{/* eslint-disable-next-line @next/next/no-img-element */}
+							<img src="/feather-pen-white.svg" alt="" width="20" height="20" aria-hidden="true" />
 							<span className="font-playfair text-xl">Mockiosa</span>
 						</div>
 						<p className="text-xs text-white/45 max-w-xs leading-relaxed">
-							Real-time 3D mockups for Framer. Crafted by a human, one cloud at a time ☁
+							Build with 🫰 by{' '}
+							<a href="https://x.com/memselon" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white underline underline-offset-2 decoration-white/20 hover:decoration-white transition-colors">Memselon</a>
+							{' & '}
+							<a href="https://x.com/meiiyve" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white underline underline-offset-2 decoration-white/20 hover:decoration-white transition-colors">May</a>
 						</p>
 					</div>
 
