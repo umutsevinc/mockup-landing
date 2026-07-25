@@ -38,12 +38,12 @@ export const metadata: Metadata = {
 	},
 	icons: {
 		// L'icône officielle Mockiosa (carte noire arrondie + plume) partout.
-		// ?v=7 : cache-bust — les navigateurs gardent les favicons très longtemps.
+		// ?v=8 : cache-bust — les navigateurs gardent les favicons très longtemps.
 		icon: [
-			{url: '/icon.svg?v=7', type: 'image/svg+xml'},
-			{url: '/brand-icon-512.png?v=7', type: 'image/png', sizes: '512x512'},
+			{url: '/icon.svg?v=8', type: 'image/svg+xml'},
+			{url: '/brand-icon-512.png?v=8', type: 'image/png', sizes: '512x512'},
 		],
-		apple: [{url: '/apple-icon.png?v=7', type: 'image/png', sizes: '180x180'}],
+		apple: [{url: '/apple-icon.png?v=8', type: 'image/png', sizes: '180x180'}],
 	},
 }
 
