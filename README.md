@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<p align="center">
+  <img src=".github/banner.jpg" alt="Mockiosa — Real-time 3D Mockups for Framer" width="100%">
+</p>
 
-## Getting Started
+<p align="center">
+  <img src=".github/logo-white.jpg" alt="Mockiosa" width="120">
+</p>
 
-First, run the development server:
+<h1 align="center">Mockiosa — Landing</h1>
+
+<p align="center">
+  Public marketing site for <strong>Mockiosa</strong>, the real-time 3D mockup studio for Framer.
+  <br>
+  Live at <a href="https://mockiosa.memselon.com">mockiosa.memselon.com</a>.
+</p>
+
+<p align="center">
+  <a href="https://mockiosa.memselon.com">Website</a> ·
+  <a href="https://www.framer.com/marketplace/plugins/mockiosa">Framer Marketplace</a> ·
+  <a href="https://x.com/memselon">@memselon</a> ·
+  <a href="https://x.com/meiiyve">@meiiyve</a>
+</p>
+
+---
+
+## Stack
+
+- **Next.js 16** (App Router, RSC, Turbopack)
+- **React Three Fiber** for the hero + `/#live` playground
+- **Tailwind + custom CSS tokens** for the design system
+- **Vercel** for hosting (auto-deploy on push to `main`)
+- **Cloudflare R2** for GLBs, HDRIs, marketing videos (via `memselon-media` Worker)
+
+## Dev
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+app/
+  page.tsx            — Home hero + landing sections (locked behind /waitlist until launch)
+  waitlist/           — Pre-launch waitlist page
+  mockups/[slug]/     — Per-device SEO pages (iphone-air, macbook-pro, …)
+  compare/[slug]/     — vs. Rotato / Smartmockups / Previewed / …
+  guides/[slug]/      — Deep-dive articles
+  changelog/          — Release timeline
+  opengraph-image.tsx — Auto-generated OG card (iPhone Cosmic Orange + wordmark)
+components/
+  HeroPlayground.tsx  — Interactive 3D playground (client-only R3F)
+  MerveTutorial.tsx   — Video tutorial section (VLC-lite custom controls)
+```
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+Pushed automatically to Vercel `mockup-landing` on push to `main`. Preview deploys generated for every branch.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+<p align="center">
+  Built with 🫰 by <a href="https://x.com/memselon">Memselon</a> & <a href="https://x.com/meiiyve">May</a>
+</p>
