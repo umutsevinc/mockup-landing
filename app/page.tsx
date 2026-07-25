@@ -98,7 +98,7 @@ export default function HomePage() {
 			<nav className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 sm:p-5 max-sm:bg-gradient-to-b max-sm:from-black max-sm:via-black/80 max-sm:to-transparent max-sm:pb-24 pointer-events-none [&>*]:pointer-events-auto">
 				<Link href="/" className="flex items-center gap-2">
 					{/* eslint-disable-next-line @next/next/no-img-element */}
-					<img src="/feather-pen-white.svg?v=7" alt="" width="26" height="26" aria-hidden="true" />
+					<img src="/feather-pen-white.svg?v=7" alt="Mockiosa" width="26" height="26" aria-hidden="true" />
 					<span className="text-white text-2xl font-playfair italic">Mockiosa</span>
 				</Link>
 
@@ -112,9 +112,13 @@ export default function HomePage() {
 					>
 						Sign Up
 					</Link>
-					<button type="button" aria-label="Open menu" className="md:hidden p-2 text-white">
-						<Menu size={22} strokeWidth={1.75} />
-					</button>
+					<Link
+						href="/sign-up"
+						aria-label="Sign up"
+						className="md:hidden cta-skeu-light text-gray-900 text-xs font-semibold px-3 py-2 rounded-full transition-all active:scale-95"
+					>
+						Try it free
+					</Link>
 				</div>
 			</nav>
 

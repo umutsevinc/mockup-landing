@@ -8,7 +8,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
   return [
     { url: `${base}/`,        lastModified, changeFrequency: "weekly",  priority: 1 },
-    { url: `${base}/waitlist`, lastModified, changeFrequency: "weekly",  priority: 0.9 },
+    // Post-launch : waitlist devient page de transition (0.3), pas prioritaire.
+    { url: `${base}/waitlist`, lastModified, changeFrequency: "monthly", priority: 0.3 },
     { url: `${base}/changelog`, lastModified, changeFrequency: "weekly", priority: 0.7 },
     { url: `${base}/compare`, lastModified, changeFrequency: "monthly", priority: 0.7 },
     ...COMPARE_ENTRIES.map((e) => ({

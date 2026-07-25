@@ -42,7 +42,7 @@ export default function PreviewGate() {
 			/>
 			<div className="flex items-center gap-3">
 				{/* eslint-disable-next-line @next/next/no-img-element */}
-		<img src="/feather-pen-white.svg?v=7" alt="" width="30" height="32" aria-hidden="true" />
+		<img src="/feather-pen-white.svg?v=7" alt="Mockiosa" width="30" height="32" aria-hidden="true" />
 				<span className="text-2xl font-playfair">Mockiosa</span>
 			</div>
 			<form

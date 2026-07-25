@@ -15,7 +15,7 @@ export default function ComparePage() {
 			<nav className="flex items-center justify-between px-6 md:px-16 py-5 max-w-[1100px] mx-auto">
 				<Link href="/" className="flex items-center gap-2">
 					{/* eslint-disable-next-line @next/next/no-img-element */}
-		<img src="/feather-pen-white.svg?v=7" alt="" width="20" height="20" aria-hidden="true" />
+		<img src="/feather-pen-white.svg?v=7" alt="Mockiosa" width="20" height="20" aria-hidden="true" />
 					<span className="font-playfair text-lg">Mockiosa</span>
 				</Link>
 				<Link

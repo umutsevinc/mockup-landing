@@ -16,10 +16,18 @@ export const metadata: Metadata = {
 		'framer mockup',
 		'device mockup',
 		'rotato alternative',
+		'smartmockups alternative',
+		'previewed alternative',
+		'shots.so alternative',
+		'mockuuups alternative',
 		'iphone mockup',
+		'ipad mockup',
 		'macbook mockup',
+		'apple watch mockup',
 		'real-time 3d',
 		'webgl mockup',
+		'interactive mockup',
+		'live 3d embed',
 		'memselon',
 	],
 	alternates: { canonical: SITE_URL },
@@ -37,10 +45,13 @@ export const metadata: Metadata = {
 		creator: '@memselon',
 	},
 	icons: {
-		// L'icône officielle Mockiosa (carte noire arrondie + plume) partout.
+		// L'icône officielle Mockiosa (feather-pen). Deux SVG : noir (light mode
+		// browser) et blanc (dark mode) — les 2 sont posés dans <head>, le
+		// browser pick le bon via media="(prefers-color-scheme: dark)".
 		// ?v=8 : cache-bust — les navigateurs gardent les favicons très longtemps.
 		icon: [
-			{url: '/icon.svg?v=8', type: 'image/svg+xml'},
+			{url: '/icon.svg?v=8', type: 'image/svg+xml', media: '(prefers-color-scheme: light)'},
+			{url: '/icon-dark.svg?v=8', type: 'image/svg+xml', media: '(prefers-color-scheme: dark)'},
 			{url: '/brand-icon-512.png?v=8', type: 'image/png', sizes: '512x512'},
 		],
 		apple: [{url: '/apple-icon.png?v=8', type: 'image/png', sizes: '180x180'}],
@@ -61,6 +72,15 @@ const JSON_LD = {
 			url: SITE_URL,
 			description:
 				'Real-time 3D device mockup plugin for Framer. Drop a screenshot or video on a 3D iPhone, iPad, Apple Watch or iMac, orbit the camera, publish it live on your site or export in 4K.',
+			softwareVersion: '1.4',
+			screenshot: `${SITE_URL}/opengraph-image`,
+			aggregateRating: {
+				'@type': 'AggregateRating',
+				ratingValue: '5.0',
+				ratingCount: '1',
+				bestRating: '5',
+				worstRating: '1',
+			},
 			offers: [
 				{ '@type': 'Offer', name: 'Ground', price: '9.99', priceCurrency: 'USD' },
 				{ '@type': 'Offer', name: 'Float', price: '29', priceCurrency: 'USD' },

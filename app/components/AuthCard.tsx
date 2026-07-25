@@ -28,7 +28,7 @@ export function AuthCard({
 			<nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 sm:p-5">
 				<Link href="/" className="flex items-center gap-2.5">
 					{/* eslint-disable-next-line @next/next/no-img-element */}
-		<img src="/feather-pen-white.svg?v=7" alt="" width="22" height="24" aria-hidden="true" />
+		<img src="/feather-pen-white.svg?v=7" alt="Mockiosa" width="22" height="24" aria-hidden="true" />
 					{/* Logo — TOUJOURS font-playfair (poids 650), jamais une autre graisse. */}
 					<span className="text-lg font-playfair">Mockiosa</span>
 				</Link>

@@ -173,7 +173,7 @@ function HermioneEasterEgg() {
 								className="absolute top-0 left-0 opacity-0 will-change-transform"
 							>
 								{/* eslint-disable-next-line @next/next/no-img-element */}
-								<img src="/feather-pen-white.svg" alt="" width={f.size} height={f.size} aria-hidden="true" style={{display: 'block'}} />
+								<img src="/feather-pen-white.svg" alt="Mockiosa" width={f.size} height={f.size} aria-hidden="true" style={{display: 'block'}} />
 							</span>
 						))}
 					</div>,
@@ -353,10 +353,12 @@ function ExportFormatsSection() {
 				{/* Device massif qui déborde sur le bord gauche : MP4 pré-rendu
 				    (2932×3840) hébergé sur R2, remplace l'iframe embed pour
 				    perf max sur la landing (pas de WebGL, pas de 3D à mount). */}
+				{/* Mobile : hauteur naturelle, collée au bord gauche viewport
+				    (calc(100vw) au lieu de calc(100%+220px) qui laissait une
+				    zone noire). Desktop : conserve le débord de -220px. */}
 				<div
 					ref={mediaRef}
-					className="relative h-[520px] sm:h-[720px] lg:h-[820px] overflow-visible -ml-16 sm:-ml-24 md:-ml-32 lg:-ml-[220px]"
-					style={{ width: 'calc(100% + 220px)' }}
+					className="relative h-[360px] sm:h-[500px] lg:h-[720px] overflow-visible w-screen -ml-6 sm:-ml-8 md:-ml-16 lg:-ml-[220px] lg:w-[calc(100%+220px)]"
 				>
 					{everInView && (
 						<video
@@ -367,7 +369,7 @@ function ExportFormatsSection() {
 							playsInline
 							preload="metadata"
 							onLoadedData={(e) => e.currentTarget.classList.add('is-loaded')}
-							className="absolute inset-0 w-full h-full object-contain pointer-events-none opacity-0 transition-opacity duration-700 ease-out [&.is-loaded]:opacity-100"
+							className="absolute inset-0 w-full h-full object-contain object-left pointer-events-none opacity-0 transition-opacity duration-700 ease-out [&.is-loaded]:opacity-100"
 						/>
 					)}
 				</div>
@@ -381,8 +383,8 @@ function ExportFormatsSection() {
 					</div>
 					<div>
 						<div className="text-sm text-white/60 mb-1">Video export</div>
-						<div className="text-4xl font-medium text-[#e8702a] tracking-tight">4K&nbsp;60s</div>
-						<div className="text-sm text-white/60 mt-1">transparent WebM, rendered offline in your browser</div>
+						<div className="text-4xl font-medium text-[#e8702a] tracking-tight">MP4 4K</div>
+						<div className="text-sm text-white/60 mt-1">high-res H.264, editable background color, rendered offline in your browser</div>
 					</div>
 					<div>
 						<div className="text-sm text-white/60 mb-1">Or skip exports entirely</div>
@@ -897,7 +899,7 @@ export default function LandingSections() {
 					<div>
 						<div className="flex items-center gap-2 mb-3">
 							{/* eslint-disable-next-line @next/next/no-img-element */}
-							<img src="/feather-pen-white.svg" alt="" width="20" height="20" aria-hidden="true" />
+							<img src="/feather-pen-white.svg" alt="Mockiosa" width="20" height="20" aria-hidden="true" />
 							<span className="font-playfair text-xl">Mockiosa</span>
 						</div>
 						<p className="text-xs text-white/45 max-w-xs leading-relaxed">
