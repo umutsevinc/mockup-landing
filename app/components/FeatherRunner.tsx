@@ -29,20 +29,17 @@ export function FeatherFloat({size = 34, color = '#ffffff'}: {size?: number; col
 			`}</style>
 
 			<div style={{width: size, height: size, animation: 'mockiosa-feather-levitate 1.8s ease-in-out infinite'}}>
-				<svg
-					width={size}
-					height={size}
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke={color}
-					strokeWidth="2"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				>
-					<path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" />
-					<path d="M16 8 2 22" />
-					<path d="M17.5 15H9" />
-				</svg>
+				{/* Nouveau feather-pen : couleur pilotée via CSS mask
+				    (l'<img> ne peut pas être tinté, mask oui). */}
+				<div
+					style={{
+						width: size,
+						height: size,
+						background: color,
+						WebkitMask: 'url(/feather-pen.svg) center/contain no-repeat',
+						mask: 'url(/feather-pen.svg) center/contain no-repeat',
+					}}
+				/>
 			</div>
 
 			{/* Ombre au sol — se contracte quand la plume monte. */}
