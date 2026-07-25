@@ -172,11 +172,8 @@ function HermioneEasterEgg() {
 								}}
 								className="absolute top-0 left-0 opacity-0 will-change-transform"
 							>
-								<svg width={f.size} height={f.size} viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-									<path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" />
-									<path d="M16 8 2 22" />
-									<path d="M17.5 15H9" />
-								</svg>
+								{/* eslint-disable-next-line @next/next/no-img-element */}
+								<img src="/feather-pen-white.svg" alt="" width={f.size} height={f.size} aria-hidden="true" style={{display: 'block'}} />
 							</span>
 						))}
 					</div>,

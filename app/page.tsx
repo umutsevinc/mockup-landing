@@ -97,8 +97,8 @@ export default function HomePage() {
 			{/* ───── Nav (fixed, over hero) ───── */}
 			<nav className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 sm:p-5 max-sm:bg-gradient-to-b max-sm:from-black max-sm:via-black/80 max-sm:to-transparent max-sm:pb-24 pointer-events-none [&>*]:pointer-events-auto">
 				<Link href="/" className="flex items-center gap-2">
-					<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" /><path d="M16 8 2 22" /><path d="M17.5 15H9" />
-					</svg>
+					{/* eslint-disable-next-line @next/next/no-img-element */}
+					<img src="/feather-pen-white.svg?v=7" alt="" width="26" height="26" aria-hidden="true" />
 					<span className="text-white text-2xl font-playfair italic">Mockiosa</span>
 				</Link>
 
