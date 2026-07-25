@@ -899,7 +899,7 @@ export default function LandingSections() {
 							<span className="font-playfair text-xl">Mockiosa</span>
 						</div>
 						<p className="text-xs text-white/45 max-w-xs leading-relaxed">
-							Built with 🤌 by{' '}
+							Build with 🫰 by{' '}
 							<a href="https://x.com/memselon" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white underline underline-offset-2 decoration-white/20 hover:decoration-white transition-colors">Memselon</a>
 							{' & '}
 							<a href="https://x.com/meiiyve" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white underline underline-offset-2 decoration-white/20 hover:decoration-white transition-colors">May</a>
