@@ -48,13 +48,13 @@ export const metadata: Metadata = {
 		// L'icône officielle Mockiosa (feather-pen). Deux SVG : noir (light mode
 		// browser) et blanc (dark mode) — les 2 sont posés dans <head>, le
 		// browser pick le bon via media="(prefers-color-scheme: dark)".
-		// ?v=8 : cache-bust — les navigateurs gardent les favicons très longtemps.
+		// ?v=9 : cache-bust — les navigateurs gardent les favicons très longtemps.
 		icon: [
-			{url: '/icon.svg?v=8', type: 'image/svg+xml', media: '(prefers-color-scheme: light)'},
-			{url: '/icon-dark.svg?v=8', type: 'image/svg+xml', media: '(prefers-color-scheme: dark)'},
-			{url: '/brand-icon-512.png?v=8', type: 'image/png', sizes: '512x512'},
+			{url: '/icon.svg?v=9', type: 'image/svg+xml', media: '(prefers-color-scheme: light)'},
+			{url: '/icon-dark.svg?v=9', type: 'image/svg+xml', media: '(prefers-color-scheme: dark)'},
+			{url: '/brand-icon-512.png?v=9', type: 'image/png', sizes: '512x512'},
 		],
-		apple: [{url: '/apple-icon.png?v=8', type: 'image/png', sizes: '180x180'}],
+		apple: [{url: '/apple-icon.png?v=9', type: 'image/png', sizes: '180x180'}],
 	},
 }
 
