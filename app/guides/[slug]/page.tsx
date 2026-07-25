@@ -16,6 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 		description: guide.seoDescription,
 		alternates: { canonical: `https://mockiosa.memselon.com/guides/${guide.slug}` },
 		openGraph: {
+			images: ['/opengraph-image'],
 			title: guide.seoTitle,
 			description: guide.seoDescription,
 			url: `https://mockiosa.memselon.com/guides/${guide.slug}`,
