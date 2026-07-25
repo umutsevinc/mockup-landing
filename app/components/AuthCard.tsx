@@ -27,8 +27,8 @@ export function AuthCard({
 			{/* ── header ── */}
 			<nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 sm:p-5">
 				<Link href="/" className="flex items-center gap-2.5">
-					<svg width="22" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" /><path d="M16 8 2 22" /><path d="M17.5 15H9" />
-					</svg>
+					{/* eslint-disable-next-line @next/next/no-img-element */}
+		<img src="/feather-pen-white.svg?v=7" alt="" width="22" height="24" aria-hidden="true" />
 					{/* Logo — TOUJOURS font-playfair (poids 650), jamais une autre graisse. */}
 					<span className="text-lg font-playfair">Mockiosa</span>
 				</Link>

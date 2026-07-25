@@ -13,7 +13,7 @@ export default function TermsPage() {
       <nav style={{ position: "sticky", top: 0, zIndex: 50, backdropFilter: "blur(20px) saturate(150%)", background: "rgba(5,5,9,0.7)", borderBottom: "1px solid var(--border-subtle)" }}>
         <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56, padding: "0 24px" }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <Image src="/logo/white.png" alt="Mockiosa" width={22} height={22} style={{ borderRadius: 6 }} />
+            <Image src="/feather-pen-white.svg?v=7" alt="Mockiosa" width={22} height={22} style={{ borderRadius: 6 }} />
             <span className="font-playfair" style={{ fontSize: 14, color: "var(--text-primary)" }}>Mockiosa</span>
           </Link>
           <Link href="/" style={{ fontSize: 13, color: "var(--text-secondary)", textDecoration: "none" }}>← Back to home</Link>

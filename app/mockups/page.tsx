@@ -14,7 +14,8 @@ export default function MockupsHubPage() {
 		<div className="min-h-screen bg-[#0a0a0a] text-white">
 			<nav className="flex items-center justify-between px-6 md:px-16 py-5 max-w-[1100px] mx-auto">
 				<Link href="/" className="flex items-center gap-2">
-					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" /><path d="M16 8 2 22" /><path d="M17.5 15H9" /></svg>
+					{/* eslint-disable-next-line @next/next/no-img-element */}
+		<img src="/feather-pen-white.svg?v=7" alt="" width="20" height="20" aria-hidden="true" />
 					<span className="font-playfair text-lg">Mockiosa</span>
 				</Link>
 				<Link

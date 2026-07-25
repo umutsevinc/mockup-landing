@@ -55,8 +55,8 @@ export default function FeaturedPage() {
 			{/* Header minimal */}
 			<header className="max-w-[1560px] mx-auto px-6 md:px-16 py-6 flex items-center justify-between">
 				<Link href="/" className="flex items-center gap-2">
-					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" /><path d="M16 8 2 22" /><path d="M17.5 15H9" />
-					</svg>
+					{/* eslint-disable-next-line @next/next/no-img-element */}
+		<img src="/feather-pen-white.svg?v=7" alt="" width="24" height="24" aria-hidden="true" />
 					<span className="text-xl font-playfair">Mockiosa</span>
 				</Link>
 				<Link href="/" className="text-sm text-white/55 hover:text-white transition-colors">
