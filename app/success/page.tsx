@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import {useEffect, useState} from 'react'
 import {supabase} from '@/lib/supabase'
 import {AuthCard} from '@/app/components/AuthCard'
@@ -66,12 +65,12 @@ export default function SuccessPage() {
 				>
 					Open Mockiosa in Framer →
 				</a>
-				<Link
-					href="/#pricing"
+				<a
+					href="https://mockiosa.memselon.com/#pricing"
 					className="text-white/60 hover:text-white text-sm font-medium text-center py-2 underline underline-offset-4 decoration-white/20 hover:decoration-white transition-colors"
 				>
 					See pricing plans
-				</Link>
+				</a>
 			</div>
 
 			{/* Tips en dessous — anti-friction pour les premiers users */}
