@@ -67,7 +67,7 @@ export default function SuccessPage() {
 					Open Mockiosa in Framer →
 				</a>
 				<Link
-					href="/pricing"
+					href="/#pricing"
 					className="text-white/60 hover:text-white text-sm font-medium text-center py-2 underline underline-offset-4 decoration-white/20 hover:decoration-white transition-colors"
 				>
 					See pricing plans
