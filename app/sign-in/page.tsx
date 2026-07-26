@@ -31,7 +31,10 @@ export default function SignInPage() {
 			setError(err.message)
 			return
 		}
-		router.push('/')
+		// /success = page post-auth qui dit "retourne dans Framer pour
+		// utiliser le plugin". La home est ouverte mais le CTA post-auth
+		// doit pousser l'user vers le plugin, pas vers le hero marketing.
+		router.push('/success')
 		router.refresh()
 	}
 

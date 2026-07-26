@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { AuthCard, AuthInput, AuthButton, AuthError } from '@/app/components/AuthCard'
 
 export default function SignUpPage() {
+	const router = useRouter()
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 	const [confirm, setConfirm] = useState('')
@@ -29,16 +31,36 @@ export default function SignUpPage() {
 			return
 		}
 		setLoading(true)
-		const { error: err } = await supabase.auth.signUp({
+		const { data, error: err } = await supabase.auth.signUp({
 			email,
 			password,
 			options: {
-				emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/sign-in?confirmed=1` : undefined,
+				// Après clic sur le lien de confirmation email : la page
+				// /success accueille avec « return to Framer » (au lieu
+				// d'un sign-in vide qui perdrait l'user).
+				emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/success` : undefined,
 			},
 		})
 		setLoading(false)
 		if (err) {
-			setError(err.message)
+			// Erreurs Supabase les plus fréquentes traduites :
+			//  - "Password should be at least X characters" → validé côté client
+			//  - "Password has been leaked" → Pwned Password Protection activée
+			//  - "User already registered" → collision email
+			if (/leaked|pwned|compromised/i.test(err.message)) {
+				setError('This password appears in known breach lists. Please choose another.')
+			} else if (/already registered/i.test(err.message)) {
+				setError('An account already exists with this email — try signing in.')
+			} else {
+				setError(err.message)
+			}
+			return
+		}
+		// Comportement Supabase selon la config projet :
+		//  - Confirm email ON  → data.session === null → afficher "Check your inbox"
+		//  - Confirm email OFF → data.session !== null → user déjà loggué → /success
+		if (data.session) {
+			router.push('/success')
 			return
 		}
 		setSent(true)

@@ -19,9 +19,11 @@ const nextConfig: NextConfig = {
       // "/free" — promis dans le Launch Kit (PH comment, FAQ annuaires) :
       // le goût gratuit = les mockups 3D interactifs des pages SEO.
       { source: "/free", destination: "/mockups", permanent: false },
-      // LOCK temporaire : la landing n'est pas prête pour le public — tout
-      // le trafic root part sur la waiting list. À retirer au lancement.
-      { source: "/", destination: "/waitlist", permanent: false },
+      // Launch 26/07/2026 : la home est ouverte au public. Tout le trafic
+      // /waitlist (bookmarks, backlinks des annuaires) redirect vers `/`
+      // pour que les visiteurs atterrissent sur le hero live 3D.
+      { source: "/waitlist", destination: "/", permanent: true },
+      { source: "/waitlist/:path*", destination: "/", permanent: true },
     ];
   },
 };
