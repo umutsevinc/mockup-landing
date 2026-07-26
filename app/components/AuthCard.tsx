@@ -1,7 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import type { ReactNode } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 
 /**
  * Auth layout « SaaS login » : formulaire à gauche, démo vidéo du
@@ -24,19 +26,14 @@ export function AuthCard({
 }) {
 	return (
 		<div className="min-h-screen bg-black text-white flex flex-col tracking-[-0.02em]">
-			{/* ── header ── */}
+			{/* ── header ── (fix 26/07 : back button déplacé sous le form
+			    pour laisser le logo respirer et se rapprocher des CTA) */}
 			<nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 sm:p-5">
 				<Link href="/" className="flex items-center gap-2.5">
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 		<img src="/feather-pen-white.svg?v=7" alt="Mockiosa" width="22" height="24" aria-hidden="true" />
 					{/* Logo — TOUJOURS font-playfair (poids 650), jamais une autre graisse. */}
 					<span className="text-lg font-playfair">Mockiosa</span>
-				</Link>
-				<Link
-					href="/"
-					className="text-sm text-white/50 hover:text-white transition-colors"
-				>
-					← Back to site
 				</Link>
 			</nav>
 
@@ -53,6 +50,16 @@ export function AuthCard({
 						)}
 						{children}
 						{footer ? <div className="mt-6 text-center">{footer}</div> : null}
+						{/* Back button déplacé ici (26/07) — plus proche du form, sur
+						    mobile il tombait hors de vue avec la nav top. */}
+						<div className="mt-6 text-center">
+							<Link
+								href="/"
+								className="text-xs text-white/40 hover:text-white/70 transition-colors"
+							>
+								← Back to site
+							</Link>
+						</div>
 					</div>
 
 					{/* footer */}
@@ -90,17 +97,37 @@ export function AuthCard({
 }
 
 export function AuthInput(props: React.InputHTMLAttributes<HTMLInputElement> & { label?: string }) {
-	const { label, ...inputProps } = props
+	const { label, type, ...inputProps } = props
+	// Password reveal (fix 26/07) : quand type="password", on affiche un
+	// petit bouton eye / eye-off à droite pour toggle password ↔ text.
+	// Comportement standard, aucun impact sur les autres types.
+	const isPassword = type === 'password'
+	const [revealed, setRevealed] = useState(false)
+	const effectiveType = isPassword ? (revealed ? 'text' : 'password') : type
 	return (
 		<div className="mb-4">
 			{label ? (
 				<label className="block text-[13px] font-medium text-white/55 mb-2">{label}</label>
 			) : null}
-			<input
-				{...inputProps}
-				className="w-full px-4 py-3.5 rounded-[14px] bg-white/[0.06] border border-white/15 text-[15px] text-white placeholder:text-white/30 outline-none focus:border-white/40 transition-colors"
-				style={inputProps.style}
-			/>
+			<div className="relative">
+				<input
+					{...inputProps}
+					type={effectiveType}
+					className={`w-full px-4 ${isPassword ? 'pr-11' : ''} py-3.5 rounded-[14px] bg-white/[0.06] border border-white/15 text-[15px] text-white placeholder:text-white/30 outline-none focus:border-white/40 transition-colors`}
+					style={inputProps.style}
+				/>
+				{isPassword ? (
+					<button
+						type="button"
+						onClick={() => setRevealed((v) => !v)}
+						tabIndex={-1}
+						aria-label={revealed ? 'Hide password' : 'Show password'}
+						className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80 transition-colors p-1"
+					>
+						{revealed ? <EyeOff size={16} /> : <Eye size={16} />}
+					</button>
+				) : null}
+			</div>
 		</div>
 	)
 }

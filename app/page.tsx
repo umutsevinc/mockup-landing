@@ -9,6 +9,7 @@ import LandingSections from './components/LandingSections'
 import MerveTutorial from './components/MerveTutorial'
 import ProductHuntBanner from './components/ProductHuntBanner'
 import PhNavBadge from './components/PhNavBadge'
+import CheckoutSuccessToast from './components/CheckoutSuccessToast'
 
 /**
  * Pill central de la nav — le highlight blanc GLISSE d'un onglet à
@@ -204,6 +205,10 @@ export default function HomePage() {
 			<div className="fixed bottom-4 right-4 z-[130] hidden sm:block">
 				<PhNavBadge />
 			</div>
+
+			{/* Toast succès Stripe — écoute `?checkout=success&plan=xxx` et
+			    nettoie l'URL après display. No-op sinon. */}
+			<CheckoutSuccessToast />
 		</div>
 	)
 }

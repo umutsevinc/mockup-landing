@@ -47,6 +47,14 @@ const FEATURES: Feature[] = [
 		height: 50,
 		alt: 'Mockiosa — Launched on Fazier',
 	},
+	{
+		name: 'Peerlist',
+		href: 'https://peerlist.io',
+		img: 'https://peerlist.io/images/logo.svg',
+		width: 160,
+		height: 40,
+		alt: 'Mockiosa — Featured on Peerlist',
+	},
 ]
 
 export default function FeaturedPage() {

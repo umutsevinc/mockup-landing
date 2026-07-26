@@ -24,6 +24,14 @@ const nextConfig: NextConfig = {
       // pour que les visiteurs atterrissent sur le hero live 3D.
       { source: "/waitlist", destination: "/", permanent: true },
       { source: "/waitlist/:path*", destination: "/", permanent: true },
+      // /blog vit sur Framer (memselon.com) — l'article de launch est
+      // là-bas. Redirect permanent pour éviter la 404 côté landing.
+      {
+        source: "/blog",
+        destination:
+          "https://www.memselon.com/blog/mockiosa-launch-real-3d-mockups-in-framer",
+        permanent: true,
+      },
     ];
   },
 };

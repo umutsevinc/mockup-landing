@@ -31,28 +31,25 @@ export default function TermsPage() {
 
         <Section title="2. Plans and billing">
           <ul style={ulStyle}>
-            <li><strong style={strongStyle}>7-day Ultra trial</strong>: full Ultra access for 7 days when you install the plugin. No credit card required.</li>
             <li><strong style={strongStyle}>Paid plans</strong> (Ground, Float, Orbit): billed in USD, monthly, via Stripe. Stripe may display local currency based on your billing country.</li>
-            <li><strong style={strongStyle}>Founder Lifetime</strong>: one-time payment for lifetime access to Ultra features and all future major features. Limited to 50 spots.</li>
+            <li>All plans are month-to-month with no long-term commitment. You can cancel at any time from the Stripe customer portal.</li>
           </ul>
-          <p>You can upgrade or downgrade at any time. Upgrades are billed prorated. Downgrades take effect at the end of the current billing period.</p>
+          <p>You can upgrade or downgrade at any time. Upgrades are billed prorated immediately. Downgrades take effect at the end of the current billing period.</p>
         </Section>
 
         <Section title="3. Refunds">
-          <p>We offer a <strong style={strongStyle}>7-day no-questions-asked refund</strong> on subscription plans. Email <a href="mailto:contact@memselon.com" style={linkStyle}>contact@memselon.com</a> within 7 days of your initial charge.</p>
-          <p>Founder Lifetime is <strong style={strongStyle}>final sale</strong> — no refund — since it provides lifetime access at a one-time discount.</p>
+          <p>Because subscriptions are month-to-month and can be cancelled at any time to stop future charges, we do not issue refunds for the current billing period once it has started. If your subscription was charged in error (duplicate charge, technical issue), email <a href="mailto:contact@memselon.com" style={linkStyle}>contact@memselon.com</a> and we&apos;ll make it right.</p>
         </Section>
 
         <Section title="4. License">
-          <p>You retain full ownership of any content (designs, screenshots, videos, exported assets) you create with the Service. We grant you a non-exclusive, worldwide license to use the Service for personal and commercial projects.</p>
-          <p>You may use exported mockups and embedded 3D components in client work, including for paid client projects, on all paid plans.</p>
+          <p>You retain full ownership of any content (designs, screenshots, videos, exported assets) you create with the Service. For the duration of your active subscription, we grant you a non-exclusive, worldwide, non-transferable license to use the Service for personal and commercial projects, including paid client work. This license terminates automatically when your subscription ends or is cancelled — exported assets you have already produced remain yours.</p>
         </Section>
 
         <Section title="5. Acceptable use">
           <p>You agree not to:</p>
           <ul style={ulStyle}>
             <li>Reverse-engineer, decompile, or attempt to extract the source code of the Service.</li>
-            <li>Resell, sublicense, or redistribute the Service or its assets without explicit permission (white-label is granted only on Studio and Founder Lifetime plans).</li>
+            <li>Resell, sublicense, or redistribute the Service or its assets without explicit written permission.</li>
             <li>Use the Service for unlawful, harmful, or infringing content.</li>
           </ul>
         </Section>

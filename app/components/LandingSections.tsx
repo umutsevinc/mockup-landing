@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import StudioFeatures from './StudioFeatures'
+import PhNavBadge from './PhNavBadge'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useInView } from '@/lib/useInView'
@@ -358,7 +359,7 @@ function ExportFormatsSection() {
 				    zone noire). Desktop : conserve le débord de -220px. */}
 				<div
 					ref={mediaRef}
-					className="relative w-full h-[300px] sm:w-screen sm:h-[500px] lg:h-[720px] overflow-hidden flex items-center justify-center sm:block sm:overflow-visible sm:-ml-8 md:-ml-16 lg:-ml-[220px] lg:w-[calc(100%+220px)]"
+					className="relative w-full h-[420px] sm:w-screen sm:h-[500px] lg:h-[720px] overflow-hidden flex items-center justify-center sm:block sm:overflow-visible sm:-ml-8 md:-ml-16 lg:-ml-[220px] lg:w-[calc(100%+220px)]"
 				>
 					{everInView && (
 						<video
@@ -369,13 +370,11 @@ function ExportFormatsSection() {
 							playsInline
 							preload="metadata"
 							onLoadedData={(e) => e.currentTarget.classList.add('is-loaded')}
-							/* Mobile : container flex-centré, vidéo en hauteur naturelle
-							   (h-full = 300px, largeur auto suivant l'aspect 0.76) →
-							   la vidéo est centrée horizontalement dans le container.
-							   Décalée verticalement de -60% pour crop le vide noir au
-							   dessus du phone (baked dans la source).
-							   Desktop (sm+) : behaviour d'origine inchangé. */
-							className="h-full w-auto max-w-none -translate-y-[24%] sm:translate-y-0 sm:absolute sm:inset-0 sm:w-full sm:h-full sm:object-contain sm:object-left pointer-events-none opacity-0 transition-opacity duration-700 ease-out [&.is-loaded]:opacity-100"
+							/* Mobile (fix 26/07) : container 420px de haut, la vidéo est
+							   contenue en hauteur (object-contain) et CENTRÉE — plus de
+							   bande noire, phone visible plein cadre. Desktop (sm+) :
+							   comportement d'origine inchangé, débord à gauche. */
+							className="absolute inset-0 w-full h-full object-contain object-center sm:relative sm:inset-auto sm:w-full sm:h-full sm:object-contain sm:object-left pointer-events-none opacity-0 transition-opacity duration-700 ease-out [&.is-loaded]:opacity-100"
 						/>
 					)}
 				</div>
@@ -981,6 +980,11 @@ export default function LandingSections() {
 							</div>
 						))}
 					</nav>
+				</div>
+				{/* PH badge en mobile (fix 26/07) — desktop l'a déjà fixé bottom-right ;
+				    ici c'est la version footer, visible uniquement sous sm. */}
+				<div className="sm:hidden mt-8 flex justify-center">
+					<PhNavBadge />
 				</div>
 				<div className="max-w-[1560px] mx-auto mt-10 pt-6 border-t border-white/[0.05] text-[10px] tracking-wider uppercase text-white/40 flex flex-wrap items-center justify-between gap-3">
 					<span>© 2026 Mockiosa</span>

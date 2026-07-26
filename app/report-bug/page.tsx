@@ -10,6 +10,10 @@ import { supabase } from '@/lib/supabase'
  * Le screenshot est ce qui nous permet de VOIR ce qui se passe chez
  * l'utilisateur — on pousse fort pour l'avoir, sans le rendre requis.
  */
+// Basic email validation — matches HTML5 `type=email` pattern in spirit
+// (letters/digits/., no whitespace, exactly one @, domain with a dot).
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 export default function ReportBugPage() {
 	const [email, setEmail] = useState('')
 	const [description, setDescription] = useState('')
@@ -18,6 +22,11 @@ export default function ReportBugPage() {
 	const [preview, setPreview] = useState<string | null>(null)
 	const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
 	const [errorMsg, setErrorMsg] = useState('')
+	// Honeypot anti-spam (fix 26/07) : champ caché "website". Un humain ne
+	// le voit pas (position off-screen + tabindex=-1) → un bot qui remplit
+	// tous les inputs se dénonce. On drop silencieusement la soumission,
+	// aucun feedback pour ne pas apprendre au bot à s'adapter.
+	const [website, setWebsite] = useState('')
 	const fileRef = useRef<HTMLInputElement>(null)
 
 	const pickFile = (f: File | undefined | null) => {
@@ -34,8 +43,18 @@ export default function ReportBugPage() {
 
 	const submit = async (e: React.FormEvent) => {
 		e.preventDefault()
+		// Honeypot rempli → bot. On simule un envoi réussi visuellement
+		// (setTimeout d'un état "done") pour ne rien apprendre au bot.
+		if (website.trim()) {
+			setState('done')
+			return
+		}
 		if (description.trim().length < 10) {
 			setErrorMsg('Please describe the bug in a few words (10 characters minimum).')
+			return
+		}
+		if (!EMAIL_RE.test(email.trim())) {
+			setErrorMsg('Please enter a valid email — we need it to write back.')
 			return
 		}
 		setState('sending')
@@ -55,7 +74,7 @@ export default function ReportBugPage() {
 				}
 			}
 			const { error } = await supabase.from('bug_reports').insert({
-				email: email.trim() || null,
+				email: email.trim(),
 				description: description.trim(),
 				context,
 				user_agent: navigator.userAgent,
@@ -86,8 +105,8 @@ export default function ReportBugPage() {
 						<div className="text-4xl mb-4">🪶</div>
 						<h1 className="text-[28px] font-normal tracking-[-0.01em] m-0 mb-3">Got it — thank you.</h1>
 						<p className="text-base text-white/50 leading-relaxed m-0 mb-8">
-							Your report {file ? 'and screenshot are' : 'is'} in our queue. If you left an email,
-							we’ll reply when it’s fixed — usually fast, check the{' '}
+							Your report {file ? 'and screenshot are' : 'is'} in our queue — we&apos;ll reply as soon as
+							it&apos;s fixed. In the meantime, keep an eye on the{' '}
 							<Link href="/changelog" className="text-white/80 underline underline-offset-4">changelog</Link>.
 						</p>
 						<Link href="/" className="text-sm text-white/60 hover:text-white transition-colors">← Back to Mockiosa</Link>
@@ -166,15 +185,36 @@ export default function ReportBugPage() {
 							</div>
 
 							<label className="flex flex-col gap-2">
-								<span className="text-[13px] text-white/60">Email (optional — to hear back when it’s fixed)</span>
+								<span className="text-[13px] text-white/60">Email *</span>
 								<input
 									type="email"
 									value={email}
 									onChange={(e) => setEmail(e.target.value)}
+									required
+									pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
 									placeholder="you@studio.com"
 									className="bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-[15px] text-white placeholder:text-white/25 focus:outline-none focus:border-[#e8702a]/60"
 								/>
 							</label>
+
+							{/* Honeypot anti-spam — invisible pour les humains, aimant
+							    à bots. Ne PAS retirer, ne PAS lui donner un label utile. */}
+							<div
+								aria-hidden="true"
+								style={{position: 'absolute', left: '-9999px', top: 'auto', width: 1, height: 1, overflow: 'hidden', opacity: 0, pointerEvents: 'none'}}
+							>
+								<label>
+									Website
+									<input
+										type="text"
+										name="website"
+										tabIndex={-1}
+										autoComplete="off"
+										value={website}
+										onChange={(e) => setWebsite(e.target.value)}
+									/>
+								</label>
+							</div>
 
 							{errorMsg ? <p className="text-sm text-[#ff6b6b] m-0">{errorMsg}</p> : null}
 

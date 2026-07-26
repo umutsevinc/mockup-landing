@@ -150,8 +150,6 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 		return () => clearTimeout(t)
 	}, [teaser, teaserMedia])
 	const fileInputRef = useRef<HTMLInputElement>(null)
-	const imageInputRef = useRef<HTMLInputElement>(null)
-	const videoInputRef = useRef<HTMLInputElement>(null)
 	// Colonne d'options gauche (demande 20/07) : Image / Video / Site /
 	// Animation — miroir de la sidebar du plugin.
 	const [siteOpen, setSiteOpen] = useState(false)
@@ -527,10 +525,10 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 					</div>
 				)}
 
-				{/* Colonne d'options — gauche (hero uniquement) : Image, Video,
-				    Site (capture serveur), Animation. Même carte sombre que les
-				    swatches ; stopPropagation pour ne pas ouvrir le picker de la
-				    zone parente. */}
+				{/* Colonne d'options — gauche (hero uniquement) : Website + Animation
+				    (simplifié 26/07 — Image/Video retirés, clic direct sur le phone
+				    = file picker, drag = upload). Même carte sombre que les swatches ;
+				    stopPropagation pour ne pas ouvrir le picker de la zone parente. */}
 				{!teaser && (
 					<div
 						className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20 bg-[#1c1c1e]/90 backdrop-blur border border-white/[0.08] rounded-2xl p-2.5"
@@ -542,61 +540,6 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 						onTouchStart={(e) => e.stopPropagation()}
 						onTouchEnd={(e) => e.stopPropagation()}
 					>
-						<div className="relative">
-							{mediaSource === 'image' && (
-								<button
-									type="button"
-									aria-label="Remove"
-									onClick={(e) => {
-										e.stopPropagation()
-										clearMedia()
-									}}
-									className="absolute -top-1.5 -right-1.5 min-w-[18px] min-h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center z-10"
-								>
-									✕
-								</button>
-							)}
-							<button
-							type="button"
-							aria-label="Set an image on the screen"
-							onClick={() => imageInputRef.current?.click()}
-							className="group relative w-9 h-9 rounded-xl flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-						>
-							<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-								<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-								<circle cx="8.5" cy="8.5" r="1.5" />
-								<path d="m21 15-5-5L5 21" />
-							</svg>
-							<span className={OPT_TIP}>Your screenshot, on the screen</span>
-						</button>
-						</div>
-						<div className="relative">
-							{mediaSource === 'video' && (
-								<button
-									type="button"
-									aria-label="Remove"
-									onClick={(e) => {
-										e.stopPropagation()
-										clearMedia()
-									}}
-									className="absolute -top-1.5 -right-1.5 min-w-[18px] min-h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center z-10"
-								>
-									✕
-								</button>
-							)}
-							<button
-							type="button"
-							aria-label="Set a video on the screen"
-							onClick={() => videoInputRef.current?.click()}
-							className="group relative w-9 h-9 rounded-xl flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-						>
-							<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-								<path d="m22 8-6 4 6 4V8Z" />
-								<rect x="2" y="6" width="14" height="12" rx="2" />
-							</svg>
-							<span className={OPT_TIP}>Your video, playing on the screen</span>
-						</button>
-						</div>
 						<div className="relative">
 							{/* Croix rouge retirée 20/07 — Remove link est dans le
 							    panel ci-dessous pour éviter les clics fantômes. */}
@@ -779,7 +722,7 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 				    couleurs ne doivent JAMAIS le déclencher. */}
 				{/* Carte sombre arrondie façon "Take a closer look" */}
 				<div
-					className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2.5 z-20 bg-[#1c1c1e]/90 backdrop-blur border border-white/[0.08] rounded-2xl p-3"
+					className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20 bg-[#1c1c1e]/90 backdrop-blur border border-white/[0.08] rounded-2xl p-2.5"
 					role="group"
 					aria-label="Device color"
 					onPointerDown={(e) => e.stopPropagation()}
@@ -794,7 +737,7 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 							type="button"
 							aria-label={`Color ${c}`}
 							onClick={() => setColor(c)}
-							className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${
+							className={`w-6 h-6 rounded-full border-2 transition-transform hover:scale-110 ${
 								color === c ? 'border-white scale-110' : 'border-white/20'
 							}`}
 							style={{backgroundColor: c}}
@@ -805,7 +748,7 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 					{!teaser && (
 						<label
 							aria-label="Custom color"
-							className={`relative w-8 h-8 rounded-full border-2 cursor-pointer overflow-hidden transition-transform hover:scale-110 ${
+							className={`relative w-6 h-6 rounded-full border-2 cursor-pointer overflow-hidden transition-transform hover:scale-110 ${
 								!deviceFinishColors(device.id).includes(color) ? 'border-white scale-110' : 'border-white/20'
 							}`}
 							style={{
@@ -877,20 +820,6 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 					ref={fileInputRef}
 					type="file"
 					accept="image/png,image/jpeg,image/webp,video/mp4,video/webm"
-					className="hidden"
-					onChange={(e) => handleFile(e.target.files?.[0])}
-				/>
-				<input
-					ref={imageInputRef}
-					type="file"
-					accept="image/png,image/jpeg,image/webp"
-					className="hidden"
-					onChange={(e) => handleFile(e.target.files?.[0])}
-				/>
-				<input
-					ref={videoInputRef}
-					type="file"
-					accept="video/mp4,video/webm"
 					className="hidden"
 					onChange={(e) => handleFile(e.target.files?.[0])}
 				/>
