@@ -131,14 +131,16 @@ export default function HomePage() {
 				<div className="relative z-10 max-w-[1560px] mx-auto grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-6 lg:gap-0 items-center px-6 md:px-16 pt-28 lg:pt-12 pb-28 lg:pb-8 min-h-[100dvh]">
 					{/* Left: title + pitch + CTA */}
 					<div className="flex flex-col items-start gap-6 max-w-xl">
-						{/* Badge version → changelog (pattern Dropshot : montre que le produit vit) */}
+						{/* Launch day badge — remplace le badge changelog v1.4 (déplacé
+						    dans le footer) pour mettre en avant la couverture PH/Launch
+						    Llama. Même style que la pill sur /waitlist. */}
 						<Link
-							href="/changelog"
+							href="/featured"
 							className="hero-anim hero-fade inline-flex items-center gap-2 rounded-full bg-white/[0.04] border border-white/[0.1] px-4 py-2 text-[13px] text-white/80 hover:bg-white/[0.09] transition-colors"
 							style={{ animationDelay: '0.05s' }}
 						>
-							<span className="font-mono text-[11px] tracking-[0.04em] text-white/50">v1.4</span>
-							White full-height device cards
+							<span className="font-mono text-[11px] tracking-[0.06em] uppercase text-[#e8702a]">Live</span>
+							Featured on Product Hunt &amp; Launch Llama
 							<span className="text-white/45">→</span>
 						</Link>
 						<h1 className="text-white leading-[1.1] m-0">

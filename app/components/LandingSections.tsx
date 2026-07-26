@@ -902,12 +902,23 @@ export default function LandingSections() {
 							<img src="/feather-pen-white.svg" alt="Mockiosa" width="20" height="20" aria-hidden="true" />
 							<span className="font-playfair text-xl">Mockiosa</span>
 						</div>
-						<p className="text-xs text-white/45 max-w-xs leading-relaxed">
+						<p className="text-xs text-white/45 max-w-xs leading-relaxed mb-4">
 							Build with 🫰 by{' '}
 							<a href="https://x.com/memselon" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white underline underline-offset-2 decoration-white/20 hover:decoration-white transition-colors">Memselon</a>
 							{' & '}
 							<a href="https://x.com/meiiyve" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white underline underline-offset-2 decoration-white/20 hover:decoration-white transition-colors">May</a>
 						</p>
+						{/* Badge changelog déplacé depuis le hero — reste visible et
+						    cliquable, mais laisse place à la pill « Featured on » en
+						    haut de page (launch day). */}
+						<Link
+							href="/changelog"
+							className="inline-flex items-center gap-2 rounded-full bg-white/[0.04] border border-white/[0.1] px-3 py-1.5 text-[11px] text-white/70 hover:text-white hover:bg-white/[0.09] transition-colors"
+						>
+							<span className="font-mono text-[10px] tracking-[0.04em] text-white/45">v1.4</span>
+							Device library
+							<span className="text-white/40">→</span>
+						</Link>
 					</div>
 
 					<nav className="grid grid-cols-2 sm:grid-cols-4 gap-x-14 gap-y-3 text-xs" aria-label="Footer">
