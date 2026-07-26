@@ -59,7 +59,7 @@ export default function SuccessPage() {
 		>
 			<div className="flex flex-col gap-3">
 				<a
-					href="https://www.framer.com/marketplace/plugins/mockiosa/"
+					href="https://framer.com/projects/"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="cta-skeu text-white text-sm font-semibold px-6 py-3 rounded-full text-center transition-all hover:scale-[1.02]"
