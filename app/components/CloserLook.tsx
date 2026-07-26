@@ -297,38 +297,48 @@ export default function CloserLook() {
 				</div>
 
 				{/* Right: live 3D — reacts to every control */}
-				<div className="relative min-h-[420px]">
-					{/* Device switch — test en temps réel iPhone / Watch */}
-					<div className="absolute top-5 right-5 z-10 flex items-center gap-1.5 bg-white/[0.08] border border-white/[0.12] backdrop-blur rounded-full p-1">
-						{CL_DEVICES.map((d) => (
-							<button
-								key={d.id}
-								type="button"
-								onClick={() => {
-									setDeviceId(d.id)
-									// Chaque mockup arrive avec SA finition par défaut.
-									setColor(defaultFinishColor(d.id))
-								}}
-								aria-pressed={deviceId === d.id}
-								className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
-									deviceId === d.id ? 'bg-white text-black' : 'text-white/75 hover:text-white'
-								}`}
-							>
-								{d.title}
-							</button>
-						))}
+				<div className="relative min-h-[420px] flex flex-col">
+					<div className="relative flex-1 min-h-[380px]">
+						<Canvas
+							frameloop={inView ? 'always' : 'never'}
+							camera={{position: [0, 0, 3.6], fov: 20, near: 0.1, far: 1000}}
+							dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1}
+							gl={{antialias: true, alpha: true, premultipliedAlpha: false, powerPreference: 'high-performance'}}
+							style={{background: 'transparent'}}
+						>
+							<Suspense fallback={null}>
+								<MockupScene payload={payload} transparentBg pose={pose} inViewport={inView} />
+							</Suspense>
+						</Canvas>
 					</div>
-					<Canvas
-						frameloop={inView ? 'always' : 'never'}
-						camera={{position: [0, 0, 3.6], fov: 20, near: 0.1, far: 1000}}
-						dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1}
-						gl={{antialias: true, alpha: true, premultipliedAlpha: false, powerPreference: 'high-performance'}}
-						style={{background: 'transparent'}}
-					>
-						<Suspense fallback={null}>
-							<MockupScene payload={payload} transparentBg pose={pose} inViewport={inView} />
-						</Suspense>
-					</Canvas>
+					{/* Device switch — même pill que le hero.
+					    Mobile : statique, en dessous du modèle (centrée, scrollable).
+					    Desktop : absolue en haut à droite du canvas 3D. */}
+					<div className="lg:absolute lg:top-5 lg:right-5 lg:bottom-auto lg:left-auto z-10 flex justify-center px-3 py-3 lg:p-0">
+						<div
+							className="flex items-center gap-1 bg-white/[0.08] border border-white/[0.12] backdrop-blur rounded-full p-1 overflow-x-auto max-w-full"
+							role="group"
+							aria-label="Choose a device"
+						>
+							{CL_DEVICES.map((d) => (
+								<button
+									key={d.id}
+									type="button"
+									onClick={() => {
+										setDeviceId(d.id)
+										// Chaque mockup arrive avec SA finition par défaut.
+										setColor(defaultFinishColor(d.id))
+									}}
+									aria-pressed={deviceId === d.id}
+									className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+										deviceId === d.id ? 'bg-white text-black' : 'text-white/70 hover:text-white'
+									}`}
+								>
+									{d.title}
+								</button>
+							))}
+						</div>
+					</div>
 				</div>
 			</div>
 		</section>

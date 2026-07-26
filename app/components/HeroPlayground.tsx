@@ -414,7 +414,16 @@ export default function HeroPlayground({teaser = false}: {teaser?: boolean} = {}
 				}}
 			>
 				<div
-					className="absolute inset-0"
+					className={`absolute inset-0 ${
+						/* Mobile-only : les 2 wide devices (iMac + Studio Display) ont
+						   une bounding box GLB large ; même à default_scale 1.7 ils
+						   débordaient le petit viewport. On rétrécit visuellement via
+						   CSS scale — plus fiable qu'un tune camera z par device
+						   (Canvas camera prop non-réactif). */
+						(deviceId === 'imac' || deviceId === 'appleProDisplayXDR')
+							? 'sm:scale-100 scale-[0.72] origin-center'
+							: ''
+					}`}
 					style={{opacity: modelReady ? 1 : 0, transition: 'opacity 0.55s ease'}}
 				>
 					<Canvas

@@ -358,7 +358,7 @@ function ExportFormatsSection() {
 				    zone noire). Desktop : conserve le débord de -220px. */}
 				<div
 					ref={mediaRef}
-					className="relative h-[360px] sm:h-[500px] lg:h-[720px] overflow-visible w-screen -ml-6 sm:-ml-8 md:-ml-16 lg:-ml-[220px] lg:w-[calc(100%+220px)]"
+					className="relative w-full h-[300px] sm:w-screen sm:h-[500px] lg:h-[720px] overflow-hidden flex items-center justify-center sm:block sm:overflow-visible sm:-ml-8 md:-ml-16 lg:-ml-[220px] lg:w-[calc(100%+220px)]"
 				>
 					{everInView && (
 						<video
@@ -369,7 +369,13 @@ function ExportFormatsSection() {
 							playsInline
 							preload="metadata"
 							onLoadedData={(e) => e.currentTarget.classList.add('is-loaded')}
-							className="absolute inset-0 w-full h-full object-contain object-left pointer-events-none opacity-0 transition-opacity duration-700 ease-out [&.is-loaded]:opacity-100"
+							/* Mobile : container flex-centré, vidéo en hauteur naturelle
+							   (h-full = 300px, largeur auto suivant l'aspect 0.76) →
+							   la vidéo est centrée horizontalement dans le container.
+							   Décalée verticalement de -60% pour crop le vide noir au
+							   dessus du phone (baked dans la source).
+							   Desktop (sm+) : behaviour d'origine inchangé. */
+							className="h-full w-auto max-w-none -translate-y-[24%] sm:translate-y-0 sm:absolute sm:inset-0 sm:w-full sm:h-full sm:object-contain sm:object-left pointer-events-none opacity-0 transition-opacity duration-700 ease-out [&.is-loaded]:opacity-100"
 						/>
 					)}
 				</div>

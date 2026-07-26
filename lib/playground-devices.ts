@@ -92,10 +92,12 @@ export const PLAYGROUND_DEVICES: PlaygroundDevice[] = [
 		description: null,
 		title: 'iMac',
 		model_url: '/3d/imac.glb',
-		// Landing hero : bump 1.15 → 2.1 pour remplir le frame (comparable
-		// au MacBook à 2.5). Le GLB iMac a une bounding box "logique"
-		// petite ; landing-only donc pas de sync avec la table plugin.
-		default_scale: 2.1,
+		// Landing hero : bump 1.15 → 1.7. Compromis mobile/desktop —
+		// 2.1 remplissait bien desktop mais débordait sur mobile (iMac est
+		// un device large, le GLB a une bounding box hors format).
+		// Un CSS scale mobile-only (voir HeroPlayground) réduit encore
+		// pour les petits viewports.
+		default_scale: 1.7,
 		screen_mesh_name: 'Retina_screen_vray_screen_0',
 		screen_material_name: 'vray_screen',
 		screen_parent_name: null,
@@ -126,8 +128,8 @@ export const PLAYGROUND_DEVICES: PlaygroundDevice[] = [
 		description: null,
 		title: 'Studio Display',
 		model_url: '/3d/appleProDisplayXDR.glb',
-		// Landing hero : bump 1 → 2.1 (même raison que iMac ; landing-only).
-		default_scale: 2.1,
+		// Landing hero : bump 1 → 1.7 (même raison que iMac ; landing-only).
+		default_scale: 1.7,
 		screen_mesh_name: 'IyklIWCEUuwKzOr',
 		screen_material_name: 'YZsKmgdmwlRdfBy',
 		screen_parent_name: 'QjRcrcXBbYCUKZS',
