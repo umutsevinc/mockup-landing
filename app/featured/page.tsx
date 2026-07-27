@@ -57,10 +57,13 @@ const FEATURES: Feature[] = [
 		alt: 'Mockiosa',
 	},
 	{
-		// Pas de badge officiel fourni (SPA, URL du badge introuvable) →
-		// wordmark texte. Remplacer par le badge dès qu'on a le snippet.
+		// Pas de badge embed chez Noon Launch → leur logo officiel,
+		// auto-hébergé (public/noonlaunch-logo.png, fond transparent).
 		name: 'Noon Launch',
 		href: 'https://noonlaunch.com/product/mockiosa',
+		img: '/noonlaunch-logo.png',
+		width: 521,
+		height: 120,
 		alt: 'Mockiosa — Featured on Noon Launch',
 	},
 ]
