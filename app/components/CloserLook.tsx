@@ -1,9 +1,10 @@
 'use client'
 
-import {Suspense, useCallback, useMemo, useRef, useState} from 'react'
+import {Suspense, useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {Canvas} from '@react-three/fiber'
 import {Plus, Minus} from 'lucide-react'
 import {MockupScene} from './mockup/MockupScene'
+import {FeatherFloat} from './FeatherRunner'
 import type {Mockup} from '@/lib/mockup-types'
 import {PLAYGROUND_DEVICES, defaultFinishColor, deviceFinishColors} from '@/lib/playground-devices'
 import {useInView} from '@/lib/useInView'
@@ -24,7 +25,29 @@ const FINISHES = [
 	{id: 'glossy', label: 'Glossy'},
 ]
 
-type FeatureId = 'colors' | 'finish' | 'animations' | 'content' | 'light'
+// iMac trop grand dans cette section (caméra plus reculée qu'au hero) :
+// on le réduit UNIQUEMENT ici, sans toucher au scale global (hero, /mockups).
+const CL_SCALE_OVERRIDE: Record<string, number> = {imac: 1.25}
+
+// 20 Mo max — même limite que le hero.
+const MAX_UPLOAD_BYTES = 20 * 1024 * 1024
+
+/** Plume Mockiosa qui lévite pendant le chargement du GLB — fade entre
+ *  les mockups au changement de device (comme le hero). */
+function MascotLoading({visible}: {visible: boolean}) {
+	return (
+		<div
+			className="absolute inset-0 flex flex-col items-center justify-center gap-3 pointer-events-none z-10"
+			style={{opacity: visible ? 1 : 0, transition: 'opacity 0.35s ease'}}
+			aria-hidden="true"
+		>
+			<FeatherFloat size={34} color="#ffffff" />
+			<p className="text-[11px] tracking-[0.14em] uppercase text-white/45">Loading model</p>
+		</div>
+	)
+}
+
+type FeatureId = 'colors' | 'finish' | 'animations' | 'light'
 
 /* Composants UI au niveau MODULE — les définir dans le corps du
    composant leur donnait une nouvelle identité à chaque render, React
@@ -92,20 +115,53 @@ export default function CloserLook() {
 	const [float, setFloat] = useState(true)
 	// Défaut aligné sur la waitlist — 0.65 délavait l'orange Cosmic.
 	const [light, setLight] = useState(0.22)
-	const [exposure, setExposure] = useState(0.5)
 	const [media, setMedia] = useState<{url: string; type: 'image' | 'video'} | null>(null)
+	const [dragOver, setDragOver] = useState(false)
+	const [uploadError, setUploadError] = useState<string | null>(null)
+	const [modelReady, setModelReady] = useState(false)
 	const fileRef = useRef<HTMLInputElement>(null)
+	// Distingue un CLIC (ouvre le sélecteur de fichier) d'un DRAG
+	// (grab-rotate du modèle) : seuil de 6px entre down et up.
+	const pointerDownRef = useRef<{x: number; y: number} | null>(null)
 	// Perf : la section est sous le fold — frameloop coupé hors viewport.
 	// Marge large : la vidéo (re)démarre avant l'arrivée, coupe après la sortie.
 	const {ref: viewRef, inView} = useInView('600px')
+
+	// Fade entre les mockups : reset à chaque changement de device, la
+	// plume couvre le chargement du GLB, puis fade-in au signal scene-ready.
+	useEffect(() => {
+		setModelReady(false)
+		const onReady = () => setModelReady(true)
+		window.addEventListener('memselon:scene-ready', onReady)
+		const t = setTimeout(() => setModelReady(true), 12000)
+		return () => {
+			window.removeEventListener('memselon:scene-ready', onReady)
+			clearTimeout(t)
+		}
+	}, [deviceId])
 
 	const handleFile = useCallback((file: File | undefined | null) => {
 		if (!file) return
 		const isImage = file.type.startsWith('image/')
 		const isVideo = file.type.startsWith('video/')
-		if (!isImage && !isVideo) return
-		if (file.size > 20 * 1024 * 1024) return
-		setMedia({url: URL.createObjectURL(file), type: isImage ? 'image' : 'video'})
+		if (!isImage && !isVideo) {
+			setUploadError('Image or video only (PNG, JPG, WebP, MP4, WebM)')
+			setTimeout(() => setUploadError(null), 3200)
+			return
+		}
+		if (file.size > MAX_UPLOAD_BYTES) {
+			setUploadError('Max upload 20 MB — compress your file and retry')
+			setTimeout(() => setUploadError(null), 3200)
+			return
+		}
+		setMedia((prev) => {
+			if (prev?.url.startsWith('blob:')) {
+				try {
+					URL.revokeObjectURL(prev.url)
+				} catch {}
+			}
+			return {url: URL.createObjectURL(file), type: isImage ? 'image' : 'video'}
+		})
 	}, [])
 
 	const payload = useMemo(() => {
@@ -132,15 +188,19 @@ export default function CloserLook() {
 				loopAnimationSensitivity: 0.05,
 				scrollZoom: false,
 				imageZoom: 1,
-				screenExposure: exposure,
+				screenExposure: 0.5,
 				showShadow: false,
 				deviceColor: color,
 				deviceColors: {},
 				deviceFinish: finish,
 			},
 		} as unknown as Mockup
-		return {mockup, device}
-	}, [device, color, finish, followCursor, autoRotate, float, light, exposure, media])
+		// Override de scale local (iMac réduit ici uniquement).
+		const scaled = CL_SCALE_OVERRIDE[device.id]
+			? {...device, default_scale: CL_SCALE_OVERRIDE[device.id]}
+			: device
+		return {mockup, device: scaled}
+	}, [device, color, finish, followCursor, autoRotate, float, light, media])
 
 	// Pose présentation : Colours / Finish / Light → vue 3/4 arrière
 	// zoomée (les couleurs/finitions vivent sur la coque) ; Content et
@@ -242,40 +302,6 @@ export default function CloserLook() {
 						</Card>
 					)}
 
-					<Pill active={open === 'content'} label="Your content" onClick={() => setOpen((o) => (o === 'content' ? null : 'content'))} />
-					{open === 'content' && (
-						<Card>
-							<b className="text-white">Photo & video.</b> Drop anything — it plays on the screen mesh,
-							ratio preserved, exposure adjustable.
-							<button
-								type="button"
-								onClick={() => fileRef.current?.click()}
-								className="mt-4 w-full border border-dashed border-white/25 hover:border-white/60 rounded-xl py-3 text-xs text-white/70 hover:text-white transition-colors"
-							>
-								Click to load an image or video (20 MB max)
-							</button>
-							<div className="mt-4">
-								<label className="text-xs text-white/55">Screen exposure</label>
-								<input
-									type="range"
-									min={0}
-									max={1}
-									step={0.01}
-									value={exposure}
-									onChange={(e) => setExposure(Number(e.target.value))}
-									className="w-full accent-[#e8702a]"
-								/>
-							</div>
-							<input
-								ref={fileRef}
-								type="file"
-								accept="image/png,image/jpeg,image/webp,video/mp4,video/webm"
-								className="hidden"
-								onChange={(e) => handleFile(e.target.files?.[0])}
-							/>
-						</Card>
-					)}
-
 					<Pill active={open === 'light'} label="Studio light" onClick={() => setOpen((o) => (o === 'light' ? null : 'light'))} />
 					{open === 'light' && (
 						<Card>
@@ -298,19 +324,82 @@ export default function CloserLook() {
 
 				{/* Right: live 3D — reacts to every control */}
 				<div className="relative min-h-[420px] flex flex-col">
-					<div className="relative flex-1 min-h-[380px]">
-						<Canvas
-							frameloop={inView ? 'always' : 'never'}
-							camera={{position: [0, 0, 3.6], fov: 20, near: 0.1, far: 1000}}
-							dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1}
-							gl={{antialias: true, alpha: true, premultipliedAlpha: false, powerPreference: 'high-performance'}}
-							style={{background: 'transparent'}}
+					<div
+						className="relative flex-1 min-h-[380px] cursor-pointer"
+						onDragOver={(e) => {
+							e.preventDefault()
+							setDragOver(true)
+						}}
+						onDragLeave={() => setDragOver(false)}
+						onDrop={(e) => {
+							e.preventDefault()
+							setDragOver(false)
+							handleFile(e.dataTransfer.files?.[0])
+						}}
+						onPointerDown={(e) => {
+							pointerDownRef.current = {x: e.clientX, y: e.clientY}
+						}}
+						onPointerUp={(e) => {
+							const d = pointerDownRef.current
+							pointerDownRef.current = null
+							if (!d) return
+							// < 6px = clic (pas un grab-rotate) → ouvre le sélecteur.
+							if (Math.hypot(e.clientX - d.x, e.clientY - d.y) < 6) fileRef.current?.click()
+						}}
+					>
+						<div
+							className="absolute inset-0"
+							style={{opacity: modelReady ? 1 : 0, transition: 'opacity 0.55s ease'}}
 						>
-							<Suspense fallback={null}>
-								<MockupScene payload={payload} transparentBg pose={pose} inViewport={inView} />
-							</Suspense>
-						</Canvas>
+							<Canvas
+								frameloop={inView ? 'always' : 'never'}
+								camera={{position: [0, 0, 3.6], fov: 20, near: 0.1, far: 1000}}
+								dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1}
+								gl={{antialias: true, alpha: true, premultipliedAlpha: false, powerPreference: 'high-performance'}}
+								style={{background: 'transparent'}}
+							>
+								<Suspense fallback={null}>
+									<MockupScene payload={payload} transparentBg pose={pose} inViewport={inView} />
+								</Suspense>
+							</Canvas>
+						</div>
+
+						{/* Overlay de drop */}
+						<div
+							className={`absolute inset-4 rounded-2xl border-2 border-dashed pointer-events-none transition-all duration-200 flex items-center justify-center ${
+								dragOver ? 'border-[#e8702a] bg-[#e8702a]/10 opacity-100' : 'border-white/0 opacity-0'
+							}`}
+						>
+							<p className="text-white text-sm font-medium bg-black/60 px-4 py-2 rounded-full">
+								Drop it — your content goes on screen
+							</p>
+						</div>
+
+						{/* Plume de chargement (au changement de device) */}
+						<MascotLoading visible={!modelReady} />
+
+						{/* Erreur upload (20 Mo max) */}
+						{uploadError && (
+							<div className="absolute left-1/2 bottom-6 -translate-x-1/2 z-30 text-xs sm:text-sm text-white font-medium bg-[#c62828]/90 backdrop-blur border border-white/20 px-4 py-2.5 rounded-full whitespace-nowrap">
+								{uploadError}
+							</div>
+						)}
+
+						{/* Hint discret — tant qu'aucun média n'est chargé */}
+						{!media && !dragOver && (
+							<div className="absolute left-1/2 bottom-3 -translate-x-1/2 z-10 text-[11px] text-white/35 pointer-events-none whitespace-nowrap">
+								Drop or tap to add a photo or video — 20 MB max
+							</div>
+						)}
 					</div>
+
+					<input
+						ref={fileRef}
+						type="file"
+						accept="image/png,image/jpeg,image/webp,video/mp4,video/webm"
+						className="hidden"
+						onChange={(e) => handleFile(e.target.files?.[0])}
+					/>
 					{/* Device switch — même pill que le hero.
 					    Mobile : statique, en dessous du modèle (centrée, scrollable).
 					    Desktop : absolue en haut à droite du canvas 3D. */}
