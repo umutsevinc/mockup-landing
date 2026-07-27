@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { DEVICE_PAGES } from '@/lib/mockup-pages'
+import SiteHeader from '@/app/components/SiteHeader'
+import SiteFooter from '@/app/components/SiteFooter'
 
 export const metadata: Metadata = {
 	title: '3D Device Mockups — iPhone, iPad, MacBook & more | Mockiosa',
@@ -12,19 +14,7 @@ export const metadata: Metadata = {
 export default function MockupsHubPage() {
 	return (
 		<div className="min-h-screen bg-[#0a0a0a] text-white">
-			<nav className="flex items-center justify-between px-6 md:px-16 py-5 max-w-[1100px] mx-auto">
-				<Link href="/" className="flex items-center gap-2">
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-		<img src="/feather-pen-white.svg?v=7" alt="Mockiosa" width="20" height="20" aria-hidden="true" />
-					<span className="font-playfair text-lg">Mockiosa</span>
-				</Link>
-				<Link
-					href="/sign-up"
-					className="cta-skeu-light text-gray-900 text-sm font-semibold px-5 py-2 rounded-full transition-all hover:scale-[1.03]"
-				>
-					Try it free
-				</Link>
-			</nav>
+			<SiteHeader />
 
 			<main className="max-w-[760px] mx-auto px-6 pt-16 pb-32">
 				<header className="mb-14">
@@ -55,11 +45,8 @@ export default function MockupsHubPage() {
 					<div className="border-t border-white/[0.07]" />
 				</div>
 
-				<footer className="mt-20 pt-8 border-t border-white/[0.07] flex items-center justify-between text-[13px] text-white/35">
-					<Link href="/" className="hover:text-white transition-colors">← Back to Mockiosa</Link>
-					<Link href="/compare" className="hover:text-white transition-colors">Compare</Link>
-				</footer>
 			</main>
+			<SiteFooter />
 		</div>
 	)
 }

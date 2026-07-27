@@ -27,7 +27,7 @@ const FINISHES = [
 
 // iMac trop grand dans cette section (caméra plus reculée qu'au hero) :
 // on le réduit UNIQUEMENT ici, sans toucher au scale global (hero, /mockups).
-const CL_SCALE_OVERRIDE: Record<string, number> = {imac: 1.25}
+const CL_SCALE_OVERRIDE: Record<string, number> = {imac: 1.25, appleProDisplayXDR: 1.2}
 
 // 20 Mo max — même limite que le hero.
 const MAX_UPLOAD_BYTES = 20 * 1024 * 1024

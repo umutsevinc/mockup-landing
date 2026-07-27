@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { COMPARE_ENTRIES, getCompareEntry, type CompareFeature } from '@/lib/compare'
+import SiteHeader from '@/app/components/SiteHeader'
+import SiteFooter from '@/app/components/SiteFooter'
 
 export function generateStaticParams() {
 	return COMPARE_ENTRIES.map((e) => ({ slug: e.slug }))
@@ -74,19 +76,7 @@ export default async function CompareSlugPage({ params }: { params: Promise<{ sl
 
 	return (
 		<div className="min-h-screen bg-[#0a0a0a] text-white">
-			<nav className="flex items-center justify-between px-6 md:px-16 py-5 max-w-[1100px] mx-auto">
-				<Link href="/" className="flex items-center gap-2">
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-		<img src="/feather-pen-white.svg?v=7" alt="Mockiosa" width="20" height="20" aria-hidden="true" />
-					<span className="font-playfair text-lg">Mockiosa</span>
-				</Link>
-				<Link
-					href="/sign-up"
-					className="cta-skeu-light text-gray-900 text-sm font-semibold px-5 py-2 rounded-full transition-all hover:scale-[1.03]"
-				>
-					Try it free
-				</Link>
-			</nav>
+			<SiteHeader />
 
 			<main className="max-w-[760px] mx-auto px-6 pt-16 pb-32">
 				<header className="mb-12">
@@ -198,6 +188,7 @@ export default async function CompareSlugPage({ params }: { params: Promise<{ sl
 					</div>
 				</footer>
 			</main>
+			<SiteFooter />
 		</div>
 	)
 }

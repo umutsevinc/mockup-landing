@@ -9,6 +9,7 @@ import LandingSections from './components/LandingSections'
 import MerveTutorial from './components/MerveTutorial'
 import ProductHuntBanner from './components/ProductHuntBanner'
 import PhNavBadge from './components/PhNavBadge'
+import SpotsLeft from './components/SpotsLeft'
 import CheckoutSuccessToast from './components/CheckoutSuccessToast'
 
 /**
@@ -169,6 +170,11 @@ export default function HomePage() {
 						<div className="flex items-center gap-4 hero-anim hero-fade" style={{ animationDelay: '0.65s' }}>
 							<Link
 								href="/sign-up"
+								onClick={() => {
+									try {
+										;(window as any).gtag?.('event', 'cta_click', { location: 'hero', label: 'try_in_framer' })
+									} catch {}
+								}}
 								className="cta-skeu text-white text-sm font-medium px-7 py-3 rounded-full transition-all hover:scale-[1.03]"
 							>
 								Try in Framer — free
@@ -179,6 +185,10 @@ export default function HomePage() {
 							>
 								See pricing
 							</a>
+						</div>
+						{/* Compteur live des places de l'offre de lancement (Stripe) */}
+						<div className="hero-anim hero-fade" style={{ animationDelay: '0.72s' }}>
+							<SpotsLeft />
 						</div>
 						<p className="text-xs text-white/40 hero-anim hero-fade" style={{ animationDelay: '0.8s' }}>
 							Try it right here → switch the device, pick a color, drop your own content.

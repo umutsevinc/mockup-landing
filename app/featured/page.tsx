@@ -1,5 +1,7 @@
 import type {Metadata} from 'next'
 import Link from 'next/link'
+import SiteHeader from '@/app/components/SiteHeader'
+import SiteFooter from '@/app/components/SiteFooter'
 
 // Page « Featured on » — liste TOUS les annuaires / newsletters / plateformes
 // de lancement où Mockiosa apparaît, avec le badge officiel de chacun. Évite
@@ -63,17 +65,7 @@ const FEATURES: Feature[] = [
 export default function FeaturedPage() {
 	return (
 		<div className="min-h-screen bg-[#0a0a0a] text-white tracking-[-0.02em]">
-			{/* Header minimal */}
-			<header className="max-w-[1560px] mx-auto px-6 md:px-16 py-6 flex items-center justify-between">
-				<Link href="/" className="flex items-center gap-2">
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-		<img src="/feather-pen-white.svg?v=7" alt="Mockiosa" width="24" height="24" aria-hidden="true" />
-					<span className="text-xl font-playfair">Mockiosa</span>
-				</Link>
-				<Link href="/" className="text-sm text-white/55 hover:text-white transition-colors">
-					← Back home
-				</Link>
-			</header>
+			<SiteHeader />
 
 			<main className="max-w-[1560px] mx-auto px-6 md:px-16 py-16 md:py-24">
 				<div className="max-w-2xl">
@@ -130,6 +122,7 @@ export default function FeaturedPage() {
 					More coming soon — we&apos;re rolling out across the directories this launch week.
 				</p>
 			</main>
+			<SiteFooter />
 		</div>
 	)
 }

@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import SiteHeader from '@/app/components/SiteHeader'
+import SiteFooter from '@/app/components/SiteFooter'
 
 /**
  * Report a bug — formulaire public du plugin : description + contexte +
@@ -91,13 +93,7 @@ export default function ReportBugPage() {
 
 	return (
 		<div className="min-h-screen bg-[#0a0a0a] text-white">
-			<nav className="flex items-center justify-between px-6 md:px-16 py-5 max-w-[1100px] mx-auto">
-				<Link href="/" className="flex items-center gap-2">
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-						<img src="/feather-pen-white.svg?v=7" alt="Mockiosa" width="20" height="20" aria-hidden="true" />
-					<span className="font-playfair text-lg">Mockiosa</span>
-				</Link>
-			</nav>
+			<SiteHeader />
 
 			<main className="max-w-[560px] mx-auto px-6 pt-16 pb-32">
 				{state === 'done' ? (
@@ -229,6 +225,7 @@ export default function ReportBugPage() {
 					</>
 				)}
 			</main>
+			<SiteFooter />
 		</div>
 	)
 }

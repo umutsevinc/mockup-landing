@@ -23,6 +23,10 @@ export default function MerveTutorial() {
 	const [progress, setProgress] = useState(0)
 	const [duration, setDuration] = useState(0)
 	const [missing, setMissing] = useState(false)
+	// Fullscreen : en normal on ZOOME un peu (object-cover + scale) pour
+	// couper les bandes noires bakées dans la source ; en plein écran on
+	// rend le ratio classique (object-contain, pas de zoom).
+	const [isFs, setIsFs] = useState(false)
 	// Merve tuto video hosted on R2 (memselon-mockup-media / marketing / videos)
 	const VIDEO_URL = 'https://memselon-media.memselon.workers.dev/marketing/videos/MerveTuto1-1.mov'
 
@@ -31,11 +35,14 @@ export default function MerveTutorial() {
 		if (!v) return
 		const onTime = () => setProgress(v.currentTime)
 		const onMeta = () => setDuration(v.duration || 0)
+		const onFs = () => setIsFs(!!document.fullscreenElement)
 		v.addEventListener('timeupdate', onTime)
 		v.addEventListener('loadedmetadata', onMeta)
+		document.addEventListener('fullscreenchange', onFs)
 		return () => {
 			v.removeEventListener('timeupdate', onTime)
 			v.removeEventListener('loadedmetadata', onMeta)
+			document.removeEventListener('fullscreenchange', onFs)
 		}
 	}, [])
 
@@ -116,7 +123,7 @@ export default function MerveTutorial() {
 				{/* Video player VLC-lite */}
 				<div
 					ref={containerRef}
-					className="group relative rounded-2xl overflow-hidden bg-black border border-white/[0.08] shadow-2xl shadow-black/40 aspect-video max-w-6xl mx-auto"
+					className="group relative rounded-2xl overflow-hidden bg-black border border-white/[0.08] shadow-2xl shadow-black/40 aspect-video w-full"
 				>
 					{missing ? (
 						<div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6">
@@ -138,9 +145,12 @@ export default function MerveTutorial() {
 							loop
 							playsInline
 							preload="metadata"
+							suppressHydrationWarning
 							onError={() => setMissing(true)}
 							onClick={togglePlay}
-							className="absolute inset-0 w-full h-full object-cover cursor-pointer"
+							className={`absolute inset-0 w-full h-full cursor-pointer transition-transform duration-300 ${
+								isFs ? 'object-contain scale-100' : 'object-cover scale-[1.2]'
+							}`}
 						/>
 					)}
 

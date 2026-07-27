@@ -263,7 +263,7 @@ function DeviceCarousel() {
 					<div
 						key={d.name}
 						data-card
-						className="snap-start relative flex-shrink-0 w-[290px] sm:w-[340px] h-[440px] rounded-3xl overflow-hidden bg-white border border-white/[0.07] transition-transform hover:scale-[1.01]"
+						className="snap-start relative flex-shrink-0 w-[290px] sm:w-[340px] h-[440px] rounded-3xl overflow-hidden bg-[#1c1c1e] border border-white/[0.08]"
 					>
 						{/* Images collées au bord bas, hauteur cappée pour laisser
 						    respirer le texte en haut (fix overlap 25/07). object-contain
@@ -280,16 +280,15 @@ function DeviceCarousel() {
 								sizes="(max-width: 640px) 290px, 340px"
 							/>
 						) : (
-							<div className="absolute inset-0 bg-white flex items-center justify-center">
-								<div className="text-4xl font-semibold text-neutral-900/10">{d.name.split(' ')[0]}</div>
+							<div className="absolute inset-0 bg-[#1c1c1e] flex items-center justify-center">
+								<div className="text-4xl font-semibold text-white/10">{d.name.split(' ')[0]}</div>
 							</div>
 						)}
-						{/* Titre superposé — texte sombre directement sur le fond blanc
-						    de la photo. Plus de mention de plan : dans la grille finale
+						{/* Titre superposé — texte clair sur le fond dark grey de la carte.
+						    Plus de mention de plan : dans la grille finale
 						    (Ground/Float/Orbit) tous les devices sont dans tous les plans. */}
 						<div className="absolute top-0 left-0 right-0 p-6 pb-10">
-							<div className="text-xl font-semibold leading-tight text-neutral-900">{d.name}</div>
-							<div className="mt-1 text-sm text-neutral-500">Production-grade GLB</div>
+							<div className="text-xl font-semibold leading-tight text-white">{d.name}</div>
 						</div>
 					</div>
 				))}
@@ -331,7 +330,7 @@ function ExportFormatsSection() {
 	}, [inView])
 	return (
 		<section className="relative bg-black border-t border-white/[0.07] overflow-hidden">
-			<div className="max-w-[1560px] mx-auto px-6 md:px-16 pt-20 md:pt-28">
+			<div className="relative z-[2] max-w-[1560px] mx-auto px-6 md:px-16 pt-20 md:pt-28">
 				<div data-reveal className="reveal-up text-center mb-14">
 					<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4">Exports</div>
 					<h2 className="text-3xl sm:text-[40px] font-normal tracking-[-0.025em] leading-[1.1] m-0">
@@ -359,7 +358,7 @@ function ExportFormatsSection() {
 				    zone noire). Desktop : conserve le débord de -220px. */}
 				<div
 					ref={mediaRef}
-					className="relative w-full h-[420px] sm:w-screen sm:h-[500px] lg:h-[720px] overflow-hidden flex items-center justify-center sm:block sm:overflow-visible sm:-ml-8 md:-ml-16 lg:-ml-[220px] lg:w-[calc(100%+220px)]"
+					className="relative z-0 w-full h-[560px] sm:h-[720px] overflow-hidden flex items-center justify-center sm:block sm:overflow-visible"
 				>
 					{everInView && (
 						<video
@@ -370,11 +369,11 @@ function ExportFormatsSection() {
 							playsInline
 							preload="metadata"
 							onLoadedData={(e) => e.currentTarget.classList.add('is-loaded')}
-							/* Mobile (fix 26/07) : container 420px de haut, la vidéo est
-							   contenue en hauteur (object-contain) et CENTRÉE — plus de
-							   bande noire, phone visible plein cadre. Desktop (sm+) :
-							   comportement d'origine inchangé, débord à gauche. */
-							className="absolute inset-0 w-full h-full object-contain object-center sm:relative sm:inset-auto sm:w-full sm:h-full sm:object-contain sm:object-left pointer-events-none opacity-0 transition-opacity duration-700 ease-out [&.is-loaded]:opacity-100"
+							/* Mobile : hauteur du container, contenue et centrée (pas de
+							   bande noire). Desktop (lg+) : positionnement custom demandé
+							   — 1400px de large, décalée left 17% / top -12%, height 130%,
+							   z-0 (le titre Exports passe au-dessus en z-2). */
+							className="absolute inset-0 w-full h-full object-cover object-left scale-[0.9] origin-left z-0 sm:inset-auto sm:left-0 sm:top-[-12%] sm:w-[1400px] sm:h-[130%] sm:scale-100 sm:origin-center sm:object-contain sm:object-left pointer-events-none opacity-0 transition-opacity duration-700 ease-out [&.is-loaded]:opacity-100"
 						/>
 					)}
 				</div>
@@ -407,11 +406,11 @@ function ExportFormatsSection() {
 const DEVICES = [
 	{ name: 'iPhone 17 Pro',    img: '/cards/iphone17pro-apple.png' },
 	{ name: 'iPhone Air',       img: '/cards/iphoneAir-apple.png' },
-	{ name: 'iPad Pro',         img: '/cards/ipadPro-apple.webp' },
-	{ name: 'MacBook Pro 14"',  img: '/cards/macbookPro-apple.webp' },
-	{ name: 'iMac',             img: '/cards/imac-apple.webp' },
-	{ name: 'Studio Display',   img: '/cards/appleProDisplayXDR.jpg' },
-	{ name: 'Apple Watch Ultra',img: '/cards/appleWatchUltra.jpg' },
+	{ name: 'iPad Pro',         img: '/cards/ipad.png' },
+	{ name: 'MacBook Pro 14"',  img: '/cards/macbookPro.png' },
+	{ name: 'iMac',             img: '/cards/imac.png' },
+	{ name: 'Studio Display',   img: '/cards/appleProDisplayXDR.png' },
+	{ name: 'Apple Watch Ultra',img: '/cards/appleWatchUltra.png' },
 ]
 
 // Feature grid — cards texte seulement (les vidéos mockups ont été
@@ -450,10 +449,10 @@ const PLANS = [
 			'All 7 Apple devices',
 			'Photo mode — 1080p PNG export, no watermark',
 			'Video mode — local MP4 download with custom background',
-			'Save your video scenes and reopen them later',
+			'Video hosting on Mockiosa — optimized for Framer',
 			'Light intensity, screen positioning, zoom & pan',
 			'Drop shadow + shadow distance',
-			'50 exports per month',
+			'Unlimited photo exports',
 			'1 GB cloud storage',
 		],
 	},
@@ -495,11 +494,6 @@ const PLANS = [
 // qu'il achète maintenant et ce qui arrive « for free » sur son plan.
 const COMING_SOON = [
 	{
-		title: 'Custom device textures',
-		desc: 'Pick any color, brushed steel, matte black — dial in the exact finish for your brand.',
-		when: 'Float · Orbit',
-	},
-	{
 		title: 'Generated 3D environments',
 		desc: 'Drop your mockup into a real scene — desks, studios, cafes — generated on demand.',
 		when: 'Orbit',
@@ -515,11 +509,6 @@ const COMING_SOON = [
 		when: 'Float · Orbit',
 	},
 	{
-		title: 'MP4 export from any 3D scene',
-		desc: 'Server-rendered offline MP4 with alpha. Local WebM already ships — cloud MP4 is next.',
-		when: 'Float · Orbit',
-	},
-	{
 		title: 'Batch export',
 		desc: 'Queue a scene across 7 devices at once — one click, all your marketing shots ready.',
 		when: 'Orbit',
@@ -531,36 +520,44 @@ const COMING_SOON = [
 // Liste devices harmonisée sur les 7 du catalogue réel.
 const FAQ = [
 	{
-		q: 'Why no free plan / free trial?',
-		a: 'We’d rather let you try before you buy: there’s a free tool at /free to get a taste, and every plan is monthly — cancel anytime, no lock-in.',
+		q: 'Is it free to try?',
+		a: 'Yes — the free tool at /free lets you drop your own screenshots onto real 3D Apple devices right in the browser: orbit them, recolor them, see exactly what you’ll ship. No signup. Then every plan is monthly — cancel anytime from the Stripe portal, no lock-in.',
+	},
+	{
+		q: 'What’s free and what’s in the plugin?',
+		a: '/free is for testing — drop a screenshot on a device and look around. Everything you actually ship happens in the Framer plugin: pose and animate the scene, export a 4K PNG or an MP4, or embed the live 3D on your published site.',
 	},
 	{
 		q: 'Why not just use a free mockup tool?',
-		a: 'Free tools export files. Mockiosa lives in your Framer canvas and on your published site — change your design, your mockup updates. No export, no re-import, ever.',
-	},
-	{
-		q: 'Won’t a 3D embed kill my page speed?',
-		a: 'That’s the part we’re most proud of: instant poster image, lazy 3D loading, adaptive quality per device and connection. Your Lighthouse score survives — that’s the whole point.',
+		a: 'Free tools hand you a flat PNG. Mockiosa is real 3D that lives in your Framer canvas and on your published site — change your design and the mockup updates. No export, no re-import, ever.',
 	},
 	{
 		q: 'What devices are available?',
 		a: 'iPhone 17 Pro, iPhone Air, iPad Pro, MacBook Pro 14", iMac, Studio Display and Apple Watch Ultra — with more on the way.',
 	},
 	{
+		q: 'Can I put a video on the screen?',
+		a: 'Yes. Drop an MP4 or MOV and it plays on the device screen, looped and synced with the 3D motion. Mockiosa hosts the video for you, so your Framer site stays light instead of carrying the heavy file.',
+	},
+	{
 		q: 'How does the live 3D embed work?',
-		a: 'Orbit users get a Framer code component that they drop on the canvas. It renders the saved scene on the published landing, and checks the owner’s subscription on every mount (cached 30 minutes). If the subscription lapses, the component falls back to a watermarked PNG.',
+		a: 'Orbit users get a Framer code component to drop on the canvas. It renders your saved 3D scene on the published site and re-checks the subscription on each mount (cached 30 minutes). If the plan lapses, it falls back to a watermarked PNG.',
+	},
+	{
+		q: 'Won’t a 3D embed kill my page speed?',
+		a: 'That’s the part we’re most proud of: instant poster image, lazy 3D loading, adaptive quality per device and connection. Your Lighthouse score survives — that’s the whole point.',
 	},
 	{
 		q: 'Can I use the mockups commercially?',
 		a: 'Yes, on every paid plan.',
 	},
 	{
-		q: 'What about Windows / Linux?',
-		a: 'Mockiosa runs in the browser via WebGL — anywhere Framer runs, the plugin runs. Mac, Windows, Linux, ChromeOS.',
+		q: 'Do I need Blender or After Effects?',
+		a: 'No — that’s the whole point. Mockiosa is real-time 3D right inside Framer: pose the device, add motion, export in a couple of clicks. No Blender, no After Effects, no Rotato, no render farm.',
 	},
 	{
 		q: 'What does the name mean?',
-		a: 'A wink to levitation — our mockups float.',
+		a: 'A wink to levitation — our mockups float. A distant cousin of Wingardium Leviosa, except this one only works on your electronics.',
 	},
 ]
 
@@ -606,6 +603,7 @@ export default function LandingSections() {
 							muted
 							loop
 							playsInline
+							suppressHydrationWarning
 							className="absolute inset-0 w-full h-full object-cover"
 						/>
 					</div>
@@ -742,6 +740,24 @@ export default function LandingSections() {
 						</p>
 					</div>
 
+					{/* Offre de lancement — coupon Stripe Mockiosaaaaa (-30% sur 3 mois,
+					    50 places). max_redemptions=50 côté Stripe : le code se
+					    désactive tout seul une fois épuisé. */}
+					<div
+						data-reveal
+						className="reveal-up max-w-2xl mx-auto -mt-2 mb-12 flex flex-col sm:flex-row items-center justify-center gap-x-3 gap-y-2 rounded-2xl border border-[#e8702a]/45 bg-gradient-to-r from-[#e8702a]/[0.14] to-[#e8702a]/[0.04] px-5 py-3.5 text-center"
+					>
+						<span className="text-sm sm:text-[15px] font-semibold text-white">
+							🚀 Launch offer — 30% off your first 3 months
+						</span>
+						<span className="text-sm text-white/60">
+							First 50 only · code{' '}
+							<span className="font-mono font-semibold text-[#e8702a] bg-[#e8702a]/15 border border-[#e8702a]/30 rounded px-2 py-0.5">
+								Mockiosaaaaa
+							</span>
+						</span>
+					</div>
+
 					<div className="grid md:grid-cols-3 gap-4 md:gap-6 mt-14">
 						{PLANS.map((p, i) => (
 							<div
@@ -762,12 +778,22 @@ export default function LandingSections() {
 								) : null}
 								<div className="mb-2 text-sm font-semibold uppercase tracking-wider text-white/70">{p.name}</div>
 								<div className="text-sm text-white/55 mb-6">{p.blurb}</div>
-								<div className="mb-2 flex items-baseline gap-1">
-									<span className="text-4xl font-medium tracking-tight">${p.monthly}</span>
-									<span className="text-sm text-white/55">/month</span>
+								<div className="mb-2">
+									<div className="flex items-baseline gap-2">
+										<span className="text-4xl font-medium tracking-tight text-white">${(Number(p.monthly) * 0.7).toFixed(2)}</span>
+										<span className="text-lg text-white/40 line-through">${p.monthly}</span>
+										<span className="text-sm text-white/55">/month</span>
+									</div>
+									<div className="mt-1.5 text-xs font-medium text-[#e8702a]">−30% for your first 3 months</div>
+									<div className="text-[11px] text-white/40">then ${p.monthly}/month</div>
 								</div>
 								<Link
 									href={'/sign-up'}
+									onClick={() => {
+										try {
+											;(window as any).gtag?.('event', 'cta_click', {location: 'pricing', label: p.name.toLowerCase()})
+										} catch {}
+									}}
 									className={
 										'mt-6 block w-full text-center text-sm font-semibold px-5 py-3 rounded-full transition-all ' +
 										(p.highlight
@@ -837,7 +863,7 @@ export default function LandingSections() {
 
 			{/* ════════════ Section 7 — FAQ ════════════ */}
 			<section id="docs" className="relative px-6 md:px-16 py-20 md:py-28 border-t border-white/[0.07]">
-				<div className="max-w-[1560px] mx-auto">
+				<div className="max-w-5xl mx-auto">
 					<div data-reveal className="reveal-up mb-14">
 						<div className="text-xs font-medium tracking-[0.18em] uppercase text-[#e8702a] mb-4 flex items-center gap-3">
 							<span className="w-8 h-px bg-[#e8702a]" />

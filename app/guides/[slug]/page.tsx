@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { GUIDES, getGuide } from '@/lib/guides'
+import SiteHeader from '@/app/components/SiteHeader'
+import SiteFooter from '@/app/components/SiteFooter'
 
 export function generateStaticParams() {
 	return GUIDES.map((g) => ({ slug: g.slug }))
@@ -43,19 +45,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 		<div className="min-h-screen bg-[#0a0a0a] text-white">
 			<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
 
-			<nav className="flex items-center justify-between px-6 md:px-16 py-5 max-w-[1100px] mx-auto">
-				<Link href="/" className="flex items-center gap-2">
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-		<img src="/feather-pen-white.svg?v=7" alt="Mockiosa" width="20" height="20" aria-hidden="true" />
-					<span className="font-playfair text-lg">Mockiosa</span>
-				</Link>
-				<Link
-					href="/sign-up"
-					className="cta-skeu-light text-gray-900 text-sm font-semibold px-5 py-2 rounded-full transition-all hover:scale-[1.03]"
-				>
-					Try it free
-				</Link>
-			</nav>
+			<SiteHeader />
 
 			<main className="max-w-[680px] mx-auto px-6 pt-16 pb-32">
 				<Link href="/guides" className="text-[13px] text-white/35 hover:text-white/70 transition-colors">
@@ -103,6 +93,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 					</div>
 				</footer>
 			</main>
+			<SiteFooter />
 		</div>
 	)
 }

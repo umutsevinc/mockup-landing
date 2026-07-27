@@ -41,6 +41,35 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
 	{
+		version: '1.5.0',
+		name: 'Liftoff',
+		date: 'July 24, 2026',
+		highlight: true,
+		headline: 'Mockiosa is live — real 3D device mockups, public in Framer.',
+		story: [
+			'We opened the doors. The Framer plugin is out, the free playground at /free is open to everyone, and Mockiosa is featured on Product Hunt, Launch Llama, Peerlist and Noon Launch. Drop a screenshot on a real 3D Apple device, pose it, and ship it live on your Framer site — no Blender, no After Effects.',
+			'The headline addition this release: Mockiosa now hosts your screen videos for you, so your published Framer site stays light instead of carrying the heavy MP4.',
+		],
+		items: [
+			{ kind: '✨', text: 'Public launch — the Framer plugin and the free playground at /free are open to everyone.' },
+			{ kind: '✨', text: 'Video hosting on Mockiosa — screen videos are served from our edge, keeping your Framer site fast instead of shipping a heavy file.' },
+			{ kind: '✨', text: 'Live 3D embed (Orbit) — a Framer code component renders your real 3D scene on the published site, re-checks the subscription on each mount, and falls back to a watermarked PNG if the plan lapses.' },
+			{ kind: '✨', text: 'Capture your live website straight onto the device screen (Orbit) — the real page, not a screenshot.' },
+			{ kind: '🎨', text: 'New brand mark — the Mockiosa feather went full 3D, and now shows up as the favicon everywhere (tab, Google, iOS).' },
+		],
+	},
+	{
+		version: '1.4.5',
+		name: 'Finishes',
+		date: 'July 20, 2026',
+		headline: 'Any color, any finish — and room to drop bigger files.',
+		items: [
+			{ kind: '✨', text: 'Custom device textures — pick any hex color plus matte, brushed metal or glossy finish, on every device.' },
+			{ kind: '✨', text: 'Take a closer look now accepts drag-and-drop: drop a photo or video straight onto the 3D device to preview it.' },
+			{ kind: '⚡', text: 'Media upload cap raised to 20 MB for both images and video.' },
+		],
+	},
+	{
 		version: '1.4.0',
 		name: 'Device library',
 		date: 'July 16, 2026',

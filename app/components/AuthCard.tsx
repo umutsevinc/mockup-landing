@@ -42,6 +42,12 @@ export function AuthCard({
 				{/* form */}
 				<div className="flex flex-col justify-center px-6 sm:px-12 pt-24 pb-10">
 					<div className="w-full max-w-[400px] mx-auto">
+						<Link
+							href="/"
+							className="inline-flex items-center text-xs text-white/40 hover:text-white/70 transition-colors mb-6"
+						>
+							← Back to site
+						</Link>
 						<h1 className="text-[28px] sm:text-[32px] font-normal tracking-[-0.02em] leading-[1.1] mb-2">{title}</h1>
 						{subtitle ? (
 							<p className="text-[15px] text-white/50 mb-8 leading-relaxed">{subtitle}</p>
@@ -50,21 +56,11 @@ export function AuthCard({
 						)}
 						{children}
 						{footer ? <div className="mt-6 text-center">{footer}</div> : null}
-						{/* Back button déplacé ici (26/07) — plus proche du form, sur
-						    mobile il tombait hors de vue avec la nav top. */}
-						<div className="mt-6 text-center">
-							<Link
-								href="/"
-								className="text-xs text-white/40 hover:text-white/70 transition-colors"
-							>
-								← Back to site
-							</Link>
-						</div>
 					</div>
 
 					{/* footer */}
 					<div className="w-full max-w-[400px] mx-auto mt-14 flex items-center gap-4 text-xs text-white/30">
-						<span>© {new Date().getFullYear()} Memselon</span>
+						<span>© 2026 Memselon</span>
 						<span className="flex-1" />
 						<Link href="/terms" className="hover:text-white/60 transition-colors">Terms</Link>
 						<Link href="/privacy" className="hover:text-white/60 transition-colors">Privacy</Link>

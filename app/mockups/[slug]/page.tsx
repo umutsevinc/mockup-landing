@@ -4,6 +4,8 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { DEVICE_PAGES, getDevicePage } from '@/lib/mockup-pages'
 import DeviceViewerLazy from '@/app/components/DeviceViewerLazy'
+import SiteHeader from '@/app/components/SiteHeader'
+import SiteFooter from '@/app/components/SiteFooter'
 
 export function generateStaticParams() {
 	return DEVICE_PAGES.map((d) => ({ slug: d.slug }))
@@ -48,19 +50,7 @@ export default async function DeviceMockupPage({ params }: { params: Promise<{ s
 		<div className="min-h-screen bg-[#0a0a0a] text-white">
 			<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
-			<nav className="flex items-center justify-between px-6 md:px-16 py-5 max-w-[1100px] mx-auto">
-				<Link href="/" className="flex items-center gap-2">
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-		<img src="/feather-pen-white.svg?v=7" alt="Mockiosa" width="20" height="20" aria-hidden="true" />
-					<span className="font-playfair text-lg">Mockiosa</span>
-				</Link>
-				<Link
-					href="/sign-up"
-					className="cta-skeu-light text-gray-900 text-sm font-semibold px-5 py-2 rounded-full transition-all hover:scale-[1.03]"
-				>
-					Try it free
-				</Link>
-			</nav>
+			<SiteHeader />
 
 			<main className="max-w-[1100px] mx-auto px-6 md:px-16 pt-12 pb-32">
 				<header className="mb-10">
@@ -158,6 +148,7 @@ export default async function DeviceMockupPage({ params }: { params: Promise<{ s
 					</div>
 				</footer>
 			</main>
+			<SiteFooter />
 		</div>
 	)
 }

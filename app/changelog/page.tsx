@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CHANGELOG, type ChangelogMedia } from '@/lib/changelog'
+import SiteHeader from '@/app/components/SiteHeader'
+import SiteFooter from '@/app/components/SiteFooter'
 
 export const metadata: Metadata = {
 	title: 'Changelog — Mockiosa',
@@ -60,20 +62,7 @@ const KIND_LABEL: Record<string, string> = {
 export default function ChangelogPage() {
 	return (
 		<div className="min-h-screen bg-[#0a0a0a] text-white">
-			{/* Nav minimale */}
-			<nav className="flex items-center justify-between px-6 md:px-16 py-5 max-w-[1100px] mx-auto">
-				<Link href="/" className="flex items-center gap-2">
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-						<img src="/feather-pen-white.svg?v=7" alt="Mockiosa" width="20" height="20" aria-hidden="true" />
-					<span className="font-playfair text-lg">Mockiosa</span>
-				</Link>
-				<Link
-					href="/sign-up"
-					className="cta-skeu-light text-gray-900 text-sm font-semibold px-5 py-2 rounded-full transition-all hover:scale-[1.03]"
-				>
-					Try it free
-				</Link>
-			</nav>
+			<SiteHeader />
 
 			<main className="max-w-[760px] mx-auto px-6 pt-16 pb-32">
 				<header className="mb-16">
@@ -128,15 +117,8 @@ export default function ChangelogPage() {
 					))}
 				</div>
 
-				<footer className="mt-24 pt-8 border-t border-white/[0.07] flex items-center justify-between text-[13px] text-white/35">
-					<Link href="/" className="hover:text-white transition-colors">
-						← Back to Mockiosa
-					</Link>
-					<a href="mailto:hi@memselon.com" className="hover:text-white transition-colors">
-						hi@memselon.com
-					</a>
-				</footer>
 			</main>
+			<SiteFooter />
 		</div>
 	)
 }

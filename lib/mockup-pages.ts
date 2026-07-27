@@ -26,7 +26,7 @@ export const DEVICE_PAGES: DevicePage[] = [
 		slug: 'iphone-17-pro-mockup',
 		name: 'iPhone 17 Pro',
 		playgroundId: 'iphone17pro',
-		cardImg: '/cards/iphone17pro-apple.webp',
+		cardImg: '/cards/iphone17pro-apple.png',
 		seoTitle: 'iPhone 17 Pro Mockup — Free Interactive 3D (Framer-ready)',
 		seoDescription:
 			'Drop your screenshot on a real 3D iPhone 17 Pro mockup — orbit it, pick Cosmic Orange, Deep Blue or Silver, export 4K or embed it live in Framer. Try it right on this page.',
@@ -45,7 +45,7 @@ export const DEVICE_PAGES: DevicePage[] = [
 		slug: 'iphone-air-mockup',
 		name: 'iPhone Air',
 		playgroundId: 'iphoneAir',
-		cardImg: '/cards/iphoneAir-apple.webp',
+		cardImg: '/cards/iphoneAir-apple.png',
 		seoTitle: 'iPhone Air Mockup — Free Interactive 3D (Framer-ready)',
 		seoDescription:
 			'Real-time 3D iPhone Air mockup: drop your screenshot, orbit the thinnest iPhone, pick Sky Blue, Light Gold or Space Black. 4K export or live Framer embed.',
@@ -63,7 +63,7 @@ export const DEVICE_PAGES: DevicePage[] = [
 		slug: 'ipad-pro-mockup',
 		name: 'iPad Pro',
 		playgroundId: 'ipadPro',
-		cardImg: '/cards/ipadPro-apple.webp',
+		cardImg: '/cards/ipad.png',
 		seoTitle: 'iPad Pro Mockup — Free Interactive 3D (Framer-ready)',
 		seoDescription:
 			'Interactive 3D iPad Pro mockup in your browser: drop a screenshot or video on the screen, orbit the tablet, export 4K or embed it live on your Framer site.',
@@ -81,7 +81,7 @@ export const DEVICE_PAGES: DevicePage[] = [
 		slug: 'apple-watch-ultra-mockup',
 		name: 'Apple Watch Ultra',
 		playgroundId: 'appleWatchUltra',
-		cardImg: '/cards/appleWatchUltra.jpg',
+		cardImg: '/cards/appleWatchUltra.png',
 		seoTitle: 'Apple Watch Ultra Mockup — Free Interactive 3D',
 		seoDescription:
 			'Real-time 3D Apple Watch Ultra mockup: drop your watch face or app screen, orbit the titanium case, export 4K. Built for Framer.',
@@ -99,7 +99,7 @@ export const DEVICE_PAGES: DevicePage[] = [
 		slug: 'imac-mockup',
 		name: 'iMac',
 		playgroundId: 'imac',
-		cardImg: '/cards/imac-apple.webp',
+		cardImg: '/cards/imac.png',
 		seoTitle: 'iMac Mockup — Free Interactive 3D (Framer-ready)',
 		seoDescription:
 			'Interactive 3D iMac mockup: put your website or app on the 24-inch display, pick Blue, Green or Silver, orbit the scene, export 4K or embed it live in Framer.',
@@ -117,7 +117,7 @@ export const DEVICE_PAGES: DevicePage[] = [
 		slug: 'macbook-pro-mockup',
 		name: 'MacBook Pro 14"',
 		playgroundId: 'macbookPro',
-		cardImg: '/cards/macbookPro-apple.webp',
+		cardImg: '/cards/macbookPro.png',
 		seoTitle: 'MacBook Pro Mockup — Real 3D for Framer',
 		seoDescription:
 			'3D MacBook Pro 14" mockup for Framer: drop your website or app on the Liquid Retina XDR display, pose the lid angle, export 4K or embed the live scene.',
@@ -135,7 +135,7 @@ export const DEVICE_PAGES: DevicePage[] = [
 		slug: 'studio-display-mockup',
 		name: 'Studio Display',
 		playgroundId: 'appleProDisplayXDR',
-		cardImg: '/cards/appleProDisplayXDR.jpg',
+		cardImg: '/cards/appleProDisplayXDR.png',
 		seoTitle: 'Apple Studio Display Mockup — Real 3D for Framer',
 		seoDescription:
 			'3D Apple Studio Display mockup: your design on the 27-inch 5K display, in real 3D, inside Framer. Drop a screenshot, pose the scene, publish it live.',
