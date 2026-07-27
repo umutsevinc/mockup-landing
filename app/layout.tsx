@@ -136,6 +136,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				>
 					{`(function(){try{var id='${process.env.NEXT_PUBLIC_GA_ID ?? 'G-ZQ6Y1NWK9Y'}';if(new URLSearchParams(location.search).get('internal')==='1'){localStorage.setItem('memselon-internal','1');}if(localStorage.getItem('memselon-internal')==='1'||location.hostname==='localhost'){window['ga-disable-'+id]=true;}}catch(e){}})();`}
 				</Script>
+				{/* Étiquette TOUTES les données GA de ce site comme « Mockiosa ».
+				    memselon.com est sur un autre code GA — content_group (dimension
+				    GA4 native) + user property `brand` permettent de distinguer
+				    proprement les pages Mockiosa dans Analytics. Poussé dans le
+				    dataLayer AVANT gtag → le tout premier page_view est déjà tagué. */}
+				<Script id="ga-brand-tag" strategy="beforeInteractive">
+					{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('set',{content_group:'Mockiosa'});gtag('set','user_properties',{brand:'mockiosa'});`}
+				</Script>
 				{children}
 			</body>
 			{/* GA4 — flux dédié "Mockiosa" (propriété séparée de memselon.com).
