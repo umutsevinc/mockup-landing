@@ -114,13 +114,16 @@ const JSON_LD = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en">
-			<head>
-				<script
+			<body>
+				{/* JSON-LD via next/script (beforeInteractive) : rendu dans le
+				    HTML initial pour les crawlers, sans le <script> brut qui
+				    faisait planter l'hydratation React 19 sur la home. */}
+				<Script
+					id="ld-json-root"
 					type="application/ld+json"
+					strategy="beforeInteractive"
 					dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
 				/>
-			</head>
-			<body>
 				{/* Trafic interne : /?internal=1 pose un flag localStorage qui
 				    désactive GA sur CE navigateur pour toujours (plus fiable
 				    qu'un filtre IP avec une IP résidentielle qui tourne).
