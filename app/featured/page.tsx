@@ -16,9 +16,10 @@ export const metadata: Metadata = {
 type Feature = {
 	name: string
 	href: string
-	img: string
-	width: number
-	height: number
+	/** Badge officiel. Absent = fallback wordmark texte (le temps d'avoir le snippet). */
+	img?: string
+	width?: number
+	height?: number
 	alt: string
 }
 
@@ -54,6 +55,13 @@ const FEATURES: Feature[] = [
 		width: 200,
 		height: 72,
 		alt: 'Mockiosa',
+	},
+	{
+		// Pas de badge officiel fourni (SPA, URL du badge introuvable) →
+		// wordmark texte. Remplacer par le badge dès qu'on a le snippet.
+		name: 'Noon Launch',
+		href: 'https://noonlaunch.com/product/mockiosa',
+		alt: 'Mockiosa — Featured on Noon Launch',
 	},
 ]
 
@@ -98,17 +106,27 @@ export default function FeaturedPage() {
 							className="group flex flex-col items-center justify-center gap-5 bg-white/[0.03] border border-white/[0.08] rounded-2xl p-8 min-h-[168px] transition-colors hover:border-white/20 hover:bg-white/[0.05]"
 							aria-label={f.alt}
 						>
-							{/* eslint-disable-next-line @next/next/no-img-element */}
-							<img
-								src={f.img}
-								alt={f.alt}
-								width={f.width}
-								height={f.height}
-								className="h-[50px] w-auto drop-shadow-lg"
-							/>
-							<span className="text-xs text-white/40 group-hover:text-white/70 transition-colors">
-								{f.name} →
-							</span>
+							{f.img ? (
+								<>
+									{/* eslint-disable-next-line @next/next/no-img-element */}
+									<img
+										src={f.img}
+										alt={f.alt}
+										width={f.width}
+										height={f.height}
+										className="h-[50px] w-auto drop-shadow-lg"
+									/>
+									<span className="text-xs text-white/40 group-hover:text-white/70 transition-colors">
+										{f.name} →
+									</span>
+								</>
+							) : (
+								// Fallback sans badge officiel : wordmark texte centré.
+								<span className="flex h-[50px] items-center text-xl font-semibold text-white/90">
+									{f.name}
+									<span className="ml-2 text-white/40 group-hover:text-white/70 transition-colors">→</span>
+								</span>
+							)}
 						</a>
 					))}
 				</div>
