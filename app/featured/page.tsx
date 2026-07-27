@@ -49,11 +49,11 @@ const FEATURES: Feature[] = [
 	},
 	{
 		name: 'Peerlist',
-		href: 'https://peerlist.io',
-		img: 'https://peerlist.io/images/logo.svg',
-		width: 160,
-		height: 40,
-		alt: 'Mockiosa — Featured on Peerlist',
+		href: 'https://peerlist.io/memselon/project/mockiosa',
+		img: 'https://peerlist.io/api/v1/projects/embed/PRJHDNDAPLDAA8EAP1NRDJONM9LRBJ?showUpvote=false&theme=light',
+		width: 200,
+		height: 72,
+		alt: 'Mockiosa',
 	},
 ]
 
