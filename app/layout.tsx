@@ -44,18 +44,9 @@ export const metadata: Metadata = {
 		site: '@memselon',
 		creator: '@memselon',
 	},
-	icons: {
-		// L'icône officielle Mockiosa (feather-pen). Deux SVG : noir (light mode
-		// browser) et blanc (dark mode) — les 2 sont posés dans <head>, le
-		// browser pick le bon via media="(prefers-color-scheme: dark)".
-		// ?v=9 : cache-bust — les navigateurs gardent les favicons très longtemps.
-		icon: [
-			{url: '/icon.svg?v=9', type: 'image/svg+xml', media: '(prefers-color-scheme: light)'},
-			{url: '/icon-dark.svg?v=9', type: 'image/svg+xml', media: '(prefers-color-scheme: dark)'},
-			{url: '/brand-icon-512.png?v=9', type: 'image/png', sizes: '512x512'},
-		],
-		apple: [{url: '/apple-icon.png?v=9', type: 'image/png', sizes: '180x180'}],
-	},
+	// Favicons servis par la convention Next (app/icon.png, app/apple-icon.png,
+	// app/favicon.ico) : la plume bleue 3D Mockiosa, déclinée et cache-bustée
+	// automatiquement par le hash de build. Pas de bloc `icons` manuel.
 }
 
 // JSON-LD — SoftwareApplication + FAQ. Rendered server-side in the
