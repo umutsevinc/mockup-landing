@@ -73,6 +73,12 @@ const ITEMS: Item[] = [
 			</span>
 		),
 	},
+	{
+		name: 'ProductWatch',
+		href: 'https://productwatch.io/products/mockiosa?utm_source=badge',
+		img: 'https://productwatch.io/backend/api/v1/badge/featured?productId=7d74c73b-5790-4f90-84cc-a3383ce39bae&darkMode=false',
+		alt: 'Mockiosa — Featured on ProductWatch',
+	},
 ]
 
 function badge(f: Item, key: string, hidden: boolean) {

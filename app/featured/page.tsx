@@ -103,6 +103,14 @@ const FEATURES: Feature[] = [
 			</div>
 		),
 	},
+	{
+		name: 'ProductWatch',
+		href: 'https://productwatch.io/products/mockiosa?utm_source=badge',
+		img: 'https://productwatch.io/backend/api/v1/badge/featured?productId=7d74c73b-5790-4f90-84cc-a3383ce39bae&darkMode=false',
+		width: 250,
+		height: 54,
+		alt: 'Mockiosa — Featured on ProductWatch',
+	},
 ]
 
 export default function FeaturedPage() {

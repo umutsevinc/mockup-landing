@@ -8,7 +8,6 @@ import { Menu } from 'lucide-react'
 import LandingSections from './components/LandingSections'
 import FeaturedMarquee from './components/FeaturedMarquee'
 import MerveTutorial from './components/MerveTutorial'
-import ProductHuntBanner from './components/ProductHuntBanner'
 import PhNavBadge from './components/PhNavBadge'
 import SpotsLeft from './components/SpotsLeft'
 import CheckoutSuccessToast from './components/CheckoutSuccessToast'
@@ -212,10 +211,7 @@ export default function HomePage() {
 			{/* ───── All sections below the hero ───── */}
 			<LandingSections />
 
-			{/* Lancement Product Hunt — carte dismissible en bas à droite */}
-			<ProductHuntBanner />
-
-			{/* PH official badge floating bottom-right (au-dessus de la banner) */}
+			{/* PH official badge floating bottom-right */}
 			<div className="fixed bottom-4 right-4 z-[130] hidden sm:block">
 				<PhNavBadge />
 			</div>
