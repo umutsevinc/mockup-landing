@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import { Menu } from 'lucide-react'
 import LandingSections from './components/LandingSections'
+import FeaturedMarquee from './components/FeaturedMarquee'
 import MerveTutorial from './components/MerveTutorial'
 import ProductHuntBanner from './components/ProductHuntBanner'
 import PhNavBadge from './components/PhNavBadge'
@@ -201,6 +202,9 @@ export default function HomePage() {
 					</div>
 				</div>
 			</section>
+
+			{/* ───── Bandeau « Featured on » — logos qui défilent à l'infini ───── */}
+			<FeaturedMarquee />
 
 			{/* ───── Merve tutorial — juste après le hero ───── */}
 			<MerveTutorial />

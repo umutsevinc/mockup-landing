@@ -115,6 +115,34 @@ html {
   }
 }
 
+/* ──────────────────────────────────────────────────────────────────
+   Marquee « Featured on » — bandeau logos qui défile à l'infini.
+   La piste contient DEUX copies identiques des items ; on translate de
+   -50 % → au moment où la 1re copie sort, la 2de est pile en place :
+   boucle sans couture. L'espacement est porté par un margin-right sur
+   chaque item (pas de flex-gap) pour que les deux moitiés soient
+   rigoureusement identiques (le flex-gap casserait le -50 % exact).
+   ────────────────────────────────────────────────────────────── */
+@keyframes marqueeScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marqueeScroll 42s linear infinite;
+  will-change: transform;
+}
+.marquee-track:hover .animate-marquee {
+  animation-play-state: paused;
+}
+/* Fondu sur les bords : les logos apparaissent/disparaissent en douceur. */
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none; }
+}
+
 /* ── Skeuomorphic CTAs ─────────────────────────────────────────────
    Convex "pill" buttons: vertical gradient, top inner highlight,
    bottom inner shade, soft colored drop shadow. Pressed state sinks. */
