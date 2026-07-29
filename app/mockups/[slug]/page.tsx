@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
@@ -48,7 +49,15 @@ export default async function DeviceMockupPage({ params }: { params: Promise<{ s
 
 	return (
 		<div className="min-h-screen bg-[#0a0a0a] text-white">
-			<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+			{/* JSON-LD via next/script : rendu dans le HTML pour les crawlers,
+			    sans le <script> brut qui déclenche le warning React « script tag »
+			    en navigation soft. Sanitize `<` → < (anti-XSS, cf. doc Next). */}
+			<Script
+				id={`ld-mockup-${page.slug}`}
+				type="application/ld+json"
+				strategy="beforeInteractive"
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, '\\u003c') }}
+			/>
 
 			<SiteHeader />
 

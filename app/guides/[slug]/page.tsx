@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { GUIDES, getGuide } from '@/lib/guides'
@@ -43,7 +44,15 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
 	return (
 		<div className="min-h-screen bg-[#0a0a0a] text-white">
-			<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+			{/* JSON-LD via next/script : rendu dans le HTML pour les crawlers,
+			    sans le <script> brut qui déclenche le warning React « script tag »
+			    en navigation soft. Sanitize `<` → < (anti-XSS, cf. doc Next). */}
+			<Script
+				id={`ld-guide-${guide.slug}`}
+				type="application/ld+json"
+				strategy="beforeInteractive"
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, '\\u003c') }}
+			/>
 
 			<SiteHeader />
 
