@@ -79,6 +79,12 @@ const ITEMS: Item[] = [
 		img: 'https://productwatch.io/backend/api/v1/badge/featured?productId=7d74c73b-5790-4f90-84cc-a3383ce39bae&darkMode=false',
 		alt: 'Mockiosa — Featured on ProductWatch',
 	},
+	{
+		name: 'Twelve Tools',
+		href: 'https://twelve.tools',
+		img: 'https://twelve.tools/badge2-white.svg',
+		alt: 'Featured on Twelve Tools',
+	},
 ]
 
 function badge(f: Item, key: string, hidden: boolean) {

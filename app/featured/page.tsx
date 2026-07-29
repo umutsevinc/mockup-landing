@@ -111,6 +111,14 @@ const FEATURES: Feature[] = [
 		height: 54,
 		alt: 'Mockiosa — Featured on ProductWatch',
 	},
+	{
+		name: 'Twelve Tools',
+		href: 'https://twelve.tools',
+		img: 'https://twelve.tools/badge2-white.svg',
+		width: 200,
+		height: 54,
+		alt: 'Featured on Twelve Tools',
+	},
 ]
 
 export default function FeaturedPage() {
