@@ -85,6 +85,12 @@ const ITEMS: Item[] = [
 		img: 'https://twelve.tools/badge2-white.svg',
 		alt: 'Featured on Twelve Tools',
 	},
+	{
+		name: 'Plug Your Build',
+		href: 'https://plugyourbuild.com/listing/mockiosa-98e4ab',
+		img: 'https://plugyourbuild.com/api/badge/mockiosa-98e4ab?style=light',
+		alt: 'Listed on Plug Your Build',
+	},
 ]
 
 function badge(f: Item, key: string, hidden: boolean) {

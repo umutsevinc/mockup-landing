@@ -119,6 +119,14 @@ const FEATURES: Feature[] = [
 		height: 54,
 		alt: 'Featured on Twelve Tools',
 	},
+	{
+		name: 'Plug Your Build',
+		href: 'https://plugyourbuild.com/listing/mockiosa-98e4ab',
+		img: 'https://plugyourbuild.com/api/badge/mockiosa-98e4ab?style=light',
+		width: 180,
+		height: 40,
+		alt: 'Listed on Plug Your Build',
+	},
 ]
 
 export default function FeaturedPage() {
