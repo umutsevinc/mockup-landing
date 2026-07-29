@@ -1,4 +1,5 @@
 import type {ReactNode} from 'react'
+import BadgeImg from './BadgeImg'
 
 // Bandeau « Featured on » qui défile à l'infini à l'horizontal, juste
 // après le hero. Reprend TOUS les annuaires listés sur /featured. Chaque
@@ -108,8 +109,18 @@ function badge(f: Item, key: string, hidden: boolean) {
 			{f.node ? (
 				f.node
 			) : (
-				/* eslint-disable-next-line @next/next/no-img-element */
-				<img src={f.img} alt="" width={160} height={40} className="h-8 w-auto" loading="lazy" decoding="async" />
+				<BadgeImg
+					src={f.img!}
+					alt=""
+					width={160}
+					height={40}
+					className="h-8 w-auto"
+					fallback={
+						<span className="whitespace-nowrap text-[17px] font-extrabold tracking-[-0.025em] text-white">
+							{f.name}
+						</span>
+					}
+				/>
 			)}
 		</a>
 	)

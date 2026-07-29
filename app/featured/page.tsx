@@ -3,6 +3,7 @@ import type {ReactNode} from 'react'
 import Link from 'next/link'
 import SiteHeader from '@/app/components/SiteHeader'
 import SiteFooter from '@/app/components/SiteFooter'
+import BadgeImg from '@/app/components/BadgeImg'
 
 // Page « Featured on » — liste TOUS les annuaires / newsletters / plateformes
 // de lancement où Mockiosa apparaît, avec le badge officiel de chacun. Évite
@@ -164,8 +165,8 @@ export default function FeaturedPage() {
 								f.node
 							) : f.img ? (
 								<>
-									{/* eslint-disable-next-line @next/next/no-img-element */}
-									<img
+									{/* Badge officiel — repli sur le wordmark ci-dessous si l'image 404. */}
+									<BadgeImg
 										src={f.img}
 										alt={f.alt}
 										width={f.width}
