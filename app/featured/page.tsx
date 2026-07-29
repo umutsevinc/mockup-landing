@@ -60,6 +60,14 @@ const FEATURES: Feature[] = [
 		height: 120,
 		alt: 'Mockiosa — Featured on Noon Launch',
 	},
+	{
+		name: 'EasyDoFollow',
+		href: 'https://easydofollow.dev/saas/https-mockiosa-memselon-com',
+		img: 'https://easydofollow.dev/badge/easydofollow-badge-light.svg',
+		width: 188,
+		height: 56,
+		alt: 'Featured on EasyDoFollow',
+	},
 ]
 
 export default function FeaturedPage() {
