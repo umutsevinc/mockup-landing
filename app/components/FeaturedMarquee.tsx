@@ -92,6 +92,12 @@ const ITEMS: Item[] = [
 		img: 'https://plugyourbuild.com/api/badge/mockiosa-98e4ab?style=light',
 		alt: 'Listed on Plug Your Build',
 	},
+	{
+		name: 'KittyLaunch',
+		href: 'https://kittylaunch.com/p/mockiosa',
+		img: 'https://kittylaunch.com/api/public/badges/launch_badge.svg?theme=dark&name=Mockiosa',
+		alt: 'Mockiosa on KittyLaunch',
+	},
 ]
 
 function badge(f: Item, key: string, hidden: boolean) {

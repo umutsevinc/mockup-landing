@@ -128,6 +128,14 @@ const FEATURES: Feature[] = [
 		height: 40,
 		alt: 'Listed on Plug Your Build',
 	},
+	{
+		name: 'KittyLaunch',
+		href: 'https://kittylaunch.com/p/mockiosa',
+		img: 'https://kittylaunch.com/api/public/badges/launch_badge.svg?theme=dark&name=Mockiosa',
+		width: 280,
+		height: 68,
+		alt: 'Mockiosa on KittyLaunch',
+	},
 ]
 
 export default function FeaturedPage() {
