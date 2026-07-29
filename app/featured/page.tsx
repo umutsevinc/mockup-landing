@@ -1,4 +1,5 @@
 import type {Metadata} from 'next'
+import type {ReactNode} from 'react'
 import Link from 'next/link'
 import SiteHeader from '@/app/components/SiteHeader'
 import SiteFooter from '@/app/components/SiteFooter'
@@ -22,6 +23,8 @@ type Feature = {
 	img?: string
 	width?: number
 	height?: number
+	/** Badge custom (SVG + texte inline) quand l'annuaire n'a pas de simple image. Prioritaire sur `img`. */
+	node?: ReactNode
 	alt: string
 }
 
@@ -68,6 +71,38 @@ const FEATURES: Feature[] = [
 		height: 56,
 		alt: 'Featured on EasyDoFollow',
 	},
+	{
+		// Pas d'image simple — badge inline (étoile gradient + wordmark),
+		// redessiné pour le thème sombre de /featured. Le backlink dofollow
+		// vers la fiche startup est l'essentiel (c'est ce que Tiny Startups vérifie).
+		name: 'Tiny Startups',
+		href: 'https://www.tinystartups.com/startup/mockiosa',
+		alt: 'Mockiosa — Launched on Tiny Startups',
+		node: (
+			<div className="flex items-center gap-3.5">
+				<svg width="52" height="52" viewBox="0 0 100 100" aria-hidden="true" className="shrink-0 drop-shadow-lg">
+					<defs>
+						<linearGradient id="tsg" x1=".1" y1="0" x2=".9" y2="1">
+							<stop offset="0%" stopColor="#3525E6" />
+							<stop offset="55%" stopColor="#D81FE0" />
+							<stop offset="100%" stopColor="#22B8F0" />
+						</linearGradient>
+					</defs>
+					<path
+						d="M50 6C52 32 68 48 94 50C68 52 52 68 50 94C48 68 32 52 6 50C32 48 48 32 50 6Z"
+						fill="url(#tsg)"
+					/>
+				</svg>
+				<span className="flex flex-col leading-[1.15] text-left">
+					<span className="font-mono text-[9px] font-semibold tracking-[0.18em] uppercase text-white/40">
+						Launched on
+					</span>
+					<span className="text-[22px] font-extrabold tracking-[-0.025em] text-white">Tiny Startups</span>
+					<span className="mt-1 text-[11px] text-white/40">tinystartups.com</span>
+				</span>
+			</div>
+		),
+	},
 ]
 
 export default function FeaturedPage() {
@@ -101,7 +136,9 @@ export default function FeaturedPage() {
 							className="group flex flex-col items-center justify-center gap-5 bg-white/[0.03] border border-white/[0.08] rounded-2xl p-8 min-h-[168px] transition-colors hover:border-white/20 hover:bg-white/[0.05]"
 							aria-label={f.alt}
 						>
-							{f.img ? (
+							{f.node ? (
+								f.node
+							) : f.img ? (
 								<>
 									{/* eslint-disable-next-line @next/next/no-img-element */}
 									<img
