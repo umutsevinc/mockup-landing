@@ -8,7 +8,6 @@ import { Menu } from 'lucide-react'
 import LandingSections from './components/LandingSections'
 import FeaturedMarquee from './components/FeaturedMarquee'
 import MerveTutorial from './components/MerveTutorial'
-import PhNavBadge from './components/PhNavBadge'
 import SpotsLeft from './components/SpotsLeft'
 import CheckoutSuccessToast from './components/CheckoutSuccessToast'
 
@@ -210,11 +209,6 @@ export default function HomePage() {
 
 			{/* ───── All sections below the hero ───── */}
 			<LandingSections />
-
-			{/* PH official badge floating bottom-right */}
-			<div className="fixed bottom-4 right-4 z-[130] hidden sm:block">
-				<PhNavBadge />
-			</div>
 
 			{/* Toast succès Stripe — écoute `?checkout=success&plan=xxx` et
 			    nettoie l'URL après display. No-op sinon. */}
