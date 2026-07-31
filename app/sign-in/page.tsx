@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { AuthCard, AuthInput, AuthButton, AuthError } from '@/app/components/AuthCard'
+import { AuthCard, AuthInput, AuthButton, AuthError, AuthNotice } from '@/app/components/AuthCard'
 
 export default function SignInPage() {
 	const router = useRouter()
@@ -12,6 +12,22 @@ export default function SignInPage() {
 	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState('')
+	const [notice, setNotice] = useState('')
+
+	// Redirigé depuis /sign-up quand le compte existe déjà (?exists=1) :
+	// on affiche un message et on pré-remplit l'email. Lu via
+	// window.location (plutôt que useSearchParams) pour éviter d'imposer
+	// une <Suspense> sur toute la page. Effet post-mount → pas de mismatch.
+	useEffect(() => {
+		try {
+			const p = new URLSearchParams(window.location.search)
+			if (p.get('exists') === '1') {
+				setNotice('You already have an account with this email — just sign in below.')
+			}
+			const prefill = p.get('email')
+			if (prefill) setEmail(prefill)
+		} catch {}
+	}, [])
 
 	async function onSubmit(e: React.FormEvent) {
 		e.preventDefault()
@@ -58,6 +74,7 @@ export default function SignInPage() {
 			}
 		>
 			<form onSubmit={onSubmit} noValidate>
+				<AuthNotice>{notice}</AuthNotice>
 				<AuthInput
 					label="Email"
 					type="email"

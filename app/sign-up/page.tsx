@@ -43,17 +43,29 @@ export default function SignUpPage() {
 		})
 		setLoading(false)
 		if (err) {
-			// Erreurs Supabase les plus fréquentes traduites :
-			//  - "Password should be at least X characters" → validé côté client
-			//  - "Password has been leaked" → Pwned Password Protection activée
-			//  - "User already registered" → collision email
+			// Mot de passe compromis (Pwned Password Protection) → inline.
 			if (/leaked|pwned|compromised/i.test(err.message)) {
 				setError('This password appears in known breach lists. Please choose another.')
-			} else if (/already registered/i.test(err.message)) {
-				setError('An account already exists with this email — try signing in.')
-			} else {
-				setError(err.message)
+				return
 			}
+			// Compte déjà existant renvoyé comme vraie erreur (cas "confirm
+			// email OFF" ou protection anti-énumération désactivée) →
+			// on redirige vers le login plutôt qu'un message inline.
+			if (/already registered|already exists|already been registered/i.test(err.message)) {
+				router.replace(`/sign-in?exists=1&email=${encodeURIComponent(email)}`)
+				return
+			}
+			setError(err.message)
+			return
+		}
+		// ⚠️ Piège Supabase : avec "Confirm email" activé + protection
+		// anti-énumération (défaut), se réinscrire avec un email DÉJÀ
+		// confirmé ne renvoie PAS d'erreur — c'est un succès factice avec
+		// data.user.identities === [] et AUCUN email envoyé. C'est le seul
+		// signal fiable pour détecter le doublon ici → redirige vers login.
+		// (Un vrai nouveau compte a identities.length === 1.)
+		if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+			router.replace(`/sign-in?exists=1&email=${encodeURIComponent(email)}`)
 			return
 		}
 		// Comportement Supabase selon la config projet :

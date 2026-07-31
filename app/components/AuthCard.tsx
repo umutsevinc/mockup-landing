@@ -147,3 +147,14 @@ export function AuthError({ children }: { children: ReactNode }) {
 		</div>
 	)
 }
+
+// Bandeau info (accent orange marque) — distinct de l'erreur rouge.
+// Utilisé p.ex. sur /sign-in quand on redirige un compte déjà existant.
+export function AuthNotice({ children }: { children: ReactNode }) {
+	if (!children) return null
+	return (
+		<div className="mb-4 px-4 py-2.5 rounded-xl bg-[#e8702a]/10 border border-[#e8702a]/25 text-[#f0a06a] text-[13px] leading-relaxed">
+			{children}
+		</div>
+	)
+}
