@@ -9,7 +9,13 @@ const FALLBACK_TOTAL = 50
 
 export async function GET() {
 	const key = process.env.STRIPE_SECRET_KEY
-	const headers = {'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120'}
+	// CORS ouvert : le plugin Framer (autre origine : framer.com / localhost)
+	// consomme ce même compteur pour afficher l'offre de lancement dans le
+	// profil. Endpoint public en lecture seule (aucune donnée sensible).
+	const headers = {
+		'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+		'Access-Control-Allow-Origin': '*',
+	}
 
 	if (!key) {
 		return Response.json({remaining: FALLBACK_TOTAL, total: FALLBACK_TOTAL, live: false}, {headers})
