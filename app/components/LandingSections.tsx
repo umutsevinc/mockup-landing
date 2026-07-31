@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import PromoCode from './PromoCode'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import StudioFeatures from './StudioFeatures'
@@ -748,13 +749,10 @@ export default function LandingSections() {
 						className="reveal-up max-w-2xl mx-auto -mt-2 mb-12 flex flex-col sm:flex-row items-center justify-center gap-x-3 gap-y-2 rounded-2xl border border-[#e8702a]/45 bg-gradient-to-r from-[#e8702a]/[0.14] to-[#e8702a]/[0.04] px-5 py-3.5 text-center"
 					>
 						<span className="text-sm sm:text-[15px] font-semibold text-white">
-							🚀 Launch offer — 30% off your first 3 months
+							🚀 Launch offer — 30% off, for life
 						</span>
-						<span className="text-sm text-white/60">
-							First 50 only · code{' '}
-							<span className="font-mono font-semibold text-[#e8702a] bg-[#e8702a]/15 border border-[#e8702a]/30 rounded px-2 py-0.5">
-								Mockiosaaaaa
-							</span>
+						<span className="text-sm text-white/60 inline-flex items-center gap-1.5">
+							First 50 only · code <PromoCode code="Mockiosaaaaa" />
 						</span>
 					</div>
 
@@ -784,8 +782,8 @@ export default function LandingSections() {
 										<span className="text-lg text-white/40 line-through">${p.monthly}</span>
 										<span className="text-sm text-white/55">/month</span>
 									</div>
-									<div className="mt-1.5 text-xs font-medium text-[#e8702a]">−30% for your first 3 months</div>
-									<div className="text-[11px] text-white/40">then ${p.monthly}/month</div>
+									<div className="mt-1.5 text-xs font-medium text-[#e8702a]">−30% locked in for life</div>
+									<div className="text-[11px] text-white/40">for the first 50 members</div>
 								</div>
 								<Link
 									href={'/sign-up'}

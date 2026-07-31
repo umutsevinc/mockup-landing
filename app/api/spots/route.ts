@@ -4,7 +4,9 @@
 // Stripe. Nécessite STRIPE_SECRET_KEY côté serveur ; sans clé, on
 // dégrade proprement sur le total (aucune place consommée affichée).
 
-const PROMO_ID = process.env.STRIPE_PROMO_ID || 'promo_1TxkDh083OcIodiDohbt3bII'
+// Code promo « Mockiosaaaaa » LIFETIME (coupon kvp1X2ZY, 30% forever, 50 places).
+// L'ancien code 3 mois (promo_1TxkDh…) est archivé. Surchargable via env.
+const PROMO_ID = process.env.STRIPE_PROMO_ID || 'promo_1Tz7sw083OcIodiDgdxvPbWg'
 const FALLBACK_TOTAL = 50
 
 export async function GET() {

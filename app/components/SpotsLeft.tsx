@@ -40,7 +40,7 @@ export default function SpotsLeft({variant = 'pill'}: {variant?: 'pill' | 'text'
 			className="inline-flex items-center gap-2 rounded-full border border-[#e8702a]/45 bg-[#e8702a]/10 px-4 py-2 text-sm font-medium text-white hover:bg-[#e8702a]/[0.16] transition-colors"
 		>
 			<span className="w-2 h-2 rounded-full bg-[#e8702a] animate-pulse" />
-			<span className="font-semibold">Launch: 30% off your first 3 months</span>
+			<span className="font-semibold">Launch: 30% off, for life</span>
 			<span className="text-white/55">· {remaining} of {total} spots left</span>
 		</a>
 	)
