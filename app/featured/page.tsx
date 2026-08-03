@@ -174,6 +174,18 @@ const FEATURES: Feature[] = [
 		height: 240,
 		alt: 'Mockiosa — Featured on ListBulb',
 	},
+	{
+		// dailypings.com est derrière un challenge Cloudflare (403 hors navigateur) :
+		// dimensions reprises du snippet officiel, non vérifiées contre le SVG.
+		// Si le challenge s'applique aussi aux <img> cross-origin, BadgeImg masque
+		// le badge et la carte retombe sur le libellé « DailyPings → ».
+		name: 'DailyPings',
+		href: 'https://dailypings.com/p/mockiosa-real-3d-real',
+		img: 'https://dailypings.com/badge-light.svg',
+		width: 179,
+		height: 32,
+		alt: 'Mockiosa — Featured on DailyPings',
+	},
 ]
 
 export default function FeaturedPage() {

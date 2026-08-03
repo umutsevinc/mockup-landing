@@ -122,6 +122,12 @@ const ITEMS: Item[] = [
 		img: 'https://www.listbulb.com/featured-on-listbulb-light.svg',
 		alt: 'Mockiosa — Featured on ListBulb',
 	},
+	{
+		name: 'DailyPings',
+		href: 'https://dailypings.com/p/mockiosa-real-3d-real',
+		img: 'https://dailypings.com/badge-light.svg',
+		alt: 'Mockiosa — Featured on DailyPings',
+	},
 ]
 
 function badge(f: Item, key: string, hidden: boolean) {
