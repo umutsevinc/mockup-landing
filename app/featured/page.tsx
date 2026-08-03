@@ -146,6 +146,14 @@ const FEATURES: Feature[] = [
 		height: 44,
 		alt: 'Mockiosa — Featured on DanielLaunches',
 	},
+	{
+		name: 'FoundrList',
+		href: 'https://www.foundrlist.com/product/mockiosa?utm_source=badge&utm_medium=embed',
+		img: 'https://www.foundrlist.com/api/badge/mockiosa',
+		width: 150,
+		height: 48,
+		alt: 'Mockiosa — Featured on FoundrList',
+	},
 ]
 
 export default function FeaturedPage() {

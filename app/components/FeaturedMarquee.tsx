@@ -104,6 +104,12 @@ const ITEMS: Item[] = [
 		img: 'https://daniellaunches.com/badge-dark.svg',
 		alt: 'Mockiosa — Featured on DanielLaunches',
 	},
+	{
+		name: 'FoundrList',
+		href: 'https://www.foundrlist.com/product/mockiosa?utm_source=badge&utm_medium=embed',
+		img: 'https://www.foundrlist.com/api/badge/mockiosa',
+		alt: 'Mockiosa — Featured on FoundrList',
+	},
 ]
 
 function badge(f: Item, key: string, hidden: boolean) {
