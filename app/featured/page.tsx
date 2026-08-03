@@ -154,6 +154,16 @@ const FEATURES: Feature[] = [
 		height: 48,
 		alt: 'Mockiosa — Featured on FoundrList',
 	},
+	{
+		// Variante `light` volontaire : le `launchit-dark.svg` (#111111) se
+		// confondrait avec la carte sur ce fond, le blanc ressort.
+		name: 'Launchit',
+		href: 'https://www.launchit.site/launches/mockiosa',
+		img: 'https://www.launchit.site/badges/launchit-light.svg',
+		width: 200,
+		height: 54,
+		alt: 'Mockiosa — Featured on Launchit',
+	},
 ]
 
 export default function FeaturedPage() {

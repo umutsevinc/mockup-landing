@@ -110,6 +110,12 @@ const ITEMS: Item[] = [
 		img: 'https://www.foundrlist.com/api/badge/mockiosa',
 		alt: 'Mockiosa — Featured on FoundrList',
 	},
+	{
+		name: 'Launchit',
+		href: 'https://www.launchit.site/launches/mockiosa',
+		img: 'https://www.launchit.site/badges/launchit-light.svg',
+		alt: 'Mockiosa — Featured on Launchit',
+	},
 ]
 
 function badge(f: Item, key: string, hidden: boolean) {
