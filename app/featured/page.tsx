@@ -136,6 +136,16 @@ const FEATURES: Feature[] = [
 		height: 68,
 		alt: 'Mockiosa on KittyLaunch',
 	},
+	{
+		// Variante `dark` du badge : c'est celle dessinée POUR un fond sombre
+		// (pill #262019), donc la bonne ici — `badge-light.svg` est le blanc cassé.
+		name: 'DanielLaunches',
+		href: 'https://daniellaunches.com',
+		img: 'https://daniellaunches.com/badge-dark.svg',
+		width: 200,
+		height: 44,
+		alt: 'Mockiosa — Featured on DanielLaunches',
+	},
 ]
 
 export default function FeaturedPage() {

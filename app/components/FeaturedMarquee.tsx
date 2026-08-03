@@ -98,6 +98,12 @@ const ITEMS: Item[] = [
 		img: 'https://kittylaunch.com/api/public/badges/launch_badge.svg?theme=dark&name=Mockiosa',
 		alt: 'Mockiosa on KittyLaunch',
 	},
+	{
+		name: 'DanielLaunches',
+		href: 'https://daniellaunches.com',
+		img: 'https://daniellaunches.com/badge-dark.svg',
+		alt: 'Mockiosa — Featured on DanielLaunches',
+	},
 ]
 
 function badge(f: Item, key: string, hidden: boolean) {
