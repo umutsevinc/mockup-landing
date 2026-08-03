@@ -164,6 +164,16 @@ const FEATURES: Feature[] = [
 		height: 54,
 		alt: 'Mockiosa — Featured on Launchit',
 	},
+	{
+		// Idem Launchit : la variante `dark` (#0b1220) disparaîtrait sur la carte.
+		// Badge natif en 720x240 (ratio 3:1) — contraint par `h-[50px] w-auto`.
+		name: 'ListBulb',
+		href: 'https://www.listbulb.com/tools/mockiosa',
+		img: 'https://www.listbulb.com/featured-on-listbulb-light.svg',
+		width: 720,
+		height: 240,
+		alt: 'Mockiosa — Featured on ListBulb',
+	},
 ]
 
 export default function FeaturedPage() {

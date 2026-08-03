@@ -116,6 +116,12 @@ const ITEMS: Item[] = [
 		img: 'https://www.launchit.site/badges/launchit-light.svg',
 		alt: 'Mockiosa — Featured on Launchit',
 	},
+	{
+		name: 'ListBulb',
+		href: 'https://www.listbulb.com/tools/mockiosa',
+		img: 'https://www.listbulb.com/featured-on-listbulb-light.svg',
+		alt: 'Mockiosa — Featured on ListBulb',
+	},
 ]
 
 function badge(f: Item, key: string, hidden: boolean) {
